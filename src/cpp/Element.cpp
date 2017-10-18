@@ -9,7 +9,7 @@
 /*****************************************************************************/
 
 #include <algorithm>
-
+#include <climits>
 #include "Element.h"
 
 //  Calculate the column height, used with the skyline storage scheme
