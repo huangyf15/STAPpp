@@ -3,7 +3,7 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <climits>
 
 #include "Node.h"
 #include "Material.h"
@@ -52,11 +53,14 @@ public:
 //!	Constructor
 	CElement() : NEN(0), nodes(NULL), ElementMaterial(NULL) {};
 
+//! Virtual deconstructor
+    virtual ~CElement();
+
 //!	Read element data from stream Input
 	virtual bool Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNode* NodeList) = 0;
 
-//!	Write element data to stream OutputFile
-	virtual void Write(ofstream& OutputFile, unsigned int Ele) = 0;
+//!	Write element data to stream
+	virtual void Write(COutputter& output, unsigned int Ele) = 0;
 
 //! Generate location matrix: the global equation number that corresponding to each DOF of the element
 //	Caution:  Equation number is numbered from 1 !

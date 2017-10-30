@@ -3,12 +3,14 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
 #pragma once
+
+#include "Outputter.h"
 
 #include <iostream>
 #include <fstream>
@@ -43,13 +45,13 @@ public:
 //!	Read nodal point data from stream Input
 	bool Read(ifstream& Input, unsigned int np);
 
-//!	Output nodal point data to stream OutputFile
-	void Write(ofstream& OutputFile, unsigned int np);
+//!	Output nodal point data to stream
+	void Write(COutputter& output, unsigned int np);
 
 //!	Output equation numbers of nodal point to stream OutputFile
-	void WriteEquationNo(ofstream& OutputFile, unsigned int np);
+	void WriteEquationNo(COutputter& OutputFile, unsigned int np);
 
 //!	Write nodal displacement
-	void WriteNodalDisplacement(ofstream& OutputFile, unsigned int np, double* Displacement);
+	void WriteNodalDisplacement(COutputter& OutputFile, unsigned int np, double* Displacement);
 
 };

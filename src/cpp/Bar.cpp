@@ -3,7 +3,7 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
@@ -31,8 +31,6 @@ CBar::CBar()
 //	Desconstructor
 CBar::~CBar()
 {
-	delete [] nodes;
-    delete [] LocationMatrix;
 }
 
 //	Read element data from stream Input
@@ -44,9 +42,9 @@ bool CBar::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNod
 
 	if (N != Ele + 1)
 	{
-		cout << "*** Error *** Elements must be inputted in order !" << endl 
-			 << "   Expected element : " << Ele + 1 << endl
-			 << "   Provided element : " << N << endl;
+		cerr << "*** Error *** Elements must be inputted in order !" << endl 
+			 << "    Expected element : " << Ele + 1 << endl
+			 << "    Provided element : " << N << endl;
 
 		return false;
 	}
@@ -62,13 +60,11 @@ bool CBar::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNod
 	return true;
 }
 
-//	Write element data to stream OutputFile
-void CBar::Write(ofstream& OutputFile, unsigned int Ele)
+//	Write element data to stream
+void CBar::Write(COutputter& output, unsigned int Ele)
 {
-	cout << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
-		 << setw(9) << nodes[1]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
-	OutputFile << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
-			   << setw(9) << nodes[1]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
+	output << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
+		   << setw(9) << nodes[1]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
 }
 
 //  Generate location matrix: the global equation number that corresponding to each DOF of the element

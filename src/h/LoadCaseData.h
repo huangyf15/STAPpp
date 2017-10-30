@@ -3,12 +3,14 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
 #pragma once
+
+#include "Outputter.h"
 
 #include <string>
 #include <fstream>
@@ -36,6 +38,6 @@ public:
 //!	Read load case data from stream Input
 	bool Read(ifstream& Input, unsigned int lcase);
 
-//!	Write load case data to stream OutputFile
-	void Write(ofstream& OutputFile, unsigned int lcase);
+//!	Write load case data to stream
+	void Write(COutputter& output, unsigned int lcase);
 };

@@ -3,7 +3,7 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
@@ -23,9 +23,9 @@ bool CBarMaterial::Read(ifstream& Input, unsigned int mset)
 
 	if (nset != mset + 1)
 	{
-		cout << "*** Error *** Material sets must be inputted in order !" << endl 
-			 << "   Expected set : " << mset + 1 << endl
-			 << "   Provided set : " << nset << endl;
+		cerr << "*** Error *** Material sets must be inputted in order !" << endl 
+			 << "    Expected set : " << mset + 1 << endl
+			 << "    Provided set : " << nset << endl;
 
 		return false;
 	}
@@ -35,9 +35,8 @@ bool CBarMaterial::Read(ifstream& Input, unsigned int mset)
 	return true;
 }
 
-//	Write material data to Stream OutputFile
-void CBarMaterial::Write(ofstream& OutputFile, unsigned int mset)
+//	Write material data to Stream
+void CBarMaterial::Write(COutputter& output, unsigned int mset)
 {
-	cout << setw(5) << mset+1 << setw(16) << E << setw(16) << Area << endl;
-	OutputFile << setw(5) << mset+1 << setw(16) << E  << setw(16) << Area << endl;
+	output << setw(5) << mset+1 << setw(16) << E << setw(16) << Area << endl;
 }

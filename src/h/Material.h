@@ -3,12 +3,14 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
 #pragma once
+
+#include "Outputter.h"
 
 #include <stddef.h>
 #include <iostream>
@@ -28,11 +30,14 @@ public:
 
 public:
 
+//! Virtual deconstructor
+    virtual ~CMaterial() {};
+
 //!	Read material data from stream Input
 	virtual bool Read(ifstream& Input, unsigned int mset) = 0;
 
-//!	Write material data to Stream OutputFile
-    virtual void Write(ofstream& OutputFile, unsigned int mset) = 0;
+//!	Write material data to Stream
+    virtual void Write(COutputter& output, unsigned int mset) = 0;
 
 };
 
@@ -48,6 +53,6 @@ public:
 //!	Read material data from stream Input
 	virtual bool Read(ifstream& Input, unsigned int mset);
 
-//!	Write material data to Stream OutputFile
-	virtual void Write(ofstream& OutputFile, unsigned int mset);
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
 };

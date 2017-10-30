@@ -3,7 +3,7 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
@@ -51,9 +51,9 @@ void CLDLTSolver::LDLT()
 
         if (fabs(K(j,j)) <= FLT_MIN)
         {
-            cout << "*** Error *** Stiffness matrix is not positive definite !" << endl
-            << "    Euqation no = " << j << endl
-            << "    Pivot = " << K(j,j) << endl;
+            cerr << "*** Error *** Stiffness matrix is not positive definite !" << endl
+            	 << "    Euqation no = " << j << endl
+            	 << "    Pivot = " << K(j,j) << endl;
             
             exit(4);
         }

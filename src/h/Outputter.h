@@ -3,7 +3,7 @@
 /*     Computational Dynamics Laboratory                                     */
 /*     School of Aerospace Engineering, Tsinghua University                  */
 /*                                                                           */
-/*     Release 1.0, October 14, 2017                                         */
+/*     Release 1.02, October 27, 2017                                        */
 /*                                                                           */
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
@@ -41,7 +41,7 @@ public:
 	static COutputter* Instance(string FileName = " ");
 
 //!	Output current time and date
-	void PrintTime(const struct tm * ptm, ostream& output);
+	void PrintTime(const struct tm * ptm, COutputter& output);
 
 //!	Output logo and heading 
 	void OutputHeading();
@@ -69,6 +69,23 @@ public:
 
 //!	Print total system data
 	void OutputTotalSystemData();
+
+//! Overload the operator <<
+	template <typename T>
+	COutputter& operator<<(const T& item) 
+	{
+		std::cout << item;
+		OutputFile << item;
+		return *this;
+	}
+
+	typedef std::basic_ostream<char, std::char_traits<char> > CharOstream;
+	COutputter& operator<<(CharOstream& (*op)(CharOstream&)) 
+	{
+		op(std::cout);
+		op(OutputFile);
+		return *this;
+	}
 
 #ifdef _DEBUG_
 
