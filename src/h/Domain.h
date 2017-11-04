@@ -16,7 +16,7 @@
 
 #include "Node.h"
 #include "ElementGroup.h"
-#include "Bar.h"
+#include "Elements/Bar.h"
 #include "Outputter.h"
 #include "Solver.h"
 #include "LoadCaseData.h"

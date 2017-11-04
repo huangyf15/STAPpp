@@ -15,7 +15,7 @@
 #include "Element.h"
 #include "Material.h"
 #include "Node.h"
-#include "Bar.h"
+#include "Elements/Bar.h"
 
 using namespace std;
 
