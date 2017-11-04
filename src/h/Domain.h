@@ -15,8 +15,8 @@
 #include <vector>
 
 #include "Node.h"
-#include "Bar.h"
 #include "ElementGroup.h"
+#include "Bar.h"
 #include "Outputter.h"
 #include "Solver.h"
 #include "LoadCaseData.h"

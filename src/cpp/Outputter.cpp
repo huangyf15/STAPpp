@@ -143,7 +143,7 @@ void COutputter::OutputElementInfo()
 		*this << " E L E M E N T   D E F I N I T I O N" << endl
 			  << endl;
 
-		unsigned int ElementType = FEMData->GetEleGrpList()[EleGrp].GetElementType();
+		ElementTypes ElementType = FEMData->GetEleGrpList()[EleGrp].GetElementType();
 		unsigned int NUME = FEMData->GetEleGrpList()[EleGrp].GetNUME();
 
 		*this << " ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =" << setw(5)
@@ -159,7 +159,7 @@ void COutputter::OutputElementInfo()
 
 		switch (ElementType)
 		{
-		case 1: // Bar element
+		case ElementTypes::Bar: // Bar element
 			PrintBarElementData(EleGrp);
 			break;
 		}
@@ -272,11 +272,11 @@ void COutputter::OutputElementStress()
 
 		CElementGroup* EleGrpList = &FEMData->GetEleGrpList()[EleGrp];
 		unsigned int NUME = EleGrpList->GetNUME();
-		unsigned int ElementType = EleGrpList->GetElementType();
+		ElementTypes ElementType = EleGrpList->GetElementType();
 
 		switch (ElementType)
 		{
-		case 1: // Bar element
+		case ElementTypes::Bar: // Bar element
 			*this << "  ELEMENT             FORCE            STRESS" << endl
 				  << "  NUMBER" << endl;
 

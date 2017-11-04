@@ -12,7 +12,6 @@
 #include <iostream>
 
 #include "Domain.h"
-#include "Bar.h"
 #include "Outputter.h"
 #include "Clock.h"
 
