@@ -13,9 +13,9 @@
 #include <fstream>
 
 #include "Element.h"
+#include "Elements/Bar.h"
 #include "Material.h"
 #include "Node.h"
-#include "Elements/Bar.h"
 
 using namespace std;
 
