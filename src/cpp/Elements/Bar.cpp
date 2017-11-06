@@ -8,7 +8,7 @@
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
-#include "Bar.h"
+#include "Elements/Bar.h"
 
 #include <iostream>
 #include <iomanip>

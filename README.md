@@ -1,3 +1,5 @@
+![](https://travis-ci.com/gwy15/STAPpp.svg?token=xVpBdFRd1VWbmgq6LXmh&branch=master)
+
 # stappp
 
 STAP++ is a C++ finite element method (FEM) code whose input/output data files are the same as STAP90. STAP90 is a FEM code in Fortran 90 provided by our textbook (Xiong Zhang, Tianshu Wang. Computational Dynamics, Tsinghau University Press, 2007; Xiong Zhang, Tianshu Wang, Yan Liu. Computational Dynamics (2nd edition), Tsinghau University Press, 2015)

@@ -9,7 +9,6 @@
 /*****************************************************************************/
 
 #include "Domain.h"
-#include "Bar.h"
 #include "Material.h"
 
 #include <iomanip>

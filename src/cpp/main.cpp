@@ -12,7 +12,6 @@
 #include <iostream>
 
 #include "Domain.h"
-#include "Bar.h"
 #include "Outputter.h"
 #include "Clock.h"
 
@@ -26,7 +25,10 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	string filename(argv[1]);
+    string filename(argv[1]);
+    if (filename.length() > 4 && filename.substr(filename.length()-4) == ".dat") {
+        filename = filename.substr(0, filename.find_last_of('.'));
+    }
 	string InFile = filename + ".dat";
 	string OutFile = filename + ".out";
 

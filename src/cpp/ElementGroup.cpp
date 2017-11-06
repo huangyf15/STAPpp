@@ -9,7 +9,6 @@
 /*****************************************************************************/
 
 #include "ElementGroup.h"
-#include "Bar.h"
 #include "Domain.h"
 
 CNode* CElementGroup::NodeList_ = nullptr;
@@ -23,7 +22,7 @@ CElementGroup::CElementGroup()
         NodeList_ = FEMData->GetNodeList();
     }
     
-    ElementType_ = 0;
+    ElementType_ = ElementTypes::UNDEFINED;
     
     NUME_ = 0;
     ElementList_ = nullptr;
@@ -45,11 +44,11 @@ CElementGroup::~CElementGroup()
 //! Read element group data from stream Input
 bool CElementGroup::Read(ifstream& Input)
 {
-    Input >> ElementType_ >> NUME_ >> NUMMAT_;
+    Input >> (int&)ElementType_ >> NUME_ >> NUMMAT_;
     
     switch (ElementType_)
     {
-        case 1:    // Bar element
+        case ElementTypes::Bar:    // Bar element
             if (!ReadBarElementData(Input))
                 return false;
             break;

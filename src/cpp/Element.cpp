@@ -9,7 +9,7 @@
 /*****************************************************************************/
 
 #include <algorithm>
-
+#include <climits>
 #include "Element.h"
 
 //! Virtual deconstructor
