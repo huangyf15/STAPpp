@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <cstddef>
 
 #include "Node.h"
 #include "ElementGroup.h"

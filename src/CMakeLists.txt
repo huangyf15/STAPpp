@@ -7,6 +7,8 @@ IF(STAP++_DEBUG)
    ADD_DEFINITIONS(-D_DEBUG_)
 ENDIF()
 
+add_compile_options(-std=c++11)
+
 INCLUDE_DIRECTORIES(h)
 INCLUDE_DIRECTORIES(h/Elements)
 
