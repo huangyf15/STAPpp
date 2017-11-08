@@ -83,11 +83,58 @@ void CTriangle::GenerateLocationMatrix()
 //  has 21 elements
 unsigned int CTriangle::SizeOfStiffnessMatrix() { return 45; }
 
+inline void normalize(double ptr[3])
+{
+    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] + ptr[2]));
+    ptr[0] /= sum;
+    ptr[1] /= sum;
+    ptr[2] /= sum;
+}
+
 //  Calculate element stiffness matrix
 //  Upper triangular matrix, stored as an array column by colum starting from the diagonal element
 void CTriangle::ElementStiffness(double* Matrix)
 {
-    // clear(Matrix, SizeOfStiffnessMatrix());
+    clear(Matrix, SizeOfStiffnessMatrix());
+
+    const CNode& n1 = *nodes[0];
+    const CNode& n2 = *nodes[1];
+    const CNode& n3 = *nodes[2];
+
+    // make p31 p21
+    double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
+    double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
+
+    // n = p31 cross p21 (normalized)
+    double const n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
+                         p31[0] * p21[1] - p31[1] * p21[0]};
+    double Aera = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+    n[0] /= Aera;
+    n[1] /= Aera;
+    n[2] /= Aera;
+    Aera /= 2.0;
+    // i = normalized p21
+    normalize(p21);
+    const auto& i = p21;
+    // j = n cross i
+    double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
+                         n[0] * i[1] - n[1] * i[0]};
+    // by here, a conversion matrix is formed,
+    // as (x', y') = ((i0, i1, i2), (j0, j1, j2)) . (x, y, z)
+
+    CTriangleMaterial* material =
+        dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
+
+    const double& E = material->E;
+    const double& v = material->nu;
+
+    double ke[21] = {
+        d * x32 * x32,
+        0,
+
+    }
+
+    // generate A as <xyz, ij>
 
     // //  Calculate bar length
     // double DX[3]; //  dx = x2-x1, dy = y2-y1, dz = z2-z1
