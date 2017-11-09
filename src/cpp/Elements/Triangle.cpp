@@ -91,6 +91,8 @@ inline void normalize(double ptr[3])
     ptr[2] /= sum;
 }
 
+inline double dot(double* p1, double* p2) { return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2]; }
+
 //  Calculate element stiffness matrix
 //  Upper triangular matrix, stored as an array column by colum starting from the diagonal element
 void CTriangle::ElementStiffness(double* Matrix)
@@ -104,82 +106,83 @@ void CTriangle::ElementStiffness(double* Matrix)
     // make p31 p21
     double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
     double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
+    double p32[3] = {n3.XYZ[0] - n2.XYZ[0], n3.XYZ[1] - n2.XYZ[1], n3.XYZ[2] - n2.XYZ[2]};
 
     // n = p31 cross p21 (normalized)
     double const n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
                          p31[0] * p21[1] - p31[1] * p21[0]};
+    // generate area and normalize n at the same time
     double Aera = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
     n[0] /= Aera;
     n[1] /= Aera;
     n[2] /= Aera;
     Aera /= 2.0;
     // i = normalized p21
-    normalize(p21);
-    const auto& i = p21;
+    // i is manually set parallel to p21 so that y21 = 0
+    double const i[3] = {p21[0], p21[1], p21[1]};
+    normalize(i);
     // j = n cross i
     double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
                          n[0] * i[1] - n[1] * i[0]};
+
     // by here, a conversion matrix is formed,
     // as (x', y') = ((i0, i1, i2), (j0, j1, j2)) . (x, y, z)
+
+    // form R = {
+    //  i0, i1, i2, 0,0,0, 0,0,0
+    //  j0, j1, j2, 0,0,0, 0,0,0
+    //  0,  0,  0,  [ i ],   0
+    //      0       [ j ],   0
+    //   ....
+    // }
+
+    //  consider Ke = R^T ke' R = R^T (A B^T D B) R, B = BB / (2*A)
+    // let M = (BB * R), then Ke = (1/4A) (M^T D M)
+    // to see how M is generated, see ../../memo/tri.nb, a mathematica file.
+
+    // generate M here
+    double x32 = dot(p32, i);
+    double y23 = -dot(p32, j) double x13 = -dot(p31, i);
+    double y31 = dot(p31, j);
+    double x21 = dot(p21, i);
+    // double y12 = -dot(p21, j); but notice y12 = 0
+    double M[27] =
+        {
+            i[0] * y23, i[1] * y23, i[2] * y23, i[0] * y31, i[1] * y31, i[2] * y31, 0, 0, 0,
+            // first row
+            j[0] * x32, j[1] * x32, j[2] * x32, j[0] * x13, j[1] * x13, j[2] * x13, j[0] * x21,
+            j[1] * x21, j[2] * x21,
+            // second row
+            i[0] * x32 + j[0] * y23, i[1] * x32 + j[1] * y23, i[2] * x32 + j[2] * y23,
+            i[0] * x13 + j[0] * y31, i[1] * x13 + j[1] * y31, i[2] * x13 + j[2] * y31, i[0] * x21,
+            i[1] * x21, i[2]* x21
+            // last row
+        }
 
     CTriangleMaterial* material =
         dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
 
     const double& E = material->E;
     const double& v = material->nu;
+    const double d_33 = (1 - v) / 2.0;
 
-    double ke[21] = {
-        d * x32 * x32,
-        0,
-
+    double ke[21];
+#ifdef m
+#error "macro m is predefined"
+#else
+#define m(ii, jj) (M[9 * (ii - 1) + (jj - 1)])
+    for (unsigned int i = 1; i <= 9; ++i)
+    {
+        for (unsigned int j = 1; j <= i; ++j)
+        {
+            // k_ij = m_ki d_kl m_lj
+            ke[i - 1 + (j * (j - 1) / 2)] = (
+                m(1, i) * (m(1, j) + v * m(2, j)) + 
+                m(2, i) * (m(2, j) + v * m(1, j)) + 
+                m(3, i) * m(3, j);
+        }
     }
-
-    // generate A as <xyz, ij>
-
-    // //  Calculate bar length
-    // double DX[3]; //  dx = x2-x1, dy = y2-y1, dz = z2-z1
-    // for (unsigned int i = 0; i < 3; i++)
-    //     DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-
-    // double DX2[6]; //  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
-    // DX2[0] = DX[0] * DX[0];
-    // DX2[1] = DX[1] * DX[1];
-    // DX2[2] = DX[2] * DX[2];
-    // DX2[3] = DX[0] * DX[1];
-    // DX2[4] = DX[1] * DX[2];
-    // DX2[5] = DX[0] * DX[2];
-
-    // double L2 = DX2[0] + DX2[1] + DX2[2];
-    // double L = sqrt(L2);
-
-    // //  Calculate element stiffness matrix
-
-    // CTriangleMaterial* material =
-    //     dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
-
-    // double k = material->E * material->Area / L / L2;
-
-    // Matrix[0] = k * DX2[0];
-    // Matrix[1] = k * DX2[1];
-    // Matrix[2] = k * DX2[3];
-    // Matrix[3] = k * DX2[2];
-    // Matrix[4] = k * DX2[4];
-    // Matrix[5] = k * DX2[5];
-    // Matrix[6] = k * DX2[0];
-    // Matrix[7] = -k * DX2[5];
-    // Matrix[8] = -k * DX2[3];
-    // Matrix[9] = -k * DX2[0];
-    // Matrix[10] = k * DX2[1];
-    // Matrix[11] = k * DX2[3];
-    // Matrix[12] = -k * DX2[4];
-    // Matrix[13] = -k * DX2[1];
-    // Matrix[14] = -k * DX2[3];
-    // Matrix[15] = k * DX2[2];
-    // Matrix[16] = k * DX2[4];
-    // Matrix[17] = k * DX2[5];
-    // Matrix[18] = -k * DX2[2];
-    // Matrix[19] = -k * DX2[4];
-    // Matrix[20] = -k * DX2[5];
+#undef m
 }
 
 //  Calculate element stress
