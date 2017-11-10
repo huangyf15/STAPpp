@@ -23,7 +23,7 @@ enum ElementTypes
 {
     UNDEFINED = 0,
     Bar,
-    Plane,
+    Quadrilateral,
     Triangle
 };
 
