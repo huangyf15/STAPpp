@@ -14,6 +14,7 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
+#include "Elements/Quadrilateral.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -61,6 +62,9 @@ public:
 
     //! Read bar element data from the input data file
     bool ReadBarElementData(ifstream& Input);
+
+    //! Read quadrilateral element data from the input data file
+    bool ReadQuadrilateralElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

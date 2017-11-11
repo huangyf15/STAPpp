@@ -162,6 +162,13 @@ void COutputter::OutputElementInfo()
 		case ElementTypes::Bar: // Bar element
 			PrintBarElementData(EleGrp);
 			break;
+		case ElementTypes::Quadrilateral:
+			PrintQuadrilateralElementData(EleGrp);
+			break;
+		default:
+			std::cerr << "unknown ElementType " << ElementType << std::endl;
+			exit(2);
+			break;
 		}
 	}
 }
@@ -198,6 +205,47 @@ void COutputter::PrintBarElementData(unsigned int EleGrp)
 		  << " NUMBER-N      I        J       SET NUMBER" << endl;
 
 	CBar* ElementList = dynamic_cast<CBar *>(ElementGroup->GetElementList());
+	unsigned int NUME = ElementGroup->GetNUME();
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < NUME; Ele++)
+		ElementList[Ele].Write(*this, Ele);
+
+	*this << endl;
+}
+//	Output quadrilateral element data
+void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup* ElementGroup = &FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup->GetNUMMAT();
+	CQuadrilateralMaterial* MaterialSet = dynamic_cast<CQuadrilateralMaterial *>(ElementGroup->GetMaterialList());
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		MaterialSet[mset].Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	CQuadrilateral* ElementList = dynamic_cast<CQuadrilateral*>(ElementGroup->GetElementList());
 	unsigned int NUME = ElementGroup->GetNUME();
 
 	//	Loop over for all elements in group EleGrp
@@ -295,6 +343,9 @@ void COutputter::OutputElementStress()
 
 			*this << endl;
 
+			break;
+		case ElementTypes::Quadrilateral:
+			*this << "Element Stress not finished yet." << std::endl;
 			break;
 
 		default: // Invalid element type

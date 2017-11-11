@@ -52,6 +52,11 @@ bool CElementGroup::Read(ifstream& Input)
             if (!ReadBarElementData(Input))
                 return false;
             break;
+
+        case ElementTypes::Quadrilateral:
+            if (!ReadQuadrilateralElementData(Input))
+                return false;
+            break;
             
         default:    // Invalid element type
             cerr << "*** Error *** Elment type " << ElementType_ <<  " has not been implemented.\n\n";
@@ -76,6 +81,30 @@ bool CElementGroup::ReadBarElementData(ifstream& Input)
 //  Read element data lines
     ElementList_ = new CBar[NUME_];    // Elements of gorup EleGrp
     CBar* elist = dynamic_cast<CBar*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+//  Read quadrilateral element data from the input data file
+bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CQuadrilateralMaterial[NUMMAT_];    // Materials for group EleGrp
+    CQuadrilateralMaterial* mlist = dynamic_cast<CQuadrilateralMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CQuadrilateral[NUME_];    // Elements of gorup EleGrp
+    CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
     
 //  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
