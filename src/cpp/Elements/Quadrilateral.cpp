@@ -95,8 +95,9 @@ void normalize(double vec[3])
     vec[2] /= length;
 }
 
-void AccumulateEtaPsi(const double& eta, const double& psi, const double& weight, const double* xe,
-                      const double* ye, double* ke, const double E, const double v)
+// returns |Je|
+double GenerateB(double B[24], const double eta, const double psi, const double xe[4],
+                 const double ye[4])
 {
     double GN4Q[8] = {
         (eta - 1) / 4, (1 - eta) / 4,  (1 + eta) / 4, (-eta - 1) / 4, // first row
@@ -127,12 +128,38 @@ void AccumulateEtaPsi(const double& eta, const double& psi, const double& weight
     };
 
     // size of B: 3 by 8
-    double B[24] = {
-        BB[0], 0,     BB[1], 0,     BB[2], 0,     BB[3], 0,     // first row
-        0,     BB[4], 0,     BB[5], 0,     BB[6], 0,     BB[7], // second row
-        BB[4], BB[0], BB[5], BB[1], BB[6], BB[2], BB[7], BB[3]  // last row
-    };
+    B[0] = BB[0];
+    B[1] = 0;
+    B[2] = BB[1];
+    B[3] = 0;
+    B[4] = BB[2];
+    B[5] = 0;
+    B[6] = BB[3];
+    B[7] = 0;
+    B[8] = 0;
+    B[9] = BB[4];
+    B[10] = 0;
+    B[11] = BB[5];
+    B[12] = 0;
+    B[13] = BB[6];
+    B[14] = 0;
+    B[15] = BB[7];
+    B[16] = BB[4];
+    B[17] = BB[0];
+    B[18] = BB[5];
+    B[19] = BB[1];
+    B[20] = BB[6];
+    B[21] = BB[2];
+    B[22] = BB[7];
+    B[23] = BB[3];
+    return DetJe;
+}
 
+void AccumulateEtaPsi(const double& eta, const double& psi, const double& weight, const double* xe,
+                      const double* ye, double* ke, const double E, const double v)
+{
+    double B[24];
+    double DetJe = GenerateB(B, eta, psi, xe, ye);
     const double d_33 = (1 - v) / 2.0;
     const double k = E / (1 - v * v) * std::abs(DetJe) * weight;
 
@@ -155,7 +182,8 @@ void AccumulateEtaPsi(const double& eta, const double& psi, const double& weight
     return;
 }
 
-void convert2d23d(const double* k, double* Matrix, const double* i, const double* j)
+// convert ke' to ke with R (input as i and j)
+void Convert2d23d(const double* k, double* Matrix, const double i[3], const double j[3])
 {
     // to see how these are generated, see ../../memo/4Q2d33d.nb and 4Q2d23d.py
     Matrix[0] = i[0] * (i[0] * k[0] + j[0] * k[1]) + j[0] * (i[0] * k[1] + j[0] * k[2]);
@@ -238,52 +266,60 @@ void convert2d23d(const double* k, double* Matrix, const double* i, const double
     Matrix[77] = i[2] * (i[0] * k[21] + j[0] * k[22]) + j[2] * (i[0] * k[28] + j[0] * k[29]);
 }
 
-//	Calculate element stiffness matrix
-//	Upper triangular matrix, stored as an array column by colum starting from the diagonal element
-void CQuadrilateral::ElementStiffness(double* Matrix)
+inline void Convert3d22d(CNode* nodes[4], double n[3], double i[3], double j[3], double xe[4],
+                         double ye[4])
 {
-    clear(Matrix, SizeOfStiffnessMatrix());
-
     const CNode& n1 = *nodes[0];
     const CNode& n2 = *nodes[1];
     const CNode& n3 = *nodes[2];
     const CNode& n4 = *nodes[3];
 
-    // =========================== 3d to 2d ============================
     // make p31 p21
     double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
     double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
     // double p32[3] = {n3.XYZ[0] - n2.XYZ[0], n3.XYZ[1] - n2.XYZ[1], n3.XYZ[2] - n2.XYZ[2]};
 
     // n = p31 cross p21 (normalized)
-    double n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
-                   p31[0] * p21[1] - p31[1] * p21[0]};
+    n[0] = p31[1] * p21[2] - p31[2] * p21[1];
+    n[1] = p31[2] * p21[0] - p31[0] * p21[2];
+    n[2] = p31[0] * p21[1] - p31[1] * p21[0];
     normalize(n);
 
     // i = normalized p21
     // i is manually set parallel to p21 so that y21 = 0
-    double i[3] = {p21[0], p21[1], p21[2]};
+    i[0] = p21[0];
+    i[1] = p21[1];
+    i[2] = p21[2];
     normalize(i);
     // j = n cross i
-    double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
-                         n[0] * i[1] - n[1] * i[0]};
+    j[0] = n[1] * i[2] - n[2] * i[1];
+    j[1] = n[2] * i[0] - n[0] * i[2];
+    j[2] = n[0] * i[1] - n[1] * i[0];
 
     // by here, a conversion matrix is formed,
     // as (x', y') = ((i0, i1, i2), (j0, j1, j2)) . (x, y, z)
 
     // generate xe, ye
-    double xe[4] = {
-        i[0] * n1.XYZ[0] + i[1] * n1.XYZ[1] + i[2] * n1.XYZ[2],
-        i[0] * n2.XYZ[0] + i[1] * n2.XYZ[1] + i[2] * n2.XYZ[2],
-        i[0] * n3.XYZ[0] + i[1] * n3.XYZ[1] + i[2] * n3.XYZ[2],
-        i[0] * n4.XYZ[0] + i[1] * n4.XYZ[1] + i[2] * n4.XYZ[2],
-    };
-    double ye[4] = {
-        j[0] * n1.XYZ[0] + j[1] * n1.XYZ[1] + j[2] * n1.XYZ[2],
-        j[0] * n2.XYZ[0] + j[1] * n2.XYZ[1] + j[2] * n2.XYZ[2],
-        j[0] * n3.XYZ[0] + j[1] * n3.XYZ[1] + j[2] * n3.XYZ[2],
-        j[0] * n4.XYZ[0] + j[1] * n4.XYZ[1] + j[2] * n4.XYZ[2],
-    };
+    xe[0] = i[0] * n1.XYZ[0] + i[1] * n1.XYZ[1] + i[2] * n1.XYZ[2];
+    xe[1] = i[0] * n2.XYZ[0] + i[1] * n2.XYZ[1] + i[2] * n2.XYZ[2];
+    xe[2] = i[0] * n3.XYZ[0] + i[1] * n3.XYZ[1] + i[2] * n3.XYZ[2];
+    xe[3] = i[0] * n4.XYZ[0] + i[1] * n4.XYZ[1] + i[2] * n4.XYZ[2];
+
+    ye[0] = j[0] * n1.XYZ[0] + j[1] * n1.XYZ[1] + j[2] * n1.XYZ[2];
+    ye[1] = j[0] * n2.XYZ[0] + j[1] * n2.XYZ[1] + j[2] * n2.XYZ[2];
+    ye[2] = j[0] * n3.XYZ[0] + j[1] * n3.XYZ[1] + j[2] * n3.XYZ[2];
+    ye[3] = j[0] * n4.XYZ[0] + j[1] * n4.XYZ[1] + j[2] * n4.XYZ[2];
+}
+
+//	Calculate element stiffness matrix
+//	Upper triangular matrix, stored as an array column by colum starting from the diagonal element
+void CQuadrilateral::ElementStiffness(double* Matrix)
+{
+    clear(Matrix, SizeOfStiffnessMatrix());
+
+    // =========================== 3d to 2d ============================
+    double n[3], i[3], j[3], xe[4], ye[4];
+    Convert3d22d(nodes, n, i, j, xe, ye);
 
     // =========================== assembly Ke' =========================
     // generate GN4Q for eta, psi
@@ -306,36 +342,59 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
 
     // ======================== assembly Ke (2d to 3d) ======================
 
-    convert2d23d(ke, Matrix, i, j);
+    Convert2d23d(ke, Matrix, i, j);
     return;
+}
+
+void CalculateStressAt(double eta, double psi, double xe[4], double ye[4], double E, double v,
+                       const double de[8], double* stress)
+{
+    // generate B first
+    double B[24];
+    GenerateB(B, eta, psi, xe, ye);
+
+    // see also 4Q2d23d.nb
+    double d33 = E / (1 - v * v);
+    stress[0] = B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6] +
+                v * (B[9] * de[1] + B[11] * de[3] + B[13] * de[5] + B[15] * de[7]);
+    stress[0] *= d33;
+    stress[1] = B[9] * de[1] + B[11] * de[3] + B[13] * de[5] +
+                v * (B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6]) + B[15] * de[7];
+    stress[1] *= d33;
+    stress[2] = d33 * (B[16] * de[0] + B[17] * de[1] + B[18] * de[2] + B[19] * de[3] +
+                       B[20] * de[4] + B[21] * de[5] + B[22] * de[6] + B[23] * de[7]);
+    stress[2] *= d33;
 }
 
 //	Calculate element stress
 void CQuadrilateral::ElementStress(double* stress, double* Displacement)
 {
-    // CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
-    //     ElementMaterial); // Pointer to material of the element
+    // =========================== 3d to 2d ============================
+    double n[3], i[3], j[3], xe[4], ye[4];
+    Convert3d22d(nodes, n, i, j, xe, ye);
 
-    // double DX[3];  //	dx = x2-x1, dy = y2-y1, dz = z2-z1
-    // double L2 = 0; //	Square of bar length (L^2)
+    // generate de
+    double de[8] = {Displacement[0] * i[0] + Displacement[1] * i[1] + Displacement[2] * i[2],
+                    Displacement[0] * j[0] + Displacement[1] * j[1] + Displacement[2] * j[2],
+                    Displacement[3] * i[0] + Displacement[4] * i[1] + Displacement[5] * i[2],
+                    Displacement[3] * j[0] + Displacement[4] * j[1] + Displacement[5] * j[2],
+                    Displacement[6] * i[0] + Displacement[7] * i[1] + Displacement[8] * i[2],
+                    Displacement[6] * j[0] + Displacement[7] * j[1] + Displacement[8] * j[2],
+                    Displacement[9] * i[0] + Displacement[10] * i[1] + Displacement[11] * i[2],
+                    Displacement[9] * j[0] + Displacement[10] * j[1] + Displacement[11] * j[2]};
 
-    // for (unsigned int i = 0; i < 3; i++)
-    // {
-    //     DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-    //     L2 = L2 + DX[i] * DX[i];
-    // }
+    // ======================= calculate stress ========================
+    CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
+        ElementMaterial); // Pointer to material of the element
+    const double& E = material->E;
+    const double& v = material->nu;
 
-    // double S[6];
-    // for (unsigned int i = 0; i < 3; i++)
-    // {
-    //     S[i] = -DX[i] * material->E / L2;
-    //     S[i + 3] = -S[i];
-    // }
+    double pos = 1 / std::sqrt(3.0f);
+    double etas[2] = {-pos, pos};
+    double psis[2] = {-pos, pos};
 
-    // *stress = 0.0;
-    // for (unsigned int i = 0; i < 6; i++)
-    // {
-    //     if (LocationMatrix[i])
-    //         *stress += S[i] * Displacement[LocationMatrix[i] - 1];
-    // }
+    CalculateStressAt(etas[0], psis[0], xe, ye, E, v, de, stress + 0);
+    CalculateStressAt(etas[0], psis[1], xe, ye, E, v, de, stress + 3);
+    CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, stress + 6);
+    CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, stress + 9);
 }

@@ -345,7 +345,25 @@ void COutputter::OutputElementStress()
 
 			break;
 		case ElementTypes::Quadrilateral:
-			*this << "Element Stress not finished yet." << std::endl;
+			*this << "  ELEMENT            STRESS" << endl
+				  << "  NUMBER" << endl;
+
+			double stresses[12];
+
+			for (unsigned int Ele = 0; Ele < NUME; Ele++)
+			{
+				CQuadrilateral* EleList = dynamic_cast<CQuadrilateral *>(EleGrpList->GetElementList());
+				EleList[Ele].ElementStress(stresses, Displacement);
+
+				*this << setw(5) << Ele + 1 << std::endl;
+				for (unsigned i=0; i<12; ++i) {
+					*this << setw(32) << stresses[i] << std::endl;
+				}
+				
+			}
+
+			*this << endl;
+
 			break;
 
 		default: // Invalid element type
