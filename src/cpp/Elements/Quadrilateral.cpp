@@ -96,96 +96,91 @@ void normalize(double vec[3])
 }
 
 // returns |Je|
-double GenerateB(double B[24], const double eta, const double psi, const double xe[4],
+// generate B
+double GenerateB(double B[8], const double eta, const double psi, const double xe[4],
                  const double ye[4])
 {
     double GN4Q[8] = {
         (eta - 1) / 4, (1 - eta) / 4,  (1 + eta) / 4, (-eta - 1) / 4, // first row
         (psi - 1) / 4, (-psi - 1) / 4, (1 + psi) / 4, (1 - psi) / 4   // second row
     };
-    double Je[2][2] = {
-        {GN4Q[0] * xe[0] + GN4Q[1] * xe[1] + GN4Q[2] * xe[2] + GN4Q[3] * xe[3],
-         GN4Q[0] * ye[0] + GN4Q[1] * ye[1] + GN4Q[2] * ye[2] + GN4Q[3] * ye[3]}, // first row
-        {GN4Q[4] * xe[0] + GN4Q[5] * xe[1] + GN4Q[6] * xe[2] + GN4Q[7] * xe[3],
-         GN4Q[4] * ye[0] + GN4Q[5] * ye[1] + GN4Q[6] * ye[2] + GN4Q[7] * ye[3]} // second row
+    // Je = GN4Q * [xe ye]
+    double Je[4] = {
+        GN4Q[0] * xe[0] + GN4Q[1] * xe[1] + GN4Q[2] * xe[2] + GN4Q[3] * xe[3],
+        GN4Q[0] * ye[0] + GN4Q[1] * ye[1] + GN4Q[2] * ye[2] + GN4Q[3] * ye[3], // first row
+        GN4Q[4] * xe[0] + GN4Q[5] * xe[1] + GN4Q[6] * xe[2] + GN4Q[7] * xe[3],
+        GN4Q[4] * ye[0] + GN4Q[5] * ye[1] + GN4Q[6] * ye[2] + GN4Q[7] * ye[3] // second row
     };
-    double DetJe = Je[0][0] * Je[1][1] - Je[0][1] * Je[1][0];
-    double JeI[2][2] = {
-        {Je[1][1] / DetJe, -Je[0][1] / DetJe}, // first row
-        {-Je[1][0] / DetJe, Je[0][0] / DetJe}  // second row
+    double DetJe = Je[0] * Je[3] - Je[1] * Je[2];
+    double JeI[4] = {
+        Je[3] / DetJe, -Je[1] / DetJe, // first row
+        -Je[2] / DetJe, Je[0] / DetJe  // second row
     };
 
     // generate [B] = Je^-1 * GN
-    double BB[8] = {
-        JeI[0][0] * GN4Q[0] + JeI[0][1] * GN4Q[4], // Be[1, 1]
-        JeI[0][0] * GN4Q[1] + JeI[0][1] * GN4Q[5], // Be[1, 2]
-        JeI[0][0] * GN4Q[2] + JeI[0][1] * GN4Q[6], // Be[1, 3]
-        JeI[0][0] * GN4Q[3] + JeI[0][1] * GN4Q[7], // first row end
-        JeI[1][0] * GN4Q[0] + JeI[1][1] * GN4Q[4], // Be[2, 1]
-        JeI[1][0] * GN4Q[1] + JeI[1][1] * GN4Q[5], // Be[2, 2]
-        JeI[1][0] * GN4Q[2] + JeI[1][1] * GN4Q[6], // Be[2, 3]
-        JeI[1][0] * GN4Q[3] + JeI[1][1] * GN4Q[7]  // second row
-    };
+    B[0] = JeI[0] * GN4Q[0] + JeI[1] * GN4Q[4]; // Be[1, 1]
+    B[1] = JeI[0] * GN4Q[1] + JeI[1] * GN4Q[5]; // Be[1, 2]
+    B[2] = JeI[0] * GN4Q[2] + JeI[1] * GN4Q[6]; // Be[1, 3]
+    B[3] = JeI[0] * GN4Q[3] + JeI[1] * GN4Q[7]; // first row end
+    B[4] = JeI[2] * GN4Q[0] + JeI[3] * GN4Q[4]; // Be[2, 1]
+    B[5] = JeI[2] * GN4Q[1] + JeI[3] * GN4Q[5]; // Be[2, 2]
+    B[6] = JeI[2] * GN4Q[2] + JeI[3] * GN4Q[6]; // Be[2, 3]
+    B[7] = JeI[2] * GN4Q[3] + JeI[3] * GN4Q[7]; // second row
 
-    // size of B: 3 by 8
-    B[0] = BB[0];
-    B[1] = 0;
-    B[2] = BB[1];
-    B[3] = 0;
-    B[4] = BB[2];
-    B[5] = 0;
-    B[6] = BB[3];
-    B[7] = 0;
-    B[8] = 0;
-    B[9] = BB[4];
-    B[10] = 0;
-    B[11] = BB[5];
-    B[12] = 0;
-    B[13] = BB[6];
-    B[14] = 0;
-    B[15] = BB[7];
-    B[16] = BB[4];
-    B[17] = BB[0];
-    B[18] = BB[5];
-    B[19] = BB[1];
-    B[20] = BB[6];
-    B[21] = BB[2];
-    B[22] = BB[7];
-    B[23] = BB[3];
     return DetJe;
 }
 
 void AccumulateEtaPsi(const double& eta, const double& psi, const double& weight, const double* xe,
                       const double* ye, double* ke, const double E, const double v)
 {
-    double B[24];
+    double B[8];
     double DetJe = GenerateB(B, eta, psi, xe, ye);
-    const double d_33 = (1 - v) / 2.0;
-    const double k = E / (1 - v * v) * std::abs(DetJe) * weight;
+    const double d33 = (1 - v) / 2.0;
+    const double cof = E / (1 - v * v) * std::abs(DetJe) * weight;
 
-#ifdef b
-#error "macro b is predefined"
-#else
-#define b(ii, jj) (B[8 * (ii - 1) + (jj - 1)])
-#endif
-    for (unsigned int j = 1; j <= 8; ++j)
-    {
-        for (unsigned int i = 1; i <= j; ++i)
-        {
-            // k_ij = B_ki d_kl B_lj
-            ke[i - 1 + (j * (j - 1) / 2)] += k * (b(1, i) * (b(1, j) + v * b(2, j))   // merge 1, v
-                                                  + b(2, i) * (b(2, j) + v * b(1, j)) // merge v, 1
-                                                  + d_33 * b(3, i) * b(3, j));
-        }
-    }
-#undef b
-    return;
+    // see 4Q.nb and 4Q-form-key.py
+    ke[0] += cof * (B[0] * B[0] + d33 * B[4] * B[4]);
+    ke[1] += cof * (d33 * B[0] * B[4] + v * B[0] * B[4]);
+    ke[2] += cof * (d33 * B[0] * B[0] + B[4] * B[4]);
+    ke[3] += cof * (B[0] * B[1] + d33 * B[4] * B[5]);
+    ke[4] += cof * (v * B[1] * B[4] + d33 * B[0] * B[5]);
+    ke[5] += cof * (B[1] * B[1] + d33 * B[5] * B[5]);
+    ke[6] += cof * (d33 * B[1] * B[4] + v * B[0] * B[5]);
+    ke[7] += cof * (d33 * B[0] * B[1] + B[4] * B[5]);
+    ke[8] += cof * (d33 * B[1] * B[5] + v * B[1] * B[5]);
+    ke[9] += cof * (d33 * B[1] * B[1] + B[5] * B[5]);
+    ke[10] += cof * (B[0] * B[2] + d33 * B[4] * B[6]);
+    ke[11] += cof * (v * B[2] * B[4] + d33 * B[0] * B[6]);
+    ke[12] += cof * (B[1] * B[2] + d33 * B[5] * B[6]);
+    ke[13] += cof * (v * B[2] * B[5] + d33 * B[1] * B[6]);
+    ke[14] += cof * (B[2] * B[2] + d33 * B[6] * B[6]);
+    ke[15] += cof * (d33 * B[2] * B[4] + v * B[0] * B[6]);
+    ke[16] += cof * (d33 * B[0] * B[2] + B[4] * B[6]);
+    ke[17] += cof * (d33 * B[2] * B[5] + v * B[1] * B[6]);
+    ke[18] += cof * (d33 * B[1] * B[2] + B[5] * B[6]);
+    ke[19] += cof * (d33 * B[2] * B[6] + v * B[2] * B[6]);
+    ke[20] += cof * (d33 * B[2] * B[2] + B[6] * B[6]);
+    ke[21] += cof * (B[0] * B[3] + d33 * B[4] * B[7]);
+    ke[22] += cof * (v * B[3] * B[4] + d33 * B[0] * B[7]);
+    ke[23] += cof * (B[1] * B[3] + d33 * B[5] * B[7]);
+    ke[24] += cof * (v * B[3] * B[5] + d33 * B[1] * B[7]);
+    ke[25] += cof * (B[2] * B[3] + d33 * B[6] * B[7]);
+    ke[26] += cof * (v * B[3] * B[6] + d33 * B[2] * B[7]);
+    ke[27] += cof * (B[3] * B[3] + d33 * B[7] * B[7]);
+    ke[28] += cof * (d33 * B[3] * B[4] + v * B[0] * B[7]);
+    ke[29] += cof * (d33 * B[0] * B[3] + B[4] * B[7]);
+    ke[30] += cof * (d33 * B[3] * B[5] + v * B[1] * B[7]);
+    ke[31] += cof * (d33 * B[1] * B[3] + B[5] * B[7]);
+    ke[32] += cof * (d33 * B[3] * B[6] + v * B[2] * B[7]);
+    ke[33] += cof * (d33 * B[2] * B[3] + B[6] * B[7]);
+    ke[34] += cof * (d33 * B[3] * B[7] + v * B[3] * B[7]);
+    ke[35] += cof * (d33 * B[3] * B[3] + B[7] * B[7]);
 }
 
 // convert ke' to ke with R (input as i and j)
 void Convert2d23d(const double* k, double* Matrix, const double i[3], const double j[3])
 {
-    // to see how these are generated, see ../../memo/4Q2d33d.nb and 4Q2d23d.py
+    // to see how these are generated, see ../../memo/4Q.nb and 4Q2d23d.py
     Matrix[0] = i[0] * (i[0] * k[0] + j[0] * k[1]) + j[0] * (i[0] * k[1] + j[0] * k[2]);
     Matrix[1] = i[1] * (i[1] * k[0] + j[1] * k[1]) + j[1] * (i[1] * k[1] + j[1] * k[2]);
     Matrix[2] = i[1] * (i[0] * k[0] + j[0] * k[1]) + j[1] * (i[0] * k[1] + j[0] * k[2]);
@@ -266,6 +261,7 @@ void Convert2d23d(const double* k, double* Matrix, const double i[3], const doub
     Matrix[77] = i[2] * (i[0] * k[21] + j[0] * k[22]) + j[2] * (i[0] * k[28] + j[0] * k[29]);
 }
 
+// calculate n, i, j and xe, ye
 inline void Convert3d22d(CNode* nodes[4], double n[3], double i[3], double j[3], double xe[4],
                          double ye[4])
 {
@@ -324,7 +320,9 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
     // =========================== assembly Ke' =========================
     // generate GN4Q for eta, psi
 
-    double ke[36]; // for ke', size = (8, 8), number of elements = 8*9/2 = 36
+    double ke[36];
+    // for ke', size = (8, 8), number of elements = 8*9/2 = 36
+    // notice ke is cached column by column, from up to down.
     clear(ke, 36);
     double pos = 1 / std::sqrt(3.0f);
     double etas[2] = {-pos, pos};
@@ -350,21 +348,19 @@ void CalculateStressAt(double eta, double psi, double xe[4], double ye[4], doubl
                        const double de[8], double* stress)
 {
     // generate B first
-    double B[24];
+    double B[8];
     GenerateB(B, eta, psi, xe, ye);
 
-    // see also 4Q2d23d.nb
+    // see ../../memo/4Q/4Q.nb and ../../memo/4Q/4Q-calc-stress.py
     double d33 = (1.f - v) / 2.0f;
     double cof = E / (1 - v * v);
-    stress[0] = B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6] +
-                v * (B[9] * de[1] + B[11] * de[3] + B[13] * de[5] + B[15] * de[7]);
-    stress[0] *= cof;
-    stress[1] = B[9] * de[1] + B[11] * de[3] + B[13] * de[5] +
-                v * (B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6]) + B[15] * de[7];
-    stress[1] *= cof;
-    stress[2] = d33 * (B[16] * de[0] + B[17] * de[1] + B[18] * de[2] + B[19] * de[3] +
-                       B[20] * de[4] + B[21] * de[5] + B[22] * de[6] + B[23] * de[7]);
-    stress[2] *= cof;
+    stress[0] = cof * (B[0] * de[0] + B[1] * de[2] + B[2] * de[4] + B[3] * de[6] +
+                       v * (B[4] * de[1] + B[5] * de[3] + B[6] * de[5] + B[7] * de[7]));
+    stress[1] =
+        cof * (B[4] * de[1] + B[5] * de[3] + B[6] * de[5] +
+               v * (B[0] * de[0] + B[1] * de[2] + B[2] * de[4] + B[3] * de[6]) + B[7] * de[7]);
+    stress[2] = cof * (d33 * (B[4] * de[0] + B[0] * de[1] + B[5] * de[2] + B[1] * de[3] +
+                              B[6] * de[4] + B[2] * de[5] + B[7] * de[6] + B[3] * de[7]));
 }
 
 //	Calculate element stress
