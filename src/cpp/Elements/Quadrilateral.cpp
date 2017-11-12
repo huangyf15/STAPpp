@@ -354,16 +354,17 @@ void CalculateStressAt(double eta, double psi, double xe[4], double ye[4], doubl
     GenerateB(B, eta, psi, xe, ye);
 
     // see also 4Q2d23d.nb
-    double d33 = E / (1 - v * v);
+    double d33 = (1.f - v) / 2.0f;
+    double cof = E / (1 - v * v);
     stress[0] = B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6] +
                 v * (B[9] * de[1] + B[11] * de[3] + B[13] * de[5] + B[15] * de[7]);
-    stress[0] *= d33;
+    stress[0] *= cof;
     stress[1] = B[9] * de[1] + B[11] * de[3] + B[13] * de[5] +
                 v * (B[0] * de[0] + B[2] * de[2] + B[4] * de[4] + B[6] * de[6]) + B[15] * de[7];
-    stress[1] *= d33;
+    stress[1] *= cof;
     stress[2] = d33 * (B[16] * de[0] + B[17] * de[1] + B[18] * de[2] + B[19] * de[3] +
                        B[20] * de[4] + B[21] * de[5] + B[22] * de[6] + B[23] * de[7]);
-    stress[2] *= d33;
+    stress[2] *= cof;
 }
 
 //	Calculate element stress
@@ -373,15 +374,26 @@ void CQuadrilateral::ElementStress(double* stress, double* Displacement)
     double n[3], i[3], j[3], xe[4], ye[4];
     Convert3d22d(nodes, n, i, j, xe, ye);
 
+    // form d first
+    double d[12];
+    for (unsigned index = 0; index < 12; ++index)
+    {
+        if (LocationMatrix[index])
+        {
+            d[index] = Displacement[LocationMatrix[index] - 1];
+        }
+        else
+        {
+            d[index] = 0;
+        }
+    }
+
     // generate de
-    double de[8] = {Displacement[0] * i[0] + Displacement[1] * i[1] + Displacement[2] * i[2],
-                    Displacement[0] * j[0] + Displacement[1] * j[1] + Displacement[2] * j[2],
-                    Displacement[3] * i[0] + Displacement[4] * i[1] + Displacement[5] * i[2],
-                    Displacement[3] * j[0] + Displacement[4] * j[1] + Displacement[5] * j[2],
-                    Displacement[6] * i[0] + Displacement[7] * i[1] + Displacement[8] * i[2],
-                    Displacement[6] * j[0] + Displacement[7] * j[1] + Displacement[8] * j[2],
-                    Displacement[9] * i[0] + Displacement[10] * i[1] + Displacement[11] * i[2],
-                    Displacement[9] * j[0] + Displacement[10] * j[1] + Displacement[11] * j[2]};
+    double de[8] = {
+        d[0] * i[0] + d[1] * i[1] + d[2] * i[2],   d[0] * j[0] + d[1] * j[1] + d[2] * j[2],
+        d[3] * i[0] + d[4] * i[1] + d[5] * i[2],   d[3] * j[0] + d[4] * j[1] + d[5] * j[2],
+        d[6] * i[0] + d[7] * i[1] + d[8] * i[2],   d[6] * j[0] + d[7] * j[1] + d[8] * j[2],
+        d[9] * i[0] + d[10] * i[1] + d[11] * i[2], d[9] * j[0] + d[10] * j[1] + d[11] * j[2]};
 
     // ======================= calculate stress ========================
     CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
