@@ -18,8 +18,8 @@ CElement::~CElement()
     if (!nodes)
         delete [] nodes;
     
-    if (!ElementMaterial)
-        delete [] ElementMaterial;
+    // if (!ElementMaterial)
+    //     delete [] ElementMaterial;
 
     if (!LocationMatrix)
         delete [] LocationMatrix;
