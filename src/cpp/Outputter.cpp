@@ -354,12 +354,19 @@ void COutputter::OutputElementStress()
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
-                *this << "    ELEMENT   GAUSS P       GPX          GPY           GPZ       "
-					  << "        SX'X'       SY'Y'        SX'Y'    "
+                *this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+					  << "                       GUASS POINTS STRESSES"
 					  #ifdef __TEST__
-					  << "            ux           uy           uz            weight"
+					  << "                      GUASS POINTS DISPLACEMENTS            INTEGRATE"
 					  #endif
-                      << endl << "     NUMBER    INDEX" << endl;
+                      << endl;
+                *this << "     NUMBER    INDEX        X             Y             Z" 
+                      << "               SX'X'         SY'Y'        SX'Y'"
+                      #ifdef __TEST__
+                      << "              UX            UY           UZ            WEIGHTS"
+                      #endif
+                      
+                      << endl;
 				CQuadrilateral* EleList = dynamic_cast<CQuadrilateral *>(EleGrpList->GetElementList());
 				#ifndef __TEST__
 				EleList[Ele].ElementStress(stresses, Displacement, Positions);
