@@ -7,6 +7,11 @@ IF(STAP++_DEBUG)
    ADD_DEFINITIONS(-D_DEBUG_)
 ENDIF()
 
+OPTION(STAP++_TEST "Output test infomation to validate." OFF)
+IF(STAP++_TEST)
+    ADD_DEFINITIONS(-D__TEST__)
+ENDIF()
+
 add_compile_options(-std=c++11)
 
 INCLUDE_DIRECTORIES(h)
