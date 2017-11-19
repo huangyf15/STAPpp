@@ -186,7 +186,7 @@ void CDomain::CalculateColumnHeights()
 	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
     {
         CElementGroup* ElemengGrp = &EleGrpList[EleGrp];
-        unsigned int NUME = ElemengGrp->GetNUME();
+        const unsigned int NUME = ElemengGrp->GetNUME();
         CElement* ElementList = ElemengGrp->GetElementList();
         
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
@@ -239,7 +239,7 @@ void CDomain::AssembleStiffnessMatrix()
 	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
 	{
         CElementGroup* ElemengGrp = &EleGrpList[EleGrp];
-        unsigned int NUME = ElemengGrp->GetNUME();
+        const unsigned int NUME = ElemengGrp->GetNUME();
         CElement* ElementList = ElemengGrp->GetElementList();
 
 		unsigned int size = ElementList[0].SizeOfStiffnessMatrix();
@@ -249,7 +249,7 @@ void CDomain::AssembleStiffnessMatrix()
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)
 			ElementList[Ele].assembly(Matrix, StiffnessMatrix);
 
-		delete Matrix;
+		delete[] Matrix;
 		Matrix = nullptr;
 	}
 
@@ -266,7 +266,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 	if (LoadCase > NLCASE) 
 		return false;
 
-	CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
+	const CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
 
 //	Loop over for all concentrated loads in load case LoadCase
 	for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)

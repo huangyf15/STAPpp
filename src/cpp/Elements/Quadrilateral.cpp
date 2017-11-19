@@ -262,7 +262,7 @@ void Convert2d23d(const double* k, double* Matrix, const double i[3], const doub
 }
 
 // calculate n, i, j and xe, ye
-inline void Convert3d22d(CNode* nodes[4], double n[3], double i[3], double j[3], double xe[4],
+inline void Convert3d22d(CNode* const nodes[4], double n[3], double i[3], double j[3], double xe[4],
                          double ye[4])
 {
     const CNode& n1 = *nodes[0];
@@ -271,8 +271,8 @@ inline void Convert3d22d(CNode* nodes[4], double n[3], double i[3], double j[3],
     const CNode& n4 = *nodes[3];
 
     // make p31 p21
-    double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
-    double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
+    const double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
+    const double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
     // double p32[3] = {n3.XYZ[0] - n2.XYZ[0], n3.XYZ[1] - n2.XYZ[1], n3.XYZ[2] - n2.XYZ[2]};
 
     // n = p31 cross p21 (normalized)
@@ -324,12 +324,12 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
     // for ke', size = (8, 8), number of elements = 8*9/2 = 36
     // notice ke is cached column by column, from up to down.
     clear(ke, 36);
-    double pos = 1 / std::sqrt(3.0f);
-    double etas[2] = {-pos, pos};
-    double psis[2] = {-pos, pos};
-    double weights[2][2] = {{1.0, 1.0}, {1.0, 1.0}};
+    const double pos = 1 / std::sqrt(3.0f);
+    const double etas[2] = {-pos, pos};
+    const double psis[2] = {-pos, pos};
+    const double weights[2][2] = {{1.0, 1.0}, {1.0, 1.0}};
 
-    CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
+    const CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
         ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
@@ -353,7 +353,7 @@ void CalculateStressAt(double eta, double psi, double xe[4], double ye[4], doubl
 
     // see ../../memo/4Q/4Q.nb and ../../memo/4Q/4Q-calc-stress.py
     double d33 = (1.f - v) / 2.0f;
-    double cof = E / (1 - v * v);
+    const double cof = E / (1 - v * v);
     stress[0] = cof * (B[0] * de[0] + B[1] * de[2] + B[2] * de[4] + B[3] * de[6] +
                        v * (B[4] * de[1] + B[5] * de[3] + B[6] * de[5] + B[7] * de[7]));
     stress[1] =

@@ -109,7 +109,7 @@ void CBar::ElementStiffness(double* Matrix)
 
 	CBarMaterial* material = dynamic_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
 
-	double k = material->E * material->Area / L / L2;
+	const double k = material->E * material->Area / L / L2;
 
 	Matrix[0] = k*DX2[0];
 	Matrix[1] = k*DX2[1];

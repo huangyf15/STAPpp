@@ -19,7 +19,7 @@
 #include "Clock.h"
 
 // Constructor
-Clock::Clock() 
+Clock::Clock():t0_(0)
 { 
 	ct_ = 0;  
 	st0_ = st1_ = false; 
@@ -79,7 +79,7 @@ void Clock::Clear()
 // Return the elapsed time since the clock started
 double Clock::ElapsedTime() 
 {
-	double elapsed;
+	double elapsed = 0.0f;
 
 	if (!st0_) {
 		cerr << "\n*** Error *** In Clock :: ElapsedTime()";

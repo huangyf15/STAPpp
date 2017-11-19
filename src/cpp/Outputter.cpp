@@ -205,7 +205,7 @@ void COutputter::PrintBarElementData(unsigned int EleGrp)
 		  << " NUMBER-N      I        J       SET NUMBER" << endl;
 
 	CBar* ElementList = dynamic_cast<CBar *>(ElementGroup->GetElementList());
-	unsigned int NUME = ElementGroup->GetNUME();
+	const unsigned int NUME = ElementGroup->GetNUME();
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < NUME; Ele++)
@@ -246,7 +246,7 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
 
 	CQuadrilateral* ElementList = dynamic_cast<CQuadrilateral*>(ElementGroup->GetElementList());
-	unsigned int NUME = ElementGroup->GetNUME();
+	const unsigned int NUME = ElementGroup->GetNUME();
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < NUME; Ele++)
@@ -310,7 +310,7 @@ void COutputter::OutputElementStress()
 
 	double* Displacement = FEMData->GetDisplacement();
 
-	unsigned int NUMEG = FEMData->GetNUMEG();
+	const unsigned int NUMEG = FEMData->GetNUMEG();
 
 	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
 	{
@@ -319,7 +319,7 @@ void COutputter::OutputElementStress()
 			  << endl;
 
 		CElementGroup* EleGrpList = &FEMData->GetEleGrpList()[EleGrp];
-		unsigned int NUME = EleGrpList->GetNUME();
+		const unsigned int NUME = EleGrpList->GetNUME();
 		ElementTypes ElementType = EleGrpList->GetElementType();
 
 		switch (ElementType)
