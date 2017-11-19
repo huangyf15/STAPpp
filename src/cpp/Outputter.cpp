@@ -389,7 +389,6 @@ void COutputter::OutputElementStress()
 					*this << std::endl;
 				}
 			}
-			exit(0);
 			*this << endl;
 
 			break;
