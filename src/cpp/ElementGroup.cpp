@@ -103,7 +103,7 @@ bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
             return false;
     
 //  Read element data lines
-    ElementList_ = new CQuadrilateral[NUME_];    // Elements of gorup EleGrp
+    ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
     CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
     
 //  Loop over for all elements in this element group

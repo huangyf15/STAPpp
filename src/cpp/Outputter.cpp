@@ -345,23 +345,38 @@ void COutputter::OutputElementStress()
 
 			break;
 		case ElementTypes::Quadrilateral:
-			*this << "  ELEMENT            STRESS" << endl
-				  << "  NUMBER" << endl;
-
 			double stresses[12];
+			double Positions[12];
+			#ifdef __TEST__
+			double GaussDisplacements[12];
+			double weights[4];
+			#endif
 
-			for (unsigned int Ele = 0; Ele < NUME; Ele++)
-			{
+            for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            {
+                *this << "    ELEMENT   GAUSS P       GPX          GPY           GPZ       "
+					  << "        SX'X'       SY'Y'        SX'Y'    " << endl
+					  #ifdef __TEST__
+					  << "   ux      uy      uz     "
+					  #endif
+                      << "     NUMBER    INDEX" << endl;
 				CQuadrilateral* EleList = dynamic_cast<CQuadrilateral *>(EleGrpList->GetElementList());
-				EleList[Ele].ElementStress(stresses, Displacement);
+				#ifndef __TEST__
+				EleList[Ele].ElementStress(stresses, Displacement, Positions);
+				#else
+				EleList[Ele].ElementStress(stresses, Displacement, Positions, GaussDisplacements, weights);
+				#endif
 
-				*this << setw(5) << Ele + 1 << std::endl;
-				for (unsigned i=0; i<12; ++i) {
-					*this << setw(32) << stresses[i] << std::endl;
+				for (unsigned i=0; i<4; ++i) { // four gauss points
+					*this << setw(8) << Ele + 1;
+					*this << setw(10) << i+1;
+					*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
+					*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+					// *this << setw(32) << stresses[i] << std::endl;
+					*this << std::endl;
 				}
-				
 			}
-
+			exit(0);
 			*this << endl;
 
 			break;

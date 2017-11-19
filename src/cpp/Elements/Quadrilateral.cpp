@@ -363,14 +363,73 @@ void CalculateStressAt(double eta, double psi, double xe[4], double ye[4], doubl
                               B[6] * de[4] + B[2] * de[5] + B[7] * de[6] + B[3] * de[7]));
 }
 
+void CalculateN(double eta, double psi, double N[4])
+{
+    N[0] = (1 - psi) * (1 - eta) / 4.;
+    N[1] = (1 + psi) * (1 - eta) / 4.;
+    N[2] = (1 + psi) * (1 + eta) / 4.;
+    N[3] = (1 - psi) * (1 + eta) / 4.;
+}
+
+// generate 3d position and return weight
+void CalculatePositionAt(double eta, double psi, double xe[4], double ye[4], double i[3],
+                         double j[3], double Positions[3])
+{
+    double N[4];
+    CalculateN(eta, psi, N);
+    // generate local x
+    double x2d = N[0] * xe[0] + N[1] * xe[1] + N[2] * xe[2] + N[3] * xe[3];
+    double y2d = N[0] * ye[0] + N[1] * ye[1] + N[2] * ye[2] + N[3] * ye[3];
+
+    // convert to 3d
+    Positions[0] = i[0] * x2d + j[0] * y2d;
+    Positions[1] = i[1] * x2d + j[1] * y2d;
+    Positions[2] = i[2] * x2d + j[2] * y2d;
+}
+
+void CalculateDisplacementAt(double eta, double psi, double de[8], double i[3], double j[3],
+                             double Displacements[3])
+{
+    double N[4];
+    CalculateN(eta, psi, N);
+    double ux = N[0] * de[0] + N[1] * de[2] + N[2] * de[4] + N[3] * de[6];
+    double uy = N[0] * de[1] + N[1] * de[3] + N[2] * de[5] + N[3] * de[7];
+    Displacements[0] = i[0] * ux + j[0] * uy;
+    Displacements[1] = i[1] * ux + j[1] * uy;
+    Displacements[2] = i[2] * ux + j[2] * uy;
+}
+
+double CalculateWeightAt(double eta, double psi, double xe[4], double ye[4])
+{
+    double GN4Q[8] = {
+        (eta - 1) / 4, (1 - eta) / 4,  (1 + eta) / 4, (-eta - 1) / 4, // first row
+        (psi - 1) / 4, (-psi - 1) / 4, (1 + psi) / 4, (1 - psi) / 4   // second row
+    };
+    // Je = GN4Q * [xe ye]
+    double Je[4] = {
+        GN4Q[0] * xe[0] + GN4Q[1] * xe[1] + GN4Q[2] * xe[2] + GN4Q[3] * xe[3],
+        GN4Q[0] * ye[0] + GN4Q[1] * ye[1] + GN4Q[2] * ye[2] + GN4Q[3] * ye[3], // first row
+        GN4Q[4] * xe[0] + GN4Q[5] * xe[1] + GN4Q[6] * xe[2] + GN4Q[7] * xe[3],
+        GN4Q[4] * ye[0] + GN4Q[5] * ye[1] + GN4Q[6] * ye[2] + GN4Q[7] * ye[3] // second row
+    };
+    return std::abs(Je[0] * Je[3] - Je[1] * Je[2]);
+}
+
 //	Calculate element stress
-void CQuadrilateral::ElementStress(double* stress, double* Displacement)
+// stress:              double[12], represent 3 stress for 4 gauss points in CQuadrilateral element.
+// Displacement:        double[NEQ], represent the Force vector.
+// Positions:           double[12], represent 3d position for 4 gauss points.
+// GaussDisplacements:  double[12], represent 3d displacements for 4 gauss points.
+// Weights:             double[4], represent integrate weights.
+void CQuadrilateral::ElementStress(double stress[12], double* Displacement, double Positions[12],
+                                   double GaussDisplacements[12], double weights[4])
 {
     // =========================== 3d to 2d ============================
     double n[3], i[3], j[3], xe[4], ye[4];
     Convert3d22d(nodes, n, i, j, xe, ye);
 
-    // form d first
+    // form d first.
+    // d represent 3d displacements at boundary nodes.
     double d[12];
     for (unsigned index = 0; index < 12; ++index)
     {
@@ -384,7 +443,7 @@ void CQuadrilateral::ElementStress(double* stress, double* Displacement)
         }
     }
 
-    // generate de
+    // generate de, convert from 3d to 2d.
     double de[8] = {
         d[0] * i[0] + d[1] * i[1] + d[2] * i[2],   d[0] * j[0] + d[1] * j[1] + d[2] * j[2],
         d[3] * i[0] + d[4] * i[1] + d[5] * i[2],   d[3] * j[0] + d[4] * j[1] + d[5] * j[2],
@@ -401,8 +460,27 @@ void CQuadrilateral::ElementStress(double* stress, double* Displacement)
     double etas[2] = {-pos, pos};
     double psis[2] = {-pos, pos};
 
+    // calculate Positions
+    CalculatePositionAt(etas[0], psis[0], xe, ye, i, j, Positions + 0);
+    CalculatePositionAt(etas[0], psis[1], xe, ye, i, j, Positions + 3);
+    CalculatePositionAt(etas[1], psis[0], xe, ye, i, j, Positions + 6);
+    CalculatePositionAt(etas[1], psis[1], xe, ye, i, j, Positions + 9);
+
+    // calculate stresses
     CalculateStressAt(etas[0], psis[0], xe, ye, E, v, de, stress + 0);
     CalculateStressAt(etas[0], psis[1], xe, ye, E, v, de, stress + 3);
     CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, stress + 6);
     CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, stress + 9);
+
+#ifdef __TEST__
+    CalculateDisplacementAt(etas[0], psis[0], de, i, j, GaussDisplacements + 0);
+    CalculateDisplacementAt(etas[0], psis[1], de, i, j, GaussDisplacements + 3);
+    CalculateDisplacementAt(etas[1], psis[0], de, i, j, GaussDisplacements + 6);
+    CalculateDisplacementAt(etas[1], psis[1], de, i, j, GaussDisplacements + 9);
+
+    weights[0] = 1.0 * CalculateWeightAt(etas[0], psis[0], xe, ye);
+    weights[1] = 1.0 * CalculateWeightAt(etas[0], psis[1], xe, ye);
+    weights[2] = 1.0 * CalculateWeightAt(etas[1], psis[0], xe, ye);
+    weights[3] = 1.0 * CalculateWeightAt(etas[1], psis[1], xe, ye);
+#endif
 }
