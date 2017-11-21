@@ -66,8 +66,12 @@ public:
 
     void CalculateMemberSize();
 
-    //! Read bar element data from the input data file
-    bool ReadBarElementData(ifstream& Input);
+    void AllocateElement(std::size_t size);
+
+    void AllocateMaterial(std::size_t size);
+
+    //! Read element data from the input data file
+    bool ReadElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }
