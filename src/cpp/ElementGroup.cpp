@@ -63,7 +63,7 @@ void CElementGroup::CalculateMemberSize()
             MaterialSize_ = sizeof(CBarMaterial);
             break;
         default:
-            std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::SetElementType." << std::endl;
+            std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
             break;
     }
@@ -90,7 +90,7 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             MaterialList_ = new CBarMaterial[size];
             break;
         default:
-            std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
+            std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
             exit(5);
     }
 }
