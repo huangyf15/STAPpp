@@ -41,14 +41,44 @@ CElementGroup::~CElementGroup()
         delete [] MaterialList_;
 }
 
+CElement& CElementGroup::GetElement(unsigned int index)
+{
+    return *(CElement*)((std::size_t)(ElementList_) + index*ElementSize_);
+}
+
+CMaterial& CElementGroup::GetMaterial(unsigned int index)
+{
+    return *(CMaterial*)((std::size_t)(MaterialList_) + index*MaterialSize_);
+}
+
+void CElementGroup::CalculateMemberSize()
+{
+    switch (ElementType_)
+    {
+        case ElementTypes::UNDEFINED:
+            std::cerr << "Setting element type to UNDEFINED." << std::endl;
+            exit(5);
+        case ElementTypes::Bar:
+            ElementSize_ = sizeof(CBar);
+            MaterialSize_ = sizeof(CBarMaterial);
+            break;
+        default:
+            std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::SetElementType." << std::endl;
+            exit(5);
+            break;
+    }
+}
+
 //! Read element group data from stream Input
 bool CElementGroup::Read(ifstream& Input)
 {
     Input >> (int&)ElementType_ >> NUME_ >> NUMMAT_;
     
+    CalculateMemberSize();
+
     switch (ElementType_)
     {
-        case ElementTypes::Bar:    // Bar element
+        case ElementTypes::Bar:    // Bar element       
             if (!ReadBarElementData(Input))
                 return false;
             break;

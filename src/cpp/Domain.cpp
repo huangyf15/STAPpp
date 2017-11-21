@@ -185,12 +185,11 @@ void CDomain::CalculateColumnHeights()
 
 	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
     {
-        CElementGroup* ElemengGrp = &EleGrpList[EleGrp];
-        unsigned int NUME = ElemengGrp->GetNUME();
-        CElement* ElementList = ElemengGrp->GetElementList();
+        CElementGroup& ElementGrp = EleGrpList[EleGrp];
+        unsigned int NUME = ElementGrp.GetNUME();
         
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
-			ElementList[Ele].CalculateColumnHeight(ColumnHeights);
+			ElementGrp.GetElement(Ele).CalculateColumnHeight(ColumnHeights);
     }
 
 //	Maximum half bandwidth ( = max(ColumnHeights) + 1 )
@@ -238,16 +237,15 @@ void CDomain::AssembleStiffnessMatrix()
 //	Loop over for all element groups
 	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
 	{
-        CElementGroup* ElemengGrp = &EleGrpList[EleGrp];
-        unsigned int NUME = ElemengGrp->GetNUME();
-        CElement* ElementList = ElemengGrp->GetElementList();
+        CElementGroup& ElementGrp = EleGrpList[EleGrp];
+        unsigned int NUME = ElementGrp.GetNUME();
 
-		unsigned int size = ElementList[0].SizeOfStiffnessMatrix();
+		unsigned int size = ElementGrp.GetElement(0).SizeOfStiffnessMatrix();
 		double* Matrix = new double[size];
 
 //		Loop over for all elements in group EleGrp
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)
-			ElementList[Ele].assembly(Matrix, StiffnessMatrix);
+			ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix);
 
 		delete Matrix;
 		Matrix = nullptr;
