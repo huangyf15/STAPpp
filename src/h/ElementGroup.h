@@ -38,6 +38,11 @@ private:
     //! Element type of this group
     ElementTypes ElementType_;
 
+    //! Element size of this group
+    std::size_t ElementSize_;
+
+    std::size_t MaterialSize_;
+
     //! Number of elements in this group
     unsigned int NUME_;
 
@@ -60,8 +65,14 @@ public:
     //! Read element group data from stream Input
     bool Read(ifstream& Input);
 
-    //! Read bar element data from the input data file
-    bool ReadBarElementData(ifstream& Input);
+    void CalculateMemberSize();
+
+    void AllocateElement(std::size_t size);
+
+    void AllocateMaterial(std::size_t size);
+
+    //! Read element data from the input data file
+    bool ReadElementData(ifstream& Input);
 
     //! Read quadrilateral element data from the input data file
     bool ReadQuadrilateralElementData(ifstream& Input);
@@ -72,12 +83,10 @@ public:
     //! Return the number of elements in the group
     unsigned int GetNUME() { return NUME_; }
 
-    //! Return element List in this group
-    CElement* GetElementList() { return ElementList_; }
+    CElement& GetElement(unsigned int index);
+
+    CMaterial& GetMaterial(unsigned int index);
 
     //! Return the number of material/section property setss in this element group
     unsigned int GetNUMMAT() { return NUMMAT_; }
-
-    //! Return material list in this group
-    CMaterial* GetMaterialList() { return MaterialList_; }
 };
