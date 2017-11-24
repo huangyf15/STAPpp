@@ -362,7 +362,8 @@ void COutputter::OutputElementStress()
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					#ifndef __TEST__
-					EleGrp.GetElement(Ele).ElementStress(stresses, Displacement, Positions);
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
 					#else
 					dynamic_cast<CQuadrilateral&>(
 						EleGrp.GetElement(Ele)).ElementStress(
