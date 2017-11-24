@@ -19,7 +19,7 @@ using namespace std;
 //  Constructor
 CTriangle::CTriangle()
 {
-    NEN = 3; // Each element has 2 nodes
+    NEN = 3; // Each element has 3 nodes
     nodes = new CNode*[NEN];
 
     ND = 9;
@@ -52,9 +52,9 @@ bool CTriangle::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets,
 
     Input >> N1 >> N2 >> N3 >> MSet;
     ElementMaterial = dynamic_cast<CTriangleMaterial*>(MaterialSets) + MSet - 1;
-    nodes[0] = &NodeList[N1 - 1];
-    nodes[1] = &NodeList[N2 - 1];
-    nodes[2] = &NodeList[N3 - 1];
+    nodes[0] = NodeList + N1 - 1;
+    nodes[1] = NodeList + N2 - 1;
+    nodes[2] = NodeList + N3 - 1;
 
     return true;
 }
@@ -79,9 +79,11 @@ void CTriangle::GenerateLocationMatrix()
 }
 
 //  Return the size of the element stiffness matrix (stored as an array column by column)
-//  For 2 node bar element, element stiffness is a 6x6 matrix, whose upper triangular part
-//  has 21 elements
-unsigned int CTriangle::SizeOfStiffnessMatrix() { return 45; }
+unsigned int CTriangle::SizeOfStiffnessMatrix()
+{
+    return 45;
+    // 9 * 10 / 2
+}
 
 inline void normalize(double ptr[3])
 {
@@ -91,7 +93,56 @@ inline void normalize(double ptr[3])
     ptr[2] /= sum;
 }
 
-inline double dot(double* p1, double* p2) { return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2]; }
+inline double dot(const double* p1, const double* p2) { return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2]; }
+
+void Convert2d23d(const double* ke, double* Matrix, const double i[3], const double j[3])
+{
+    Matrix[0] = i[0] * (i[0] * ke[0] + j[0] * ke[2]) + j[0] * j[0] * ke[1];
+    Matrix[1] = i[1] * (i[1] * ke[0] + j[1] * ke[2]) + j[1] * j[1] * ke[1];
+    Matrix[2] = j[0] * j[1] * ke[1] + i[0] * (i[1] * ke[0] + j[1] * ke[2]);
+    Matrix[3] = i[2] * i[2] * ke[0] + j[2] * j[2] * ke[1] + i[2] * j[2] * ke[2];
+    Matrix[4] = j[1] * j[2] * ke[1] + i[1] * (i[2] * ke[0] + j[2] * ke[2]);
+    Matrix[5] = j[0] * j[2] * ke[1] + i[0] * (i[2] * ke[0] + j[2] * ke[2]);
+    Matrix[6] = i[0] * i[0] * ke[3] + j[0] * j[0] * ke[6] + i[0] * j[0] * ke[7];
+    Matrix[7] = i[0] * (j[2] * ke[4] + i[2] * ke[5]) + j[0] * (j[2] * ke[8] + i[2] * ke[9]);
+    Matrix[8] = i[0] * (j[1] * ke[4] + i[1] * ke[5]) + j[0] * (j[1] * ke[8] + i[1] * ke[9]);
+    Matrix[9] = i[0] * i[0] * ke[5] + j[0] * j[0] * ke[8] + i[0] * j[0] * (ke[4] + ke[9]);
+    Matrix[10] = i[1] * i[1] * ke[3] + j[1] * j[1] * ke[6] + i[1] * j[1] * ke[7];
+    Matrix[11] = j[0] * j[1] * ke[6] + i[0] * (i[1] * ke[3] + j[1] * ke[7]);
+    Matrix[12] = i[1] * (j[2] * ke[4] + i[2] * ke[5]) + j[1] * (j[2] * ke[8] + i[2] * ke[9]);
+    Matrix[13] = i[1] * i[1] * ke[5] + j[1] * j[1] * ke[8] + i[1] * j[1] * (ke[4] + ke[9]);
+    Matrix[14] = j[0] * (i[1] * ke[4] + j[1] * ke[8]) + i[0] * (i[1] * ke[5] + j[1] * ke[9]);
+    Matrix[15] = i[2] * i[2] * ke[3] + j[2] * j[2] * ke[6] + i[2] * j[2] * ke[7];
+    Matrix[16] = j[1] * j[2] * ke[6] + i[1] * (i[2] * ke[3] + j[2] * ke[7]);
+    Matrix[17] = j[0] * j[2] * ke[6] + i[0] * (i[2] * ke[3] + j[2] * ke[7]);
+    Matrix[18] = i[2] * i[2] * ke[5] + j[2] * j[2] * ke[8] + i[2] * j[2] * (ke[4] + ke[9]);
+    Matrix[19] = j[1] * (i[2] * ke[4] + j[2] * ke[8]) + i[1] * (i[2] * ke[5] + j[2] * ke[9]);
+    Matrix[20] = j[0] * (i[2] * ke[4] + j[2] * ke[8]) + i[0] * (i[2] * ke[5] + j[2] * ke[9]);
+    Matrix[21] = i[0] * i[0] * ke[10] + j[0] * j[0] * ke[15] + i[0] * j[0] * ke[16];
+    Matrix[22] = i[0] * (j[2] * ke[11] + i[2] * ke[12]) + j[0] * (j[2] * ke[17] + i[2] * ke[18]);
+    Matrix[23] = i[0] * (j[1] * ke[11] + i[1] * ke[12]) + j[0] * (j[1] * ke[17] + i[1] * ke[18]);
+    Matrix[24] = i[0] * i[0] * ke[12] + j[0] * j[0] * ke[17] + i[0] * j[0] * (ke[11] + ke[18]);
+    Matrix[25] = i[0] * (j[2] * ke[13] + i[2] * ke[14]) + j[0] * (j[2] * ke[19] + i[2] * ke[20]);
+    Matrix[26] = i[0] * (j[1] * ke[13] + i[1] * ke[14]) + j[0] * (j[1] * ke[19] + i[1] * ke[20]);
+    Matrix[27] = i[0] * i[0] * ke[14] + j[0] * j[0] * ke[19] + i[0] * j[0] * (ke[13] + ke[20]);
+    Matrix[28] = i[1] * i[1] * ke[10] + j[1] * j[1] * ke[15] + i[1] * j[1] * ke[16];
+    Matrix[29] = j[0] * j[1] * ke[15] + i[0] * (i[1] * ke[10] + j[1] * ke[16]);
+    Matrix[30] = i[1] * (j[2] * ke[11] + i[2] * ke[12]) + j[1] * (j[2] * ke[17] + i[2] * ke[18]);
+    Matrix[31] = i[1] * i[1] * ke[12] + j[1] * j[1] * ke[17] + i[1] * j[1] * (ke[11] + ke[18]);
+    Matrix[32] = j[0] * (i[1] * ke[11] + j[1] * ke[17]) + i[0] * (i[1] * ke[12] + j[1] * ke[18]);
+    Matrix[33] = i[1] * (j[2] * ke[13] + i[2] * ke[14]) + j[1] * (j[2] * ke[19] + i[2] * ke[20]);
+    Matrix[34] = i[1] * i[1] * ke[14] + j[1] * j[1] * ke[19] + i[1] * j[1] * (ke[13] + ke[20]);
+    Matrix[35] = j[0] * (i[1] * ke[13] + j[1] * ke[19]) + i[0] * (i[1] * ke[14] + j[1] * ke[20]);
+    Matrix[36] = i[2] * i[2] * ke[10] + j[2] * j[2] * ke[15] + i[2] * j[2] * ke[16];
+    Matrix[37] = j[1] * j[2] * ke[15] + i[1] * (i[2] * ke[10] + j[2] * ke[16]);
+    Matrix[38] = j[0] * j[2] * ke[15] + i[0] * (i[2] * ke[10] + j[2] * ke[16]);
+    Matrix[39] = i[2] * i[2] * ke[12] + j[2] * j[2] * ke[17] + i[2] * j[2] * (ke[11] + ke[18]);
+    Matrix[40] = j[1] * (i[2] * ke[11] + j[2] * ke[17]) + i[1] * (i[2] * ke[12] + j[2] * ke[18]);
+    Matrix[41] = j[0] * (i[2] * ke[11] + j[2] * ke[17]) + i[0] * (i[2] * ke[12] + j[2] * ke[18]);
+    Matrix[42] = i[2] * i[2] * ke[14] + j[2] * j[2] * ke[19] + i[2] * j[2] * (ke[13] + ke[20]);
+    Matrix[43] = j[1] * (i[2] * ke[13] + j[2] * ke[19]) + i[1] * (i[2] * ke[14] + j[2] * ke[20]);
+    Matrix[44] = j[0] * (i[2] * ke[13] + j[2] * ke[19]) + i[0] * (i[2] * ke[14] + j[2] * ke[20]);
+}
 
 //  Calculate element stiffness matrix
 //  Upper triangular matrix, stored as an array column by colum starting from the diagonal element
@@ -109,80 +160,62 @@ void CTriangle::ElementStiffness(double* Matrix)
     double p32[3] = {n3.XYZ[0] - n2.XYZ[0], n3.XYZ[1] - n2.XYZ[1], n3.XYZ[2] - n2.XYZ[2]};
 
     // n = p31 cross p21 (normalized)
-    double const n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
+    double n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
                          p31[0] * p21[1] - p31[1] * p21[0]};
     // generate area and normalize n at the same time
-    double Aera = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
-    n[0] /= Aera;
-    n[1] /= Aera;
-    n[2] /= Aera;
-    Aera /= 2.0;
-    // i = normalized p21
-    // i is manually set parallel to p21 so that y21 = 0
-    double const i[3] = {p21[0], p21[1], p21[1]};
+    double Area = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+    n[0] /= Area;
+    n[1] /= Area;
+    n[2] /= Area;
+    Area /= 2.0;
+    // i = normalized p21, so that y21 = 0
+    double i[3] = {p21[0], p21[1], p21[1]};
     normalize(i);
     // j = n cross i
     double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
                          n[0] * i[1] - n[1] * i[0]};
 
-    // by here, a conversion matrix is formed,
-    // as (x', y') = ((i0, i1, i2), (j0, j1, j2)) . (x, y, z)
-
-    // form R = {
-    //  i0, i1, i2, 0,0,0, 0,0,0
-    //  j0, j1, j2, 0,0,0, 0,0,0
-    //  0,  0,  0,  [ i ],   0
-    //      0       [ j ],   0
-    //   ....
-    // }
-
-    //  consider Ke = R^T ke' R = R^T (A B^T D B) R, B = BB / (2*A)
-    // let M = (BB * R), then Ke = (1/4A) (M^T D M)
-    // to see how M is generated, see ../../memo/tri.nb, a mathematica file.
-
     // generate M here
     double x32 = dot(p32, i);
-    double y23 = -dot(p32, j) double x13 = -dot(p31, i);
+    double y23 = -dot(p32, j);
+    double x13 = -dot(p31, i);
     double y31 = dot(p31, j);
     double x21 = dot(p21, i);
-    // double y12 = -dot(p21, j); but notice y12 = 0
-    double M[27] =
-        {
-            i[0] * y23, i[1] * y23, i[2] * y23, i[0] * y31, i[1] * y31, i[2] * y31, 0, 0, 0,
-            // first row
-            j[0] * x32, j[1] * x32, j[2] * x32, j[0] * x13, j[1] * x13, j[2] * x13, j[0] * x21,
-            j[1] * x21, j[2] * x21,
-            // second row
-            i[0] * x32 + j[0] * y23, i[1] * x32 + j[1] * y23, i[2] * x32 + j[2] * y23,
-            i[0] * x13 + j[0] * y31, i[1] * x13 + j[1] * y31, i[2] * x13 + j[2] * y31, i[0] * x21,
-            i[1] * x21, i[2]* x21
-            // last row
-        }
 
-    CTriangleMaterial* material =
-        dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
+    CTriangleMaterial& material =
+        *dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
 
-    const double& E = material->E;
-    const double& v = material->nu;
-    const double d_33 = (1 - v) / 2.0;
+    auto E = material.E;
+    auto v = material.nu;
 
     double ke[21];
-#ifdef m
-#error "macro m is predefined"
-#else
-#define m(ii, jj) (M[9 * (ii - 1) + (jj - 1)])
-    for (unsigned int i = 1; i <= 9; ++i)
-    {
-        for (unsigned int j = 1; j <= i; ++j)
-        {
-            // k_ij = m_ki d_kl m_lj
-            ke[i - 1 + (j * (j - 1) / 2)] = (
-                m(1, i) * (m(1, j) + v * m(2, j)) + 
-                m(2, i) * (m(2, j) + v * m(1, j)) + 
-                m(3, i) * m(3, j);
-        }
-    }
-#undef m
+    double cof = E / (8 * Area * (1 - v * v));
+    double va = 1 - v;
+
+    // ke is stored down to up
+    ke[0] = cof * (va * (x32 * x32) + 2 * (y23 * y23));
+    ke[1] = cof * (2 * (x32 * x32) + va * (y23 * y23));
+    ke[2] = cof * ((1 + v) * x32 * y23);
+    ke[3] = cof * (va * (x13 * x13) + 2 * (y31 * y31));
+    ke[4] = cof * (x13 * (y23 - v * y23) + 2 * v * x32 * y31);
+    ke[5] = cof * (x13 * (x32 - v * x32) + 2 * y23 * y31);
+    ke[6] = cof * (2 * (x13 * x13) + va * (y31 * y31));
+    ke[7] = cof * ((1 + v) * x13 * y31);
+    ke[8] = cof * (2 * x13 * x32 + va * y23 * y31);
+    ke[9] = cof * (2 * v * x13 * y23 + va * x32 * y31);
+    ke[10] = cof * (va * (x21 * x21));
+    ke[11] = cof * (va * x21 * y31);
+    ke[12] = cof * (va * x13 * x21);
+    ke[13] = cof * (va * x21 * y23);
+    ke[14] = cof * (va * x21 * x32);
+    ke[15] = cof * (2 * (x21 * x21));
+    ke[16] = 0;
+    ke[17] = cof * (2 * x13 * x21);
+    ke[18] = cof * (2 * v * x21 * y31);
+    ke[19] = cof * (2 * x21 * x32);
+    ke[20] = cof * (2 * v * x21 * y23);
+
+    Convert2d23d(ke, Matrix, i, j);
 }
 
 //  Calculate element stress
