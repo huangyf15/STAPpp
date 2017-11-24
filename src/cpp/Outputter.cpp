@@ -162,6 +162,13 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Bar: // Bar element
 				PrintBarElementData(EleGrp);
 				break;
+			case ElementTypes::Quadrilateral:
+				PrintQuadrilateralElementData(EleGrp);
+				break;
+			default:
+				std::cerr << "unknown ElementType " << ElementType << std::endl;
+				exit(2);
+				break;
 		}
 	}
 }
@@ -196,7 +203,7 @@ void COutputter::PrintBarElementData(unsigned int EleGrp)
 	*this << " ELEMENT     NODE     NODE       MATERIAL" << endl
 		  << " NUMBER-N      I        J       SET NUMBER" << endl;
 
-	unsigned int NUME = ElementGroup.GetNUME();
+	const unsigned int NUME = ElementGroup.GetNUME();
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < NUME; Ele++)
@@ -204,6 +211,45 @@ void COutputter::PrintBarElementData(unsigned int EleGrp)
 
 	*this << endl;
 }
+
+//	Output quadrilateral element data
+void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
 
 //	Print load data
 void COutputter::OutputLoadInfo()
@@ -260,7 +306,7 @@ void COutputter::OutputElementStress()
 
 	double* Displacement = FEMData->GetDisplacement();
 
-	unsigned int NUMEG = FEMData->GetNUMEG();
+	const unsigned int NUMEG = FEMData->GetNUMEG();
 
 	for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
 	{
@@ -290,6 +336,55 @@ void COutputter::OutputElementStress()
 						<< stress << endl;
 				}
 
+				*this << endl;
+				break;
+			
+			case ElementTypes::Quadrilateral:
+				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+					<< "                       GUASS POINTS STRESSES"
+					#ifdef __TEST__
+					<< "                      GUASS POINTS DISPLACEMENTS            INTEGRATE"
+					#endif
+					<< endl;
+				*this << "     NUMBER    INDEX        X             Y             Z" 
+					<< "               SX'X'         SY'Y'        SX'Y'"
+					#ifdef __TEST__
+					<< "              UX            UY           UZ            WEIGHTS"
+					#endif
+					<< endl;
+				double stresses[12];
+				double Positions[12];
+				#ifdef __TEST__
+				double GaussDisplacements[12];
+				double weights[4];
+				#endif
+
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					#ifndef __TEST__
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
+					#else
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(
+							stresses, Displacement, Positions, GaussDisplacements, weights);
+					#endif
+
+					for (unsigned i=0; i<4; ++i) { // four gauss points
+						*this << setw(8) << Ele + 1;
+						*this << setw(10) << i+1;
+						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
+						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+						// *this << setw(32) << stresses[i] << std::endl;
+						#ifdef __TEST__
+						*this << setw(17) << GaussDisplacements[i*3] 
+							<< setw(14) << GaussDisplacements[i*3+1] 
+							<< setw(14) << GaussDisplacements[i*3+2];
+						*this << setw(15) << weights[i];
+						#endif
+						*this << std::endl;
+					}
+				}
 				*this << endl;
 
 				break;

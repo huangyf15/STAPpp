@@ -22,13 +22,13 @@ CSolver::CSolver(CSkylineMatrix<double>* K) : K(*K) {};
 // LDLT facterization
 void CLDLTSolver::LDLT()
 {
-	unsigned int N = K.dim();
+	const unsigned int N = K.dim();
     unsigned int* ColumnHeights = K.GetColumnHeights();   // Column Hights
 
 	for (unsigned int j = 2; j <= N; j++)      // Loop for column 2:n (Numbering starting from 1)
 	{
         // Row number of the first non-zero element in column j (Numbering starting from 1)
-		unsigned int mj = j - ColumnHeights[j-1];
+		const unsigned int mj = j - ColumnHeights[j-1];
         
 		for (unsigned int i = mj+1; i < j; i++)	// Loop for mj+1:j-1 (Numbering starting from 1)
 		{
@@ -63,8 +63,8 @@ void CLDLTSolver::LDLT()
 // Solve displacement by back substitution
 void CLDLTSolver::BackSubstitution(double* Force)
 {
-	unsigned int N = K.dim();
-    unsigned int* ColumnHeights = K.GetColumnHeights();   // Column Hights
+	const unsigned int N = K.dim();
+    const unsigned int* ColumnHeights = K.GetColumnHeights();   // Column Hights
 
 //	Reduce right-hand-side load vector (LV = R)
 	for (unsigned int i = 2; i <= N; i++)	// Loop for i=2:N (Numering starting from 1)
@@ -81,7 +81,7 @@ void CLDLTSolver::BackSubstitution(double* Force)
 
 	for (unsigned int j = N; j >= 2; j--)	// Loop for j=N:2
 	{
-        unsigned int mj = j - ColumnHeights[j-1];
+        const unsigned int mj = j - ColumnHeights[j-1];
 
 		for (unsigned int i = mj; i < j; i++)	// Loop for i=mj:j-1
 			Force[i-1] -= K(i,j) * Force[j-1];	// a_i = Vbar_i - sum_j(L_ij Vbar_j)
