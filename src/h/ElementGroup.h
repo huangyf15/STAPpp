@@ -14,6 +14,7 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
+#include "Elements/Triangle.h"
 #include "Material.h"
 #include "Node.h"
 

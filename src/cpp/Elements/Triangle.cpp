@@ -93,7 +93,10 @@ inline void normalize(double ptr[3])
     ptr[2] /= sum;
 }
 
-inline double dot(const double* p1, const double* p2) { return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2]; }
+inline double dot(const double* p1, const double* p2)
+{
+    return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2];
+}
 
 void Convert2d23d(const double* ke, double* Matrix, const double i[3], const double j[3])
 {
@@ -161,7 +164,7 @@ void CTriangle::ElementStiffness(double* Matrix)
 
     // n = p31 cross p21 (normalized)
     double n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
-                         p31[0] * p21[1] - p31[1] * p21[0]};
+                   p31[0] * p21[1] - p31[1] * p21[0]};
     // generate area and normalize n at the same time
     double Area = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
     n[0] /= Area;
@@ -219,31 +222,67 @@ void CTriangle::ElementStiffness(double* Matrix)
 }
 
 //  Calculate element stress
-void CTriangle::ElementStress(double* stress, double* Displacement)
+void CTriangle::ElementStress(double stress[3], double* Displacement)
 {
-    // CTriangleMaterial* material =
-    //     dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
+    const CNode& n1 = *nodes[0];
+    const CNode& n2 = *nodes[1];
+    const CNode& n3 = *nodes[2];
 
-    // double DX[3];  //  dx = x2-x1, dy = y2-y1, dz = z2-z1
-    // double L2 = 0; //  Square of bar length (L^2)
+    // make p31 p21
+    double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
+    double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
+    double p32[3] = {n3.XYZ[0] - n2.XYZ[0], n3.XYZ[1] - n2.XYZ[1], n3.XYZ[2] - n2.XYZ[2]};
 
-    // for (unsigned int i = 0; i < 3; i++)
-    // {
-    //     DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-    //     L2 = L2 + DX[i] * DX[i];
-    // }
+    // n = p31 cross p21 (normalized)
+    double n[3] = {p31[1] * p21[2] - p31[2] * p21[1], p31[2] * p21[0] - p31[0] * p21[2],
+                   p31[0] * p21[1] - p31[1] * p21[0]};
+    // generate area and normalize n at the same time
+    double Area = std::sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+    n[0] /= Area;
+    n[1] /= Area;
+    n[2] /= Area;
+    Area /= 2.0;
+    // i = normalized p21, so that y21 = 0
+    double i[3] = {p21[0], p21[1], p21[1]};
+    normalize(i);
+    // j = n cross i
+    double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
+                         n[0] * i[1] - n[1] * i[0]};
 
-    // double S[6];
-    // for (unsigned int i = 0; i < 3; i++)
-    // {
-    //     S[i] = -DX[i] * material->E / L2;
-    //     S[i + 3] = -S[i];
-    // }
+    // generate M here
+    double x32 = dot(p32, i);
+    double y23 = -dot(p32, j);
+    double x13 = -dot(p31, i);
+    double y31 = dot(p31, j);
+    double x21 = dot(p21, i);
 
-    // *stress = 0.0;
-    // for (unsigned int i = 0; i < 6; i++)
-    // {
-    //     if (LocationMatrix[i])
-    //         *stress += S[i] * Displacement[LocationMatrix[i] - 1];
-    // }
+    // form d first.
+    // d represent 3d displacements at boundary nodes.
+    double d[9];
+    for (unsigned index = 0; index < 9; ++index)
+    {
+        if (LocationMatrix[index])
+            d[index] = Displacement[LocationMatrix[index] - 1];
+        else
+            d[index] = 0;
+    }
+
+    double de[6] = {
+        i[0] * d[0] + i[1] * d[3] + i[2] * d[6],
+        j[0] * d[0] + j[1] * d[3] + j[2] * d[6], // node 1 (2d)
+        i[0] * d[1] + i[1] * d[4] + i[2] * d[7],
+        j[0] * d[1] + j[1] * d[4] + j[2] * d[7], // node 2 (2d)
+        i[0] * d[2] + i[1] * d[5] + i[2] * d[8],
+        j[0] * d[2] + j[1] * d[5] + j[2] * d[8] // node 3 (2d)
+    };
+
+    CTriangleMaterial& material = *dynamic_cast<CTriangleMaterial*>(ElementMaterial);
+
+    double v = material.nu;
+    double cof = material.E / (4 * Area * (1 - v * v));
+
+    stress[0] =
+        2 * cof * (y23 * de[0] + y31 * de[2] + v * (x32 * de[1] + x13 * de[3] + x21 * de[5]));
+    stress[1] = 2 * (v * y23 * de[0] + x32 * de[1] + v * y31 * de[2] + x13 * de[3] + x21 * de[5]);
+    stress[2] = (1 - v) * (x32 * de[0] + y23 * de[1] + x13 * de[2] + y31 * de[3] + x21 * de[4]);
 }
