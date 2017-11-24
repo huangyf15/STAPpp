@@ -294,6 +294,22 @@ void COutputter::OutputElementStress()
 
 				break;
 
+			case ElementTypes::Triangle:
+				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
+					  << "  NUMBER         SXX            SYY            SYY" << endl;
+				double stress3T[3];
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp.GetElement(Ele);
+					Element.ElementStress(stress3T, Displacement);
+					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
+
+					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
+					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+				}
+				*this << endl;
+				break;
+
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
 					<< " has not been implemented.\n\n";
