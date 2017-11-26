@@ -52,4 +52,12 @@ bool CPlate::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CN
 	return true;
 }
 
+void CPlate::Write(COutputter& output, unsigned int Ele)
+{
+	output << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
+		   << setw(9) << nodes[1]->NodeNumber << setw(9) << nodes[2]->NodeNumber 
+		   << setw(9) << nodes[3]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
+}
+
+
 /*to be continued*/
