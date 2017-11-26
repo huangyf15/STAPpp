@@ -120,6 +120,23 @@ public:
 	double n2;// y component of y' axis
 	double n3;// z component of y' axis
 
+	public:
+	
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};
+
+class CPlateMaterial : public CMaterial
+{
+public:
+
+	double h; //thickness or height
+
+	double nu; // Poisson's ratio
+
 public:
 	
 //!	Read material data from stream Input
