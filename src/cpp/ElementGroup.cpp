@@ -119,7 +119,9 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::TimoshenkoEBMOD:
             ElementList_ = new CTimoshenkoEBMOD[size];
             break;
-
+        case ElementTypes::Plate:
+            ElementList_ = new CPlate[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -151,7 +153,9 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::TimoshenkoEBMOD:
             MaterialList_ = new CTimoshenkoMaterial[size];
             break;
-
+        case ElementTypes::Plate:
+            MaterialList_ = new CPlateMaterial[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
             exit(5);
@@ -188,6 +192,53 @@ bool CElementGroup::ReadElementData(ifstream& Input)
 //  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
         if (!GetElement(Ele).Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+//  Read quadrilateral element data from the input data file
+bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CQuadrilateralMaterial[NUMMAT_];    // Materials for group EleGrp
+    CQuadrilateralMaterial* mlist = dynamic_cast<CQuadrilateralMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
+    CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+bool CElementGroup::ReadPlateElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CPlateMaterial[NUMMAT_];    // Materials for group EleGrp
+    CPlateMaterial* mlist = dynamic_cast<CPlateMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CPlate[NUME_];    // Elements of group EleGrp
+    CPlate* elist = dynamic_cast<CPlate*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
             return false;
     
     return true;
