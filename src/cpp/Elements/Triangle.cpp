@@ -238,7 +238,7 @@ void CTriangle::ElementStress(double stress[3], double* Displacement)
     n[2] /= Area;
     Area /= 2.0;
     // i = normalized p21, so that y21 = 0
-    double i[3] = {p21[0], p21[1], p21[1]};
+    double i[3] = {p21[0], p21[1], p21[2]};
     normalize(i);
     // j = n cross i
     double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
@@ -263,12 +263,12 @@ void CTriangle::ElementStress(double stress[3], double* Displacement)
     }
 
     double de[6] = {
-        i[0] * d[0] + i[1] * d[3] + i[2] * d[6],
-        j[0] * d[0] + j[1] * d[3] + j[2] * d[6], // node 1 (2d)
-        i[0] * d[1] + i[1] * d[4] + i[2] * d[7],
-        j[0] * d[1] + j[1] * d[4] + j[2] * d[7], // node 2 (2d)
-        i[0] * d[2] + i[1] * d[5] + i[2] * d[8],
-        j[0] * d[2] + j[1] * d[5] + j[2] * d[8] // node 3 (2d)
+        i[0] * d[0] + i[1] * d[1] + i[2] * d[2],
+        j[0] * d[0] + j[1] * d[1] + j[2] * d[2], // node 1 (2d)
+        i[0] * d[3] + i[1] * d[4] + i[2] * d[5],
+        j[0] * d[3] + j[1] * d[4] + j[2] * d[5], // node 2 (2d)
+        i[0] * d[6] + i[1] * d[7] + i[2] * d[8],
+        j[0] * d[6] + j[1] * d[7] + j[2] * d[8] // node 3 (2d)
     };
 
     CTriangleMaterial& material = *dynamic_cast<CTriangleMaterial*>(ElementMaterial);
