@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <climits>
+#include <cmath>
 
 #include "Node.h"
 #include "Material.h"
@@ -26,6 +27,14 @@ using namespace std;
 class CDomain;
 
 template <class type> void clear( type* a, unsigned int N );	// Clear an array
+
+inline void normalize(double ptr[3])
+{
+    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] + ptr[2]));
+    ptr[0] /= sum;
+    ptr[1] /= sum;
+    ptr[2] /= sum;
+}
 
 //!	Element base class
 /*!	All type of element classes should be derived from this base class */
@@ -51,7 +60,7 @@ protected:
 public:
 
 //!	Constructor
-	CElement() : NEN(0), nodes(nullptr), ElementMaterial(nullptr), LocationMatrix(nullptr) {};
+	CElement() : NEN(0), nodes(nullptr), ElementMaterial(nullptr), LocationMatrix(nullptr), ND(0) {};
 
 //! Virtual deconstructor
     virtual ~CElement();
@@ -76,7 +85,7 @@ public:
 	virtual void ElementStiffness(double* stiffness) = 0; 
 
 //!	Calculate element stress 
-	virtual void ElementStress(double* stress, double* Displacement) = 0;
+	virtual void ElementStress(double* stress, double* Displacement){};
 
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }

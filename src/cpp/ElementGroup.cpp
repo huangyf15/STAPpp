@@ -62,6 +62,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBar);
             MaterialSize_ = sizeof(CBarMaterial);
             break;
+        case ElementTypes::Quadrilateral:
+            ElementSize_ = sizeof(CQuadrilateral);
+            MaterialSize_ = sizeof(CQuadrilateralMaterial);
+            break;
         case ElementTypes::Triangle:
             ElementSize_ = sizeof(CTriangle);
             MaterialSize_ = sizeof(CTriangleMaterial);
@@ -79,6 +83,9 @@ void CElementGroup::AllocateElement(std::size_t size)
     {
         case ElementTypes::Bar:
             ElementList_ = new CBar[size];
+            break;
+        case ElementTypes::Quadrilateral:
+            ElementList_ = new CQuadrilateral[size];
             break;
         case ElementTypes::Triangle:
             ElementList_ = new CTriangle[size];
@@ -98,6 +105,9 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             break;
         case ElementTypes::Triangle:
             MaterialList_ = new CTriangleMaterial[size];
+            break;
+        case ElementTypes::Quadrilateral:
+            MaterialList_ = new CQuadrilateralMaterial[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
@@ -135,6 +145,30 @@ bool CElementGroup::ReadElementData(ifstream& Input)
 //  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
         if (!GetElement(Ele).Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+//  Read quadrilateral element data from the input data file
+bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CQuadrilateralMaterial[NUMMAT_];    // Materials for group EleGrp
+    CQuadrilateralMaterial* mlist = dynamic_cast<CQuadrilateralMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
+    CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
             return false;
     
     return true;

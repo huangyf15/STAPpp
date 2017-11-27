@@ -77,7 +77,7 @@ inline CSkylineMatrix<T_>::CSkylineMatrix()
 }
 
 template <class T_>
-inline CSkylineMatrix<T_>::CSkylineMatrix(unsigned int N)
+inline CSkylineMatrix<T_>::CSkylineMatrix(unsigned int N):NWK_(0)
 {
     NEQ_ = N;
 

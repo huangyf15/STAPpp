@@ -85,20 +85,12 @@ unsigned int CTriangle::SizeOfStiffnessMatrix()
     // 9 * 10 / 2
 }
 
-inline void normalize(double ptr[3])
-{
-    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] + ptr[2]));
-    ptr[0] /= sum;
-    ptr[1] /= sum;
-    ptr[2] /= sum;
-}
-
 inline double dot(const double* p1, const double* p2)
 {
     return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2];
 }
 
-void Convert2d23d(const double* ke, double* Matrix, const double i[3], const double j[3])
+void Convert2d23d3T(const double* ke, double* Matrix, const double i[3], const double j[3])
 {
     Matrix[0] = i[0] * (i[0] * ke[0] + j[0] * ke[2]) + j[0] * j[0] * ke[1];
     Matrix[1] = i[1] * (i[1] * ke[0] + j[1] * ke[2]) + j[1] * j[1] * ke[1];
@@ -218,7 +210,7 @@ void CTriangle::ElementStiffness(double* Matrix)
     ke[19] = cof * (2 * x21 * x32);
     ke[20] = cof * (2 * v * x21 * y23);
 
-    Convert2d23d(ke, Matrix, i, j);
+    Convert2d23d3T(ke, Matrix, i, j);
 }
 
 //  Calculate element stress

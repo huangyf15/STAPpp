@@ -45,7 +45,7 @@ void CElement::CalculateColumnHeight(unsigned int* ColumnHeight)
 		if (!column)
 			continue;
 
-		unsigned int Height = column - nfirstrow;
+		const unsigned int Height = column - nfirstrow;
 		if (ColumnHeight[column-1] < Height) ColumnHeight[column-1] = Height;
 	}
 }

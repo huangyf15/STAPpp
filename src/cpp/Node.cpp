@@ -13,7 +13,7 @@
 
 #include "Node.h"
 
-CNode::CNode(double X, double Y, double Z)
+CNode::CNode(double X, double Y, double Z):NodeNumber(0)
 {
     XYZ[0] = X;		// Coordinates of the node
     XYZ[1] = Y;

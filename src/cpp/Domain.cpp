@@ -264,7 +264,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 	if (LoadCase > NLCASE) 
 		return false;
 
-	CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
+	const CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
 
 //	Loop over for all concentrated loads in load case LoadCase
 	for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)

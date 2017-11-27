@@ -58,6 +58,9 @@ public:
 //!	Output bar element data
 	void PrintBarElementData(unsigned int EleGrp);
 
+//!	Output Quadrilateral element data
+	void PrintQuadrilateralElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
