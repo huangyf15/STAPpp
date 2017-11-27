@@ -427,6 +427,34 @@ void COutputter::OutputElementStress()
 				}
 				*this << endl;
 
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					#ifndef __TEST__
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
+					#else
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(
+							stresses, Displacement, Positions, GaussDisplacements, weights);
+					#endif
+
+					for (unsigned i=0; i<4; ++i) { // four gauss points
+						*this << setw(8) << Ele + 1;
+						*this << setw(10) << i+1;
+						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
+						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+						// *this << setw(32) << stresses[i] << std::endl;
+						#ifdef __TEST__
+						*this << setw(17) << GaussDisplacements[i*3] 
+							<< setw(14) << GaussDisplacements[i*3+1] 
+							<< setw(14) << GaussDisplacements[i*3+2];
+						*this << setw(15) << weights[i];
+						#endif
+						*this << std::endl;
+					}
+				}
+				*this << endl;
+
 				break;
 
 			case ElementTypes::Triangle:
