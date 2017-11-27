@@ -29,7 +29,10 @@ CTriangle::CTriangle()
 }
 
 //  Desconstructor
-CTriangle::~CTriangle() {}
+CTriangle::~CTriangle() {
+    delete[] nodes;
+    delete[] LocationMatrix;
+}
 
 //  Read element data from stream Input
 bool CTriangle::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNode* NodeList)
@@ -164,7 +167,7 @@ void CTriangle::ElementStiffness(double* Matrix)
     n[2] /= Area;
     Area /= 2.0;
     // i = normalized p21, so that y21 = 0
-    double i[3] = {p21[0], p21[1], p21[1]};
+    double i[3] = {p21[0], p21[1], p21[2]};
     normalize(i);
     // j = n cross i
     double const j[3] = {n[1] * i[2] - n[2] * i[1], n[2] * i[0] - n[0] * i[2],
