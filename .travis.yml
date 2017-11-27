@@ -7,3 +7,6 @@ script:
   - cd build
   - cmake ../src
   - make
+  - ./stap++ ../data/test_truss_22.dat
+  - ./stap++ ../data/truss
+  - ./stap++ ../data/bar-6
