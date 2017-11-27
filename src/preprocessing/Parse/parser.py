@@ -3,4 +3,17 @@ class Parser():
         self.fin = fin
 
     def parse(self):
-        pass
+        '''
+        return parsed data.
+        {
+            'heading': headingStr,
+            'nodes': [Node],
+            'elementGroups': [ElementGroups],
+            'loads': [Load]
+        }
+        '''
+
+        with open(fin, 'r') as fp:
+            self.lines = fp.readlines()
+        
+
