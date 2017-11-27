@@ -1,9 +1,12 @@
 import sys
 from optparse import OptionParser
 
+from Parse import Parser
+from Output import Outputter
+
 def convert(fin, fout):
-    print('fin =', fin)
-    print('fout =', fout)
+    data = Parser(fin).parse()
+    Outputter(data, fout).print()
 
 def main():
     parser = OptionParser('Usage: main.py [options] inputFile')
