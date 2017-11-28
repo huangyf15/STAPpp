@@ -98,8 +98,8 @@ bool CDomain::ReadData(string FileName, string OutFile)
     else
         return false;
 
-    //	Read load data
-    if (ReadLoadCases())
+//	Read load data
+	if (ReadLoadCases())
         Output->OutputLoadInfo();
     else
         return false;

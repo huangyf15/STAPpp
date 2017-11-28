@@ -52,12 +52,24 @@ bool CPlate::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CN
 	return true;
 }
 
+//Write plate element data
 void CPlate::Write(COutputter& output, unsigned int Ele)
 {
 	output << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
 		   << setw(9) << nodes[1]->NodeNumber << setw(9) << nodes[2]->NodeNumber 
 		   << setw(9) << nodes[3]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
 }
-
+/*
+//  Generate location matrix: the global equation number that corresponding to each DOF of the element
+//	Caution:  Equation number is numbered from 1 !
+void CPlate::GenerateLocationMatrix()
+{
+    unsigned int i = 0;
+    for (unsigned int N = 0; N < NEN; N++)
+        for (unsigned int D = 0; D < 6; D++)
+            LocationMatrix[i++] = nodes[N]->bcode[D];
+}
+*/
+/*it makes me think of another question that when should the rotation dof turn to zero*/ 
 
 /*to be continued*/
