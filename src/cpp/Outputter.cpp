@@ -786,7 +786,7 @@ void COutputter::OutputElementStress()
 				*this << "     NUMBER    INDEX        X             Y             Z" 
 					<< "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX"
 					<< endl;
-				double stresses[13];
+				double stresses[12];
 				double Positions[12];
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{

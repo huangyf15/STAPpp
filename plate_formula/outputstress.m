@@ -1,6 +1,6 @@
 syms a b s t Dst nu Dxr Dyr D1r Dxyr p k;
 NT=[-(s-1)*(t-1)*(s^2+s+t^2+t-2)/8;
-    -(s-1)*(t-1)^2*(t+1);
+    -(s-1)*(t-1)^2*(t+1)/8;
     (s-1)^2*(s+1)*(t-1)/8;
     (s+1)*(t-1)*(s^2-s+t^2+t-2)/8;
     (s+1)*(t-1)^2*(t+1)/8;
@@ -41,7 +41,7 @@ gspts=[-0.577350269189626 -0.577350269189626;
 syms dis1 dis2 dis3 dis4 dis5 dis6 dis7 dis8 dis9 dis10 dis11 dis12
 disut=[dis1;dis2;dis3;dis4;dis5;dis6;dis7;dis8;dis9;dis10;dis11;dis12];
 gsstrs=Stresses*disut;
-fileused=fopen('stresses.txt','wt');
+fileused=fopen('stresses2.txt','wt');
 %for i=1:3
 %    for j=1:12
 %        fprintf(fileused,'%s%i%s%s%s\n','Matrix[',(j-1)*3+i-1,'] = ',char(Stresses(i,j)),';');

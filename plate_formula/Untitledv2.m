@@ -1,6 +1,6 @@
 syms a b s t Dst nu Dxr Dyr D1r Dxyr p;
 NT=[-(s-1)*(t-1)*(s^2+s+t^2+t-2)/8;
-    -(s-1)*(t-1)^2*(t+1);
+    -(s-1)*(t-1)^2*(t+1)/8;
     (s-1)^2*(s+1)*(t-1)/8;
     (s+1)*(t-1)*(s^2-s+t^2+t-2)/8;
     (s+1)*(t-1)^2*(t+1)/8;
@@ -31,7 +31,7 @@ Koriginal=Bnew*conj(chg_mat')*Cmat*chg_mat*conj(Bnew');
 %Kall=a*b*int(int(Bnew*Cmat*conj(Bnew'),t,-1,1),s,-1,1);
 Kall=a*b*int(int(Koriginal,t,-1,1),s,-1,1);
 
-fileused=fopen('newint.txt','wt');
+fileused=fopen('newint2.txt','wt');
 for j=1:12
     for i=j:-1:1
         fprintf(fileused,'%s%i%s%s%s\n','Matrix[',j*(j+1)/2-i,'] = ',char(Kall(i,j)),';');
