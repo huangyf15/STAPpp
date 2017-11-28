@@ -779,6 +779,31 @@ void COutputter::OutputElementStress()
 				}
 				break;
 
+			case ElementTypes::Plate:
+				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+					<< "                       GUASS POINTS STRESSES"
+					<< endl;
+				*this << "     NUMBER    INDEX        X             Y             Z" 
+					<< "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX"
+					<< endl;
+				double stresses[13];
+				double Positions[12];
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					
+					for (unsigned i=0; i<4; ++i) { // four gauss points
+						*this << setw(8) << Ele + 1;
+						*this << setw(10) << i+1;
+						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
+						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+						// *this << setw(32) << stresses[i] << std::endl;
+						
+						*this << std::endl;
+					}
+				}
+				*this << endl;
+
+				break;
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
 					<< " has not been implemented.\n\n";
