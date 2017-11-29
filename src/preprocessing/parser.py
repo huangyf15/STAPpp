@@ -32,9 +32,9 @@ class Parser():
 
         self.parseHeading()
         self.parseParts()
-        self.parseAssembly()
-        self.parseMaterial()
-        self.parseLoad()
+        # self.parseAssembly()
+        # self.parseMaterial()
+        # self.parseLoad()
 
         return self.data()
 
@@ -43,9 +43,20 @@ class Parser():
         self.heading = self.getNextLine()[3:]
 
     def parseParts(self):
-        self.gotoKeyWord('*Part')
-        self.goBack()
+        self.parts = []
+        while True:
+            line = self.getNextLine()
+            if '*Part' in line:
+                print('parsing %s'%line)
+                part = self.parsePart()
+                self.parts.append(part)
+            elif '*Assembly' in line:
+                self.goBack()
+                break
+        print('%d part parsed.'%len(self.parts))
 
+
+    def parsePart(self):
         part = ABAQUS.Part()
 
         while True:
@@ -62,10 +73,18 @@ class Parser():
                 _type, elements = self.parseElement(part.nodes)
                 part.type = _type
                 part.elements = elements
-            elif 'Nset' in line:
-                self.parseNset()
-                pass
-        quit()
+            # elif '*Nset' in line:
+            #     nset = self.parseNset()
+            #     part.nset = nset
+            # elif '*Elset' in line:
+            #     elset = self.parseElset()
+            #     part.elset = elset
+            elif '*Solid Section' in line:
+                material = re.findall(r'material=(\w+)', self.getLine())[0]
+                part.material = material
+        
+        print('part parsed')
+        # quit()
 
     def parseNode(self):
         'returns a dict of node'
@@ -159,10 +178,51 @@ class Parser():
         pass
 
     def parseNset(self):
-        pass
+        line = self.getLine()
+        nset = ABAQUS.Nset()
+        res = re.match(r'\s*\*Nset, nset=([\_\w]+), instance=([\w+\-]+)', line)
+        if res:
+            nset.name, nset.instance = res.groups()
+            # print(nset.name, nset.instance)
+        else:
+            nset.name, = re.match(r'\s*\*Nset, nset=([\_\w]+)', line).groups()
+            # print(nset.name)
+
+        line = self.getNextLine()
+        args = line.split(',')
+        if len(args) == 2:
+            nset.indexs = (int(args[0]), int(args[1]))
+        elif len(args) == 3 and int(args[2]) == 1:
+            nset.indexs = range(int(args[0], int(args[1]) + 1, 1))
+        else:
+            raise RuntimeError('undefined nset len args')
+
+        return nset
 
     def parseElset(self):
-        pass
+        line = self.getLine()
+        elset = ABAQUS.Elset()
+        res = re.match(r'\s*\*Elset, elset=([\_\w]+), instance=([\w+\-]+)', line)
+        if res:
+            elset.name, elset.instance = res.groups()
+            # print(nset.name, nset.instance)
+        else:
+            elset.name, = re.match(r'\s*\*Elset, elset=([\_\w]+)', line).groups()
+            # print(nset.name)
+        
+        line = self.getNextLine().replace(',', '')
+        args = line.split()
+        if len(args) == 1:
+            elset.indexs = (int(args[0]),)
+        elif len(args) == 2:
+            elset.indexs = (int(args[0]), int(args[1]))
+        elif len(args) == 3 and int(args[2]) == 1:
+            elset.indexs = range(int(args[0], int(args[1])+1, 1))
+        else:
+            raise RuntimeError('undefined elset len args')
+        
+        return elset
+
 
     def parseSurface(self):
         pass
