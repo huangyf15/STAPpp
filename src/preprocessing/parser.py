@@ -32,7 +32,7 @@ class Parser():
 
         self.parseHeading()
         self.parseParts()
-        # self.parseAssembly()
+        self.parseAssembly()
         # self.parseMaterial()
         # self.parseLoad()
 
@@ -47,14 +47,14 @@ class Parser():
         while True:
             line = self.getNextLine()
             if '*Part' in line:
-                print('parsing %s'%line)
+                print('parsing %s' % line)
+                self.goBack()
                 part = self.parsePart()
                 self.parts.append(part)
             elif '*Assembly' in line:
                 self.goBack()
                 break
-        print('%d part parsed.'%len(self.parts))
-
+        print('%d part parsed.' % len(self.parts))
 
     def parsePart(self):
         part = ABAQUS.Part()
@@ -82,8 +82,9 @@ class Parser():
             elif '*Solid Section' in line:
                 material = re.findall(r'material=(\w+)', self.getLine())[0]
                 part.material = material
-        
+
         print('part parsed')
+        return part
         # quit()
 
     def parseNode(self):
@@ -124,8 +125,6 @@ class Parser():
 
     def parseAssembly(self):
         '从 *Assembly 到 *End Assembly'
-        self.gotoKeyWord('*Assembly')
-
         while True:
             line = self.getNextLine()
             if '*Instance' in line:
@@ -140,36 +139,21 @@ class Parser():
                 self.parseTie()
             elif '*End Assembly' in line:
                 break
-
         return
 
     def parseInstance(self):
         line = self.getLine()
-        res = re.match(r'\*Instance, name=([^,]+), part=([\w\-]+)', line)
-        name, part = res.groups()
+        name, partName = re.match(r'\*Instance, name=([^,]+), part=([\w\-]+)', line).groups()
 
-        try:  # 读取偏移
-            line = self.getNextLine()
-            dx, dy, dz = line.split(',')
-            dx, dy, dz = float(dx), float(dy), float(dz)
-        except:
-            self.goBack()
-            dx, dy, dz = 0, 0, 0
+        part = [part for part in self.parts if part.name == partName][0]
 
         while True:
             line = self.getNextLine()
-            if '*Node' in line:
-                self.parseNode()
-            elif '*Element' in line:
-                self.parseElement()
-            elif '*Nset' in line:
-                self.parseNset()
-            elif '*Elset' in line:
-                self.parseElset()
-            elif '*Solid' in line:
-                self.parseSolid()
+            if False:
+                pass
             elif '*End Instance' in line:
                 break
+        print('Instance parsed.')
 
     def parseMaterial(self):
         pass
@@ -202,14 +186,16 @@ class Parser():
     def parseElset(self):
         line = self.getLine()
         elset = ABAQUS.Elset()
-        res = re.match(r'\s*\*Elset, elset=([\_\w]+), instance=([\w+\-]+)', line)
+        res = re.match(
+            r'\s*\*Elset, elset=([\_\w]+), instance=([\w+\-]+)', line)
         if res:
             elset.name, elset.instance = res.groups()
             # print(nset.name, nset.instance)
         else:
-            elset.name, = re.match(r'\s*\*Elset, elset=([\_\w]+)', line).groups()
+            elset.name, = re.match(
+                r'\s*\*Elset, elset=([\_\w]+)', line).groups()
             # print(nset.name)
-        
+
         line = self.getNextLine().replace(',', '')
         args = line.split()
         if len(args) == 1:
@@ -217,12 +203,11 @@ class Parser():
         elif len(args) == 2:
             elset.indexs = (int(args[0]), int(args[1]))
         elif len(args) == 3 and int(args[2]) == 1:
-            elset.indexs = range(int(args[0], int(args[1])+1, 1))
+            elset.indexs = range(int(args[0], int(args[1]) + 1, 1))
         else:
             raise RuntimeError('undefined elset len args')
-        
-        return elset
 
+        return elset
 
     def parseSurface(self):
         pass
@@ -251,7 +236,7 @@ class Parser():
 
     def getLine(self):
         res = self.lines[self.index][:-1]
-        if res[:2] == '**':
+        if '**' in res:
             self.index += 1
             return self.getLine()
         else:
