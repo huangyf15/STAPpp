@@ -12,3 +12,5 @@ class Node():
             res += '\t%lf' % item
         return res
     
+    def __repr__(self):
+        return '<' + self.format() + '>'

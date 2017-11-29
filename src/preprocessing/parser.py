@@ -4,6 +4,8 @@ from node import *
 from load import *
 from material import *
 from element import *
+import ABAQUS
+
 
 class Parser():
     def __init__(self, fin):
@@ -29,6 +31,7 @@ class Parser():
         self.index = -1
 
         self.parseHeading()
+        self.parseParts()
         self.parseAssembly()
         self.parseMaterial()
         self.parseLoad()
@@ -39,42 +42,132 @@ class Parser():
         self.gotoKeyWord('*Heading')
         self.heading = self.getNextLine()[3:]
 
-    def parseAssembly(self):
-        self.gotoKeyWord('*Assembly')
+    def parseParts(self):
+        self.gotoKeyWord('*Part')
+        self.goBack()
 
-        self.parseInstance()
+        part = ABAQUS.Part()
 
-        self.gotoKeyWord('*End Assembly')
-
-    def parseInstance(self):
-        self.gotoKeyWord('*Instance')
-
-        # 读点信息
-        self.gotoKeyWord('*Node')
         while True:
             line = self.getNextLine()
+            if '*End Part' in line:
+                break
+            elif '*Part' in line:
+                name = re.match(r'\*Part, name=([\w\-]+)', line).groups()[0]
+                part.name = name
+            elif '*Node' in line:
+                nodes = self.parseNode()
+                part.nodes = nodes
+            elif '*Element' in line:
+                _type, elements = self.parseElement(part.nodes)
+                part.type = _type
+                part.elements = elements
+            elif 'Nset' in line:
+                self.parseNset()
+                pass
+        quit()
+
+    def parseNode(self):
+        'returns a dict of node'
+        nodes = dict()
+        while True:
             try:
-                line = line.replace(', ', '')
-                index, x, y, z = line.split()
+                line = self.getNextLine()
+                index, x, y, z = line.split(',')
+                index = int(index)
+                x, y, z = float(x), float(y), float(z)
                 node = Node()
                 node.index = int(index)
-                node.pos = (float(x), float(y), float(z))
-                self.nodes.append(node)
+                node.pos = x, y, z
+                nodes[index] = node
             except:
                 self.goBack()
                 break
+        return nodes
 
-        # 读单元信息
-        self.gotoKeyWord('*Element')
+    def parseElement(self, nodes):
+        ' returns [type, [elements]] '
         line = self.getLine()
-        elementType = re.findall(r'type=(\w+)', line)[0]
-        element = 
-        
+        _type = re.match(r'\s*\*Element, type=(\w+)', line).groups()[0]
+        elements = []
+        while True:
+            try:
+                line = self.getNextLine()
+                index, *nodeIndex = line.split(',')
+                element = Element()
+                element.index = int(index)
+                element.nodes = [nodes[float(item)] for item in nodeIndex]
+                elements.append(element)
+            except:
+                self.goBack()
+                break
+        return [_type, elements]
+
+    def parseAssembly(self):
+        '从 *Assembly 到 *End Assembly'
+        self.gotoKeyWord('*Assembly')
+
+        while True:
+            line = self.getNextLine()
+            if '*Instance' in line:
+                self.parseInstance()
+            elif '*Nset' in line:
+                self.parseNset()
+            elif '*Elset' in line:
+                self.parseElset()
+            elif '*Surface' in line:
+                self.parseSurface()
+            elif '*Tie' in line:
+                self.parseTie()
+            elif '*End Assembly' in line:
+                break
+
+        return
+
+    def parseInstance(self):
+        line = self.getLine()
+        res = re.match(r'\*Instance, name=([^,]+), part=([\w\-]+)', line)
+        name, part = res.groups()
+
+        try:  # 读取偏移
+            line = self.getNextLine()
+            dx, dy, dz = line.split(',')
+            dx, dy, dz = float(dx), float(dy), float(dz)
+        except:
+            self.goBack()
+            dx, dy, dz = 0, 0, 0
+
+        while True:
+            line = self.getNextLine()
+            if '*Node' in line:
+                self.parseNode()
+            elif '*Element' in line:
+                self.parseElement()
+            elif '*Nset' in line:
+                self.parseNset()
+            elif '*Elset' in line:
+                self.parseElset()
+            elif '*Solid' in line:
+                self.parseSolid()
+            elif '*End Instance' in line:
+                break
 
     def parseMaterial(self):
         pass
 
     def parseLoad(self):
+        pass
+
+    def parseNset(self):
+        pass
+
+    def parseElset(self):
+        pass
+
+    def parseSurface(self):
+        pass
+
+    def parseTie(self):
         pass
 
     def data(self):
@@ -97,7 +190,13 @@ class Parser():
         return self.getLine()
 
     def getLine(self):
-        return self.lines[self.index][:-1]
+        res = self.lines[self.index][:-1]
+        if res[:2] == '**':
+            self.index += 1
+            return self.getLine()
+        else:
+            return res
+
 
 if __name__ == '__main__':
-    print(Parser('Job-1.inp').parse())
+    print(Parser('data/Job-1.inp').parse())
