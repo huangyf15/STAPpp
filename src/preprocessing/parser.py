@@ -196,7 +196,8 @@ class Parser():
         line = self.getLine()
         # print(line)
         elset = ABAQUS.Elset()
-        res = re.match(r'\*Elset, elset=([\_\-\w]+), instance=([\w+\-]+)', line)
+        res = re.match(
+            r'\*Elset, elset=([\_\-\w]+), instance=([\w+\-]+)', line)
         assert res
         elset.name, elset.instance = res.groups()
 
@@ -216,7 +217,12 @@ class Parser():
         return elset
 
     def parseSurface(self):
-        pass
+        surfaceName = re.match(
+            r'\*Surface, type=NODE, name=([^,]+), internal', self.getLine()
+        ).groups()[0]
+        nset = re.match(r'[^,]+', self.getNextLine())[0]
+        print(surfaceName, nset)
+        print('Surface parsed.')
 
     def parseTie(self):
         pass
