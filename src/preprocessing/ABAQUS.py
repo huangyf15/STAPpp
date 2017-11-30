@@ -46,7 +46,11 @@ class Element():
 class Nset():
     def __init__(self):
         self.name = None
-        self.index = None
+        self.instance = None
+        self.nodeIndexs = None
+
+    def __repr__(self):
+        return f'<Nset name={self.name}, instance={self.instance.name}, indexs={self.nodeIndexs}>'
 
 
 class Elset(Nset):

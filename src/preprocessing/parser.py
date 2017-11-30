@@ -119,13 +119,18 @@ class Parser():
     def parseAssembly(self):
         '从 *Assembly 到 *End Assembly'
         self.instancesDict = dict()
+        self.nsetsDict = dict()  # {name: [nsets]}
         while True:
             line = self.getNextLine()
             if '*Instance' in line:
                 instance = self.parseInstance()
                 self.instancesDict[instance.name] = instance
             elif '*Nset' in line:
-                self.parseNset()
+                nset = self.parseNset()
+                if nset.name in self.nsetsDict:
+                    self.nsetsDict[nset.name].append(nset)
+                else:
+                    self.nsetsDict[nset.name] = [nset, ]
             elif '*Elset' in line:
                 self.parseElset()
             elif '*Surface' in line:
@@ -152,12 +157,12 @@ class Parser():
         else:
             # see http://wufengyun.com:888/v6.14/books/key/default.htm?startat=ch09abk19.html#ksuperprop-rot-instance
             instance.offset = tuple(float(item)
-                               for item in self.getLine().split(','))
+                                    for item in self.getLine().split(','))
             if '*End Instance' in self.getNextLine():
                 pass
             else:
                 instance.rotation = tuple(float(item)
-                                     for item in self.getLine().split(','))
+                                          for item in self.getLine().split(','))
                 assert '*End Instance' in self.getNextLine()
 
         print('Instance parsed.')
@@ -199,20 +204,22 @@ class Parser():
         nset = ABAQUS.Nset()
         res = re.match(r'\*Nset, nset=([\_\-\w]+), instance=([\w+\-]+)', line)
         assert res
-        nset.name, nset.instance = res.groups()
+        nset.name, instanceName = res.groups()
+        nset.instance = self.instancesDict[instanceName]
 
+        indexs = []
         while True:
             line = self.getNextLine()
             try:
-                indexs = [int(item) for item in line.split(',') if item]
-                print(indexs)
+                indexs += [int(item) for item in line.split(',') if item]
             except:
                 if '*Nset' in line or '*Elset' in line or '*Surface' in line:
                     self.goBack()
                     break
                 else:
                     raise
-        print('Nset parsed.')
+        nset.nodeIndexs = tuple(indexs)
+        print('Nset parsed. %s' % nset)
         return nset
 
     def parseElset(self):
