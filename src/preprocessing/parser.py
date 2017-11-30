@@ -172,50 +172,47 @@ class Parser():
 
     def parseNset(self):
         line = self.getLine()
+        # print(line)
         nset = ABAQUS.Nset()
-        res = re.match(r'\s*\*Nset, nset=([\_\w]+), instance=([\w+\-]+)', line)
-        if res:
-            nset.name, nset.instance = res.groups()
-            # print(nset.name, nset.instance)
-        else:
-            nset.name, = re.match(r'\s*\*Nset, nset=([\_\w]+)', line).groups()
-            # print(nset.name)
+        res = re.match(r'\*Nset, nset=([\_\-\w]+), instance=([\w+\-]+)', line)
+        assert res
+        nset.name, nset.instance = res.groups()
 
-        line = self.getNextLine()
-        args = line.split(',')
-        if len(args) == 2:
-            nset.indexs = (int(args[0]), int(args[1]))
-        elif len(args) == 3 and int(args[2]) == 1:
-            nset.indexs = range(int(args[0], int(args[1]) + 1, 1))
-        else:
-            raise RuntimeError('undefined nset len args')
-
+        while True:
+            line = self.getNextLine()
+            try:
+                indexs = [int(item) for item in line.split(',') if item]
+                print(indexs)
+            except:
+                if '*Nset' in line or '*Elset' in line or '*Surface' in line:
+                    self.goBack()
+                    break
+                else:
+                    raise
+        print('Nset parsed.')
         return nset
 
     def parseElset(self):
         line = self.getLine()
+        # print(line)
         elset = ABAQUS.Elset()
-        res = re.match(
-            r'\s*\*Elset, elset=([\_\w]+), instance=([\w+\-]+)', line)
-        if res:
-            elset.name, elset.instance = res.groups()
-            # print(nset.name, nset.instance)
-        else:
-            elset.name, = re.match(
-                r'\s*\*Elset, elset=([\_\w]+)', line).groups()
-            # print(nset.name)
+        res = re.match(r'\*Elset, elset=([\_\-\w]+), instance=([\w+\-]+)', line)
+        assert res
+        elset.name, elset.instance = res.groups()
 
-        line = self.getNextLine().replace(',', '')
-        args = line.split()
-        if len(args) == 1:
-            elset.indexs = (int(args[0]),)
-        elif len(args) == 2:
-            elset.indexs = (int(args[0]), int(args[1]))
-        elif len(args) == 3 and int(args[2]) == 1:
-            elset.indexs = range(int(args[0], int(args[1]) + 1, 1))
-        else:
-            raise RuntimeError('undefined elset len args')
-
+        while True:
+            line = self.getNextLine()
+            try:
+                indexs = [int(item) for item in line.split(',') if item]
+                print(indexs)
+            except:
+                if '*Nset' in line or '*Elset' in line or '*Surface' in line:
+                    self.goBack()
+                    break
+                else:
+                    print(line)
+                    raise
+        print('Elset parsed.')
         return elset
 
     def parseSurface(self):
