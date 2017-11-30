@@ -143,16 +143,25 @@ class Parser():
 
     def parseInstance(self):
         line = self.getLine()
-        name, partName = re.match(r'\*Instance, name=([^,]+), part=([\w\-]+)', line).groups()
+        name, partName = re.match(
+            r'\*Instance, name=([^,]+), part=([\w\-]+)', line).groups()
+
+        print('parsing instance %s' % name)
 
         part = [part for part in self.parts if part.name == partName][0]
 
-        while True:
-            line = self.getNextLine()
-            if False:
+        if '*End Instance' in self.getNextLine():
+            dx, dy, dz = 0, 0, 0
+        else:
+            # see http://wufengyun.com:888/v6.14/books/key/default.htm?startat=ch09abk19.html#ksuperprop-rot-instance
+            dx, dy, dz = (float(item) for item in self.getLine().split(','))
+            if '*End Instance' in self.getNextLine():
                 pass
-            elif '*End Instance' in line:
-                break
+            else:
+                rt_a_x, rt_a_y, rt_a_z, rt_b_x, rt_b_y, rt_b_z, rt_phi = (
+                    float(item) for item in self.getLine().split(','))
+                assert '*End Instance' in self.getNextLine()
+
         print('Instance parsed.')
 
     def parseMaterial(self):
