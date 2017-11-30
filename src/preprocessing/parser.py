@@ -120,10 +120,13 @@ class Parser():
         '从 *Assembly 到 *End Assembly'
         self.instancesDict = dict()
         self.nsetsDict = dict()  # {name: [nsets]}
+        self.surfacesDict = dict()
+        self.ties = []
         while True:
             line = self.getNextLine()
             if '*Instance' in line:
                 instance = self.parseInstance()
+                assert instance.name not in self.instancesDict
                 self.instancesDict[instance.name] = instance
             elif '*Nset' in line:
                 nset = self.parseNset()
@@ -131,12 +134,14 @@ class Parser():
                     self.nsetsDict[nset.name].append(nset)
                 else:
                     self.nsetsDict[nset.name] = [nset, ]
-            elif '*Elset' in line:
-                self.parseElset()
+            # elif '*Elset' in line:
+            #     self.parseElset()
             elif '*Surface' in line:
-                self.parseSurface()
+                surface = self.parseSurface()
+                assert surface.name not in self.surfacesDict
+                self.surfacesDict[surface.name] = surface
             elif '*Tie' in line:
-                self.parseTie()
+                self.ties.append(self.parseTie())
             elif '*End Assembly' in line:
                 break
         return
@@ -170,16 +175,17 @@ class Parser():
         return instance
 
     def parseMaterials(self):
-        self.materials = []
+        self.materialsDict = dict()
         while True:
             line = self.getNextLine()
             if '*Material' in line:
                 self.goBack()
-                self.materials.append(self.parseMaterial())
+                material = self.parseMaterial()
+                self.materialsDict[material.name] = material
             if '*Step' in line:
                 self.goBack()
                 break
-        print(self.materials)
+        print(self.materialsDict)
 
     def parseMaterial(self):
         material = ABAQUS.Material()
@@ -247,24 +253,29 @@ class Parser():
         return elset
 
     def parseSurface(self):
-        surfaceName = re.match(
+        surface = ABAQUS.Surface()
+        surface.name = re.match(
             r'\*Surface, type=NODE, name=([^,]+), internal', self.getLine()
         ).groups()[0]
-        nset = re.match(r'[^,]+', self.getNextLine())[0]
-        print(surfaceName, nset)
-        print('Surface parsed.')
+        surface.nsetName = re.match(r'[^,]+', self.getNextLine())[0]
+        print('Surface parsed. %s' % surface)
+        return surface
 
     def parseTie(self):
+        tie = ABAQUS.Tie()
         line = self.getLine()
-        ratatioin = 'rotation' not in line
-        adjust = 'adjust=yes' in line
-        # Tie name is useless
+        # Tie name is useless actually
+        tie.name = re.match(r'\*Tie, name=([\w\-]+)', line).groups()[0]
+        tie.rotation = 'rotation' not in line
+        tie.adjust = 'adjust=yes' in line
 
         line = self.getNextLine()
         surf1, surf2 = line.split(',')
-        surf1 = surf1.replace(' ', '')
-        surf2 = surf2.replace(' ', '')
-        print('tie parsed, sf1 = %s, sf2 = %s' % (surf1, surf2))
+        tie.surfaceName1 = surf1.replace(' ', '')
+        tie.surfaceName2 = surf2.replace(' ', '')
+        
+        print('tie parsed %s' % tie)
+        return tie
 
     def data(self):
         return {
