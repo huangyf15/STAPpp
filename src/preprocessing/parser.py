@@ -33,7 +33,7 @@ class Parser():
         self.parseHeading()
         self.parseParts()
         self.parseAssembly()
-        # self.parseMaterial()
+        self.parseMaterials()
         # self.parseLoad()
 
         return self.data()
@@ -73,12 +73,6 @@ class Parser():
                 _type, elements = self.parseElement(part.nodes)
                 part.type = _type
                 part.elements = elements
-            # elif '*Nset' in line:
-            #     nset = self.parseNset()
-            #     part.nset = nset
-            # elif '*Elset' in line:
-            #     elset = self.parseElset()
-            #     part.elset = elset
             elif '*Solid Section' in line:
                 material = re.findall(r'material=(\w+)', self.getLine())[0]
                 part.material = material
@@ -164,8 +158,31 @@ class Parser():
 
         print('Instance parsed.')
 
+    def parseMaterials(self):
+        self.materials = []
+        while True:
+            line = self.getNextLine()
+            if '*Material' in line:
+                self.goBack()
+                self.materials.append(self.parseMaterial())
+            if '*Step' in line:
+                self.goBack()
+                break
+        print(self.materials)
+
     def parseMaterial(self):
-        pass
+        material = ABAQUS.Material()
+        material.name = re.match(
+            r'\*Material, name=(\w+)', self.getLine()).groups()[0]
+
+        self.getNextLine()
+        material.density = float(self.getNextLine()[:-1])
+
+        self.getNextLine()
+        material.E, material.v = (float(item)
+                                  for item in self.getNextLine().split(','))
+
+        return material
 
     def parseLoad(self):
         pass
@@ -234,7 +251,7 @@ class Parser():
         surf1, surf2 = line.split(',')
         surf1 = surf1.replace(' ', '')
         surf2 = surf2.replace(' ', '')
-        print('tie parsed, sf1 = %s, sf2 = %s'%(surf1, surf2))
+        print('tie parsed, sf1 = %s, sf2 = %s' % (surf1, surf2))
 
     def data(self):
         return {
