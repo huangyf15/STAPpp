@@ -225,7 +225,16 @@ class Parser():
         print('Surface parsed.')
 
     def parseTie(self):
-        pass
+        line = self.getLine()
+        ratatioin = 'rotation' not in line
+        adjust = 'adjust=yes' in line
+        # Tie name is useless
+
+        line = self.getNextLine()
+        surf1, surf2 = line.split(',')
+        surf1 = surf1.replace(' ', '')
+        surf2 = surf2.replace(' ', '')
+        print('tie parsed, sf1 = %s, sf2 = %s'%(surf1, surf2))
 
     def data(self):
         return {
