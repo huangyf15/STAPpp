@@ -223,7 +223,7 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << " M A T E R I A L   D E F I N I T I O N" << endl
 		  << endl;
 	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
-	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+	*this << " AND CROSS-SECTIONAL CONSTANTS . . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
 		  << endl
 		  << endl;
 
@@ -253,7 +253,31 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 //	Output TimoshenkoSRINT Beam element data
 void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 {
+	CDomain* FEMData = CDomain::Instance();
 
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		<< endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		<< endl
+		<< endl;
+
+/*! ============== NEED TO BE IMPROVED ============== !*/
+	*this << "  SET      YOUNG'S        SHEAR   CROSS-SECTIONAL MOMENT-INER  MOMENT-INER  TORSIONAL" << endl
+		  << " NUMBER    MODULUS       MODULUS       AREA      LOCAL Y-AXIS LOCAL Z-AXIS  CONSTANT" << endl
+		  << "              E             G          Area          Iyy          Izz          J" << endl << endl;
+
+	*this << "THETAY1       THETAY2       THETAY3       THETAZ1       THETAZ2       THETAZ3" << endl << endl;
+/*! ============== NEED TO BE IMPROVED ============== !*/
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
 }
 
 //	Print load data
@@ -344,7 +368,7 @@ void COutputter::OutputElementStress()
 				*this << endl;
 				break;
 			
-			case ElementTypes::Quadrilateral:
+			case ElementTypes::Quadrilateral: // Quadrilateral element
 				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
 					<< "                       GUASS POINTS STRESSES"
 					#ifdef __TEST__
@@ -387,6 +411,56 @@ void COutputter::OutputElementStress()
 							<< setw(14) << GaussDisplacements[i*3+2];
 						*this << setw(15) << weights[i];
 						#endif
+						*this << std::endl;
+					}
+				}
+				*this << endl;
+
+				break;
+
+			case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
+				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+					<< "                       GUASS POINTS STRESSES"
+#ifdef __TEST__
+					<< "                      GUASS POINTS DISPLACEMENTS            INTEGRATE"
+#endif
+					<< endl;
+				*this << "     NUMBER    INDEX        X             Y             Z"
+					<< "               SX'X'         SY'Y'        SX'Y'"
+#ifdef __TEST__
+					<< "              UX            UY           UZ            WEIGHTS"
+#endif
+					<< endl;
+				double TimoshenkoStresses[3];
+				double TimoshenkoForces[12];
+#ifdef __TEST__
+				double GaussDisplacements[12];
+				double weights[4];
+#endif
+
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+#ifndef __TEST__
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoStresses, TimoshenkoForces, Positions);
+#else
+					dynamic_cast<CQuadrilateral&>(
+						EleGrp.GetElement(Ele)).ElementStress(
+							stresses, Displacement, Positions, GaussDisplacements, weights);
+#endif
+
+					for (unsigned i = 0; i<4; ++i) { // four gauss points
+						*this << setw(8) << Ele + 1;
+						*this << setw(10) << i + 1;
+						*this << setw(17) << Positions[i * 3] << setw(14) << Positions[i * 3 + 1] << setw(14) << Positions[i * 3 + 2];
+						*this << setw(17) << stresses[i * 3] << setw(14) << stresses[i * 3 + 1] << setw(14) << stresses[i * 3 + 2];
+						// *this << setw(32) << stresses[i] << std::endl;
+#ifdef __TEST__
+						*this << setw(17) << GaussDisplacements[i * 3]
+							<< setw(14) << GaussDisplacements[i * 3 + 1]
+							<< setw(14) << GaussDisplacements[i * 3 + 2];
+						*this << setw(15) << weights[i];
+#endif
 						*this << std::endl;
 					}
 				}

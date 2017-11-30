@@ -84,25 +84,21 @@ public:
 
 	double Iyy;     // Moment of inertia for bending about local y-axis
 
-	double Iyz;     // Moment of inertia for crossing bending
-
 	double Izz;     // Moment of inertia for bending about local z-axis
 
 	double J;       // Torsional constant
 
-	double Gamma;   // Sectional moment
+	double Thetay1; // 1st direction cosine of local y-axis
 
-	double Thetay1; // First direction cosine of local y-axis
+	double Thetay2; // 2nd direction cosine of local y-axis
 
-	double Thetay2; // Second direction cosine of local y-axis
+	double Thetay3; // 3rd direction cosine of local y-axis
 
-	double Thetay3; // Third direction cosine of local y-axis
+	double Thetaz1; // 1st direction cosine of local z-axis
 
-	double Thetaz1; // First direction cosine of local z-axis
+	double Thetaz2; // 2nd direction cosine of local z-axis
 
-	double Thetaz2; // Second direction cosine of local z-axis
-
-	double Thetaz3; // Third direction cosine of local z-axis
+	double Thetaz3; // 3rd direction cosine of local z-axis
 
 public:
 

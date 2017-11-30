@@ -80,9 +80,9 @@ bool CTimoshenkoMaterial::Read(ifstream& Input, unsigned int mset)
 		return false;
 	}
 
-	Input >> E >> G >> Area;			// Young's modulus, shear modulus and Section area
-	Input >> Iyy >> Iyz >> Izz; // Moment of inertia for bending about local axis
-	Input >> J >> Gamma;		// Torsional constant and Sectional moment
+	Input >> E >> G >> Area;	// Young's modulus, shear modulus and Section area
+	Input >> Iyy >> Izz >> J; 
+								// Moment of inertia for bending about local axis, torsional constant and Sectional moment
 	Input >> Thetay1 >> Thetay2 >> Thetay3 >> Thetaz1 >> Thetaz2 >> Thetaz3;
 								// Direction cosine of local axis
 
@@ -92,14 +92,13 @@ bool CTimoshenkoMaterial::Read(ifstream& Input, unsigned int mset)
 //	Write material data to Stream
 void CTimoshenkoMaterial::Write(COutputter& output, unsigned int mset)
 {
-	output << setw(5) << mset + 1 << endl;
+	output << setw(5) << mset + 1;
 
-	// Young's modulus, shear modulus and section area
-	output << setw(16) << E << setw(16) << G << setw(16) << Area << endl;
-	
+	// Young's modulus, shear modulus, section area,
 	// Moment of inertia for bending about local axis,
 	// as well as torsional constant and sectional moment
-	output << Iyy << setw(16) << Iyz << setw(16) << Izz << J << setw(16) << Gamma << endl;
+	output << setw(16) << E << setw(16) << G << setw(16) << Area << setw(16) 
+		   << Iyy << setw(16) << Izz << setw(16) << J << endl;
 	
 	// Direction cosine of local axis
 	output << setw(5) << Thetay1 << setw(16) << Thetay2 << setw(16) << Thetay3 

@@ -88,10 +88,10 @@ unsigned int CTimoshenkoSRINT::SizeOfStiffnessMatrix() { return 78; }
 void CTimoshenkoSRINT::ElementStiffness(double* Matrix)
 {
 	clear(Matrix, SizeOfStiffnessMatrix());
+
 }
 
 //	Calculate element stress 
-
 void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double* Displacement)
 {
 	CBarMaterial* material = dynamic_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
