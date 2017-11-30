@@ -24,7 +24,7 @@ public:
 
 //!	Maximum number of degrees of freedom per node
 /*!	For 3D bar and solid elements, NDF = 3. For 3D beam or shell elements, NDF = 5 or 6 */
-	const static unsigned int NDF = 3;
+	const static unsigned int NDF = 6;
 
 //!	Node numer
 	unsigned int NodeNumber;
@@ -40,7 +40,7 @@ public:
 	unsigned int bcode[NDF];
 
 //!	Constructor
-	CNode(double X = 0, double Y = 0, double Z = 0);
+	CNode(double X = 0, double Y = 0, double Z = 0, double COSX = 0, double COSY = 0, double COSZ = 0);
 
 //!	Read nodal point data from stream Input
 	bool Read(ifstream& Input, unsigned int np);

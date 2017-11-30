@@ -15,6 +15,7 @@
 #include "Element.h"
 #include "Elements/Bar.h"
 #include "Elements/Quadrilateral.h"
+#include "Elements/TimoshenkoSRINT.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -25,7 +26,8 @@ enum ElementTypes
     UNDEFINED = 0,
     Bar,
     Quadrilateral,
-    Triangle
+    Triangle,
+	TimoshenkoSRINT
 };
 
 //! Element group class
@@ -76,6 +78,9 @@ public:
 
     //! Read quadrilateral element data from the input data file
     bool ReadQuadrilateralElementData(ifstream& Input);
+
+	//  Read TimoshenkoSRINT element data from the input data file
+	bool ReadTimoshenkoSRINTElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

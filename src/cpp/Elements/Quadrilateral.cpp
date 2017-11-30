@@ -439,7 +439,7 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
         }
         else
         {
-            d[index] = 0;
+            d[index] = 0.0;
         }
     }
 

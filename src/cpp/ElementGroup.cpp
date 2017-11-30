@@ -68,6 +68,17 @@ void CElementGroup::CalculateMemberSize()
             MaterialSize_ = sizeof(CQuadrilateralMaterial);
             break;
 
+		case ElementTypes::TimoshenkoSRINT:
+			ElementSize_ = sizeof(CTimoshenkoSRINT);
+			MaterialSize_ = sizeof(CTimoshenkoMaterial);
+			break;
+
+/*		case ElementTypes::TimoshenkoEBMOD:
+			ElementSize_ = sizeof(CTimoshenkoEBMOD);
+			MaterialSize_ = sizeof(CTimoshenkoMaterial);
+			break;
+*/
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -85,7 +96,15 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Quadrilateral:
             ElementList_ = new CQuadrilateral[size];
             break;
-        default:
+		case ElementTypes::TimoshenkoSRINT:
+			ElementList_ = new CTimoshenkoSRINT[size];
+			break;
+/*		case ElementTypes::TimoshenkoEBMOD:
+			ElementList_ = new CTimoshenkoEBMOD[size];
+			break;
+*/
+
+		default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
     }
@@ -101,6 +120,14 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::Quadrilateral:
             MaterialList_ =new CQuadrilateralMaterial[size];
             break;
+		case ElementTypes::TimoshenkoSRINT:
+			MaterialList_ = new CTimoshenkoMaterial[size];
+			break;
+/*		case ElementTypes::TimoshenkoEBMOD:
+			MaterialList_ = new CTimoshenkoMaterial[size];
+			break;
+*/
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
             exit(5);
@@ -164,4 +191,28 @@ bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
             return false;
     
     return true;
+}
+
+//  Read TimoshenkoSRINT element data from the input data file
+bool CElementGroup::ReadTimoshenkoSRINTElementData(ifstream& Input)
+{
+	//  Read material/section property lines
+	MaterialList_ = new CTimoshenkoMaterial[NUMMAT_];    // Materials for group EleGrp
+	CTimoshenkoMaterial* mlist = dynamic_cast<CTimoshenkoMaterial*>(MaterialList_);
+
+	//  Loop over for all material property sets in this element group
+	for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+		if (!mlist[mset].Read(Input, mset))
+			return false;
+
+	//  Read element data lines
+	ElementList_ = new CTimoshenkoSRINT[NUME_];    // Elements of group EleGrp
+	CTimoshenkoSRINT* elist = dynamic_cast<CTimoshenkoSRINT*>(ElementList_);
+
+	//  Loop over for all elements in this element group
+	for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+		if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
+			return false;
+
+	return true;
 }

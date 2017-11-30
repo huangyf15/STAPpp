@@ -250,6 +250,11 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
+//	Output TimoshenkoSRINT Beam element data
+void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
+{
+
+}
 
 //	Print load data
 void COutputter::OutputLoadInfo()

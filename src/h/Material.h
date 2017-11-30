@@ -72,3 +72,43 @@ public:
 //!	Write material data to Stream
 	virtual void Write(COutputter& output, unsigned int mset);
 };
+
+//!	Material class for Timoshenko beam element
+class CTimoshenkoMaterial : public CMaterial
+{
+public:
+
+	double G;       // Shear modulus
+
+	double Area;    // Sectional area of a bar element
+
+	double Iyy;     // Moment of inertia for bending about local y-axis
+
+	double Iyz;     // Moment of inertia for crossing bending
+
+	double Izz;     // Moment of inertia for bending about local z-axis
+
+	double J;       // Torsional constant
+
+	double Gamma;   // Sectional moment
+
+	double Thetay1; // First direction cosine of local y-axis
+
+	double Thetay2; // Second direction cosine of local y-axis
+
+	double Thetay3; // Third direction cosine of local y-axis
+
+	double Thetaz1; // First direction cosine of local z-axis
+
+	double Thetaz2; // Second direction cosine of local z-axis
+
+	double Thetaz3; // Third direction cosine of local z-axis
+
+public:
+
+	//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+	//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};

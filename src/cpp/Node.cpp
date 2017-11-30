@@ -13,15 +13,21 @@
 
 #include "Node.h"
 
-CNode::CNode(double X, double Y, double Z):NodeNumber(0)
+CNode::CNode(double X, double Y, double Z, double COSX, double COSY, double COSZ):NodeNumber(0)
 {
     XYZ[0] = X;		// Coordinates of the node
     XYZ[1] = Y;
     XYZ[2] = Z;
+	XYZ[3] = COSX;
+	XYZ[4] = COSY;
+	XYZ[5] = COSZ;
     
     bcode[0] = 0;	// Boundary codes
     bcode[1] = 0;
     bcode[2] = 0;
+	bcode[3] = 0;
+	bcode[4] = 0;
+	bcode[5] = 0;
 };
 
 //	Read element data from stream Input
@@ -41,8 +47,8 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 
 	NodeNumber = N;
 
-	Input >> bcode[0] >> bcode[1] >> bcode[2]
-		  >> XYZ[0] >> XYZ[1] >> XYZ[2];
+	Input >> bcode[0] >> bcode[1] >> bcode[2] >> bcode[3] >> bcode[4] >> bcode[5]
+		  >> XYZ[0] >> XYZ[1] >> XYZ[2] >> XYZ[3] >> XYZ[4] >> XYZ[5];
 
 	return true;
 }
@@ -50,8 +56,11 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 //	Output nodal point data to stream
 void CNode::Write(COutputter& output, unsigned int np)
 {
-	output << setw(9) << np + 1 << setw(5) << bcode[0] << setw(5) << bcode[1] << setw(5) << bcode[2]
-		   << setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] << endl;
+	output << setw(9) << np + 1 
+		<< setw(5) << bcode[0] << setw(5) << bcode[1] << setw(5) << bcode[2]
+		<< setw(5) << bcode[3] << setw(5) << bcode[4] << setw(5) << bcode[5]
+		<< setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] 
+		<< setw(15) << XYZ[3] << setw(15) << XYZ[4] << setw(15) << XYZ[5] << endl;
 }
 
 //	Output equation numbers of nodal point to stream
