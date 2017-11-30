@@ -43,18 +43,18 @@ class Parser():
         self.heading = self.getNextLine()[3:]
 
     def parseParts(self):
-        self.parts = []
+        self.partsDict = dict()
         while True:
             line = self.getNextLine()
             if '*Part' in line:
                 print('parsing %s' % line)
                 self.goBack()
                 part = self.parsePart()
-                self.parts.append(part)
+                self.partsDict[part.name] = part
             elif '*Assembly' in line:
                 self.goBack()
                 break
-        print('%d part parsed.' % len(self.parts))
+        print('%d part parsed.' % len(self.partsDict))
 
     def parsePart(self):
         part = ABAQUS.Part()
@@ -68,21 +68,21 @@ class Parser():
                 part.name = name
             elif '*Node' in line:
                 nodes = self.parseNode()
-                part.nodes = nodes
+                part.localNodesDict = nodes
             elif '*Element' in line:
-                _type, elements = self.parseElement(part.nodes)
+                _type, elements = self.parseElement()
                 part.type = _type
-                part.elements = elements
+                part.localElementsDict = elements
             elif '*Solid Section' in line:
                 material = re.findall(r'material=(\w+)', self.getLine())[0]
-                part.material = material
+                part.materialName = material
 
         print('part parsed')
+        # print(part)
         return part
-        # quit()
 
     def parseNode(self):
-        'returns a dict of node'
+        'returns a dict of node {localIndex: ABAQUS.Node}'
         nodes = dict()
         while True:
             try:
@@ -90,28 +90,27 @@ class Parser():
                 index, x, y, z = line.split(',')
                 index = int(index)
                 x, y, z = float(x), float(y), float(z)
-                node = Node()
-                node.index = int(index)
-                node.pos = x, y, z
+                node = ABAQUS.Node()
+                node.pos = (x, y, z)
                 nodes[index] = node
             except:
                 self.goBack()
                 break
         return nodes
 
-    def parseElement(self, nodes):
-        ' returns [type, [elements]] '
+    def parseElement(self):
+        ' returns [type, {localIndex: ABAQUS.ELEMENT}] '
         line = self.getLine()
         _type = re.match(r'\s*\*Element, type=(\w+)', line).groups()[0]
-        elements = []
+        elements = dict()
         while True:
             try:
                 line = self.getNextLine()
                 index, *nodeIndex = line.split(',')
-                element = Element()
+                element = ABAQUS.Element()
                 element.index = int(index)
-                element.nodes = [nodes[float(item)] for item in nodeIndex]
-                elements.append(element)
+                element.nodesIndexs = tuple(int(item) for item in nodeIndex)
+                elements[index] = element
             except:
                 self.goBack()
                 break
@@ -119,10 +118,12 @@ class Parser():
 
     def parseAssembly(self):
         '从 *Assembly 到 *End Assembly'
+        self.instancesDict = dict()
         while True:
             line = self.getNextLine()
             if '*Instance' in line:
-                self.parseInstance()
+                instance = self.parseInstance()
+                self.instancesDict[instance.name] = instance
             elif '*Nset' in line:
                 self.parseNset()
             elif '*Elset' in line:
@@ -136,27 +137,32 @@ class Parser():
         return
 
     def parseInstance(self):
+        instance = ABAQUS.Instance()
         line = self.getLine()
         name, partName = re.match(
             r'\*Instance, name=([^,]+), part=([\w\-]+)', line).groups()
 
         print('parsing instance %s' % name)
 
-        part = [part for part in self.parts if part.name == partName][0]
+        instance.name = name
+        instance.part = self.partsDict[partName]
 
         if '*End Instance' in self.getNextLine():
-            dx, dy, dz = 0, 0, 0
+            pass
         else:
             # see http://wufengyun.com:888/v6.14/books/key/default.htm?startat=ch09abk19.html#ksuperprop-rot-instance
-            dx, dy, dz = (float(item) for item in self.getLine().split(','))
+            instance.offset = tuple(float(item)
+                               for item in self.getLine().split(','))
             if '*End Instance' in self.getNextLine():
                 pass
             else:
-                rt_a_x, rt_a_y, rt_a_z, rt_b_x, rt_b_y, rt_b_z, rt_phi = (
-                    float(item) for item in self.getLine().split(','))
+                instance.rotation = tuple(float(item)
+                                     for item in self.getLine().split(','))
                 assert '*End Instance' in self.getNextLine()
 
         print('Instance parsed.')
+        print(instance)
+        return instance
 
     def parseMaterials(self):
         self.materials = []
