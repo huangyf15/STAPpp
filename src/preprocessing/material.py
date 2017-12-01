@@ -8,6 +8,6 @@ class Material():
 
     def format(self):
         res = '%d' % self.index
-        for key in self.attributes:
-            res += '\t%lf' % self.attributes[key]
+        for attr in self.attributes:
+            res += '\t%lf' % attr
         return res
