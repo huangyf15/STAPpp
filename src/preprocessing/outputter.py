@@ -1,3 +1,6 @@
+from ProgressBar import ProgressBar
+
+
 class Outputter():
     def __init__(self, data, fout):
         self.data = data
@@ -5,12 +8,19 @@ class Outputter():
 
     def print(self):
         self.f = open(self.fout, 'w')
+        self.total = len(self.data['nodes']) + \
+            sum(len(eleGrp.elements)
+                for eleGrp in self.data['elementGroups']) + \
+            len(self.data['loads'])
+        self.count = 0
+        self.bar = ProgressBar(1000, printCount=False, printTime=True)
         self.printHeadingLine()
         self.printControlLines()
         self.printNodalDataLines()
         self.printLoadDataLines()
         self.printElementDataLines()
         self.f.close()
+        del self.bar
 
     def printHeadingLine(self):
         print(self.data['heading'], file=self.f)
@@ -26,8 +36,11 @@ class Outputter():
         print(file=self.f)
 
     def printNodalDataLines(self):
+        count = 0
+        total = len(self.data['nodes'])
         for node in self.data['nodes']:
             print(node.format(), file=self.f)
+            self.grow()
         print(file=self.f)
 
     def printLoadDataLines(self):
@@ -37,6 +50,7 @@ class Outputter():
             count += 1
             for force in load.forces:
                 print(force.format(), file=self.f)
+                self.grow()
         print(file=self.f)
 
     def printElementDataLines(self):
@@ -50,5 +64,10 @@ class Outputter():
                 print(material.format(), file=self.f)
             for element in elementGroup.elements:
                 print(element.format(), file=self.f)
+                self.grow()
         print(file=self.f)
 
+    def grow(self):
+        self.count += 1
+        if self.count / self.total > self.bar.currentCount / self.bar.maxCount:
+            self.bar.grow()

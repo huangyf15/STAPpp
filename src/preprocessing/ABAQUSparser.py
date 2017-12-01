@@ -448,10 +448,10 @@ class Parser():
                 )
             )
 
-        print('totle ABAQUS nodes: %d' % self.localPointsSum)
-        print('totle STAPpp nodes: %d' % self.nodeCount)
-        print('  linked nodes: %d' % len(self.linkedNodes))
-        print('  unlinked nodes: %d' %
+        print('total ABAQUS nodes: %d' % self.localPointsSum)
+        print('total STAPpp nodes: %d' % self.nodeCount)
+        print('  linked nodes    : %d' % len(self.linkedNodes))
+        print('  unlinked nodes  : %d' %
               (self.nodeCount - len(self.linkedNodes)))
 
     def matchGlobalNode(self, gPos):
