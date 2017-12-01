@@ -3,7 +3,6 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-
 using namespace std;
 
 //	Constructor
@@ -43,7 +42,7 @@ bool CPlate::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CN
 	unsigned int N1, N2, N3, N4;	// node numbers in counter-clock sequence
 
 	Input >> N1 >> N2 >> N3 >> N4 >> MSet;
-	ElementMaterial = dynamic_cast<CBarMaterial*>(MaterialSets) + MSet - 1;
+	ElementMaterial = dynamic_cast<CPlateMaterial*>(MaterialSets) + MSet - 1;
 	nodes[0] = &NodeList[N1 - 1];
 	nodes[1] = &NodeList[N2 - 1];
 	nodes[2] = &NodeList[N3 - 1];
@@ -58,11 +57,14 @@ bool CPlate::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CN
 	edges[3]=nodes[2]->XYZ[1]-nodes[0]->XYZ[1];
 	edges[4]=nodes[3]->XYZ[0]-nodes[0]->XYZ[0];
 	edges[5]=nodes[3]->XYZ[1]-nodes[0]->XYZ[1];
-	if (nodes[1]->XYZ[2]!=nodes[0]->XYZ[2]||nodes[2]->XYZ[2]!=nodes[0]->XYZ[2]||nodes[3]->XYZ[2]!=nodes[0]->XYZ[0]){
+	if (abs(nodes[1]->XYZ[2]-nodes[0]->XYZ[2])>FLT_EPSILON||abs(nodes[2]->XYZ[2]-nodes[0]->XYZ[2])>FLT_EPSILON||abs(nodes[3]->XYZ[2]-nodes[0]->XYZ[2])>FLT_EPSILON){
 		cout<<"A plate out of XY plane is not supported currently"<<endl;
+#ifdef _DEBUG_
+		cout<<setw(20)<<nodes[0]->XYZ[2]<<setw(20)<<nodes[1]->XYZ[2]<<setw(20)<<nodes[2]->XYZ[2]<<setw(20)<<nodes[3]->XYZ[2]<<endl;
+#endif
 		return false;
 	}
-	if (abs(nodes[3]->XYZ[0]-nodes[0]->XYZ[0]+nodes[1]->XYZ[0]-nodes[2]->XYZ[0])>DBL_EPSILON||abs(nodes[3]->XYZ[1]-nodes[0]->XYZ[1]+nodes[1]->XYZ[1]-nodes[1]->XYZ[0])>DBL_EPSILON){
+	if (abs(nodes[3]->XYZ[0]-nodes[0]->XYZ[0]+nodes[1]->XYZ[0]-nodes[2]->XYZ[0])>FLT_EPSILON||abs(nodes[3]->XYZ[1]-nodes[0]->XYZ[1]+nodes[1]->XYZ[1]-nodes[2]->XYZ[1])>FLT_EPSILON){
 		cout<<"A shape of parallelogram is needed to guarantee convergence"<<endl;
 		return false;
 	}
@@ -119,7 +121,7 @@ void CPlate::ElementStiffness(double* Matrix)
 	double etay=xpsi/Jacobian;
 
 #ifdef _DEBUG_
-	cout<<setw(20)<<psix<<setw(20)<<psiy<<setw(20)<<etax<<setw(5)<<etay;
+	cout<<"Jacobian"<<setw(20)<<psix<<setw(20)<<psiy<<setw(20)<<etax<<setw(5)<<etay;
 #endif
 	Matrix[0] = k*(etax*etax*etax*etax + etay*etay*etay*etay + psix*psix*psix*psix + psiy*psiy*psiy*psiy + 2*etax*etax*etay*etay + (19*etax*etax*psix*psix)/10 + (7*etax*etax*psiy*psiy)/10 + (7*etay*etay*psix*psix)/10 + (19*etay*etay*psiy*psiy)/10 + 2*psix*psix*psiy*psiy - (etax*etax*nu*psiy*psiy)/5 - (etay*etay*nu*psix*psix)/5 + (12*etax*etay*psix*psiy)/5 + (2*etax*etay*nu*psix*psiy)/5);
 	Matrix[1] = k*(etax*etax*etax*psix + etay*etay*etay*psiy + (4*etax*etax*etax*etax)/3 + (4*etay*etay*etay*etay)/3 + (8*etax*etax*etay*etay)/3 + (8*etax*etax*psix*psix)/15 + (4*etax*etax*psiy*psiy)/15 + (4*etay*etay*psix*psix)/15 + (8*etay*etay*psiy*psiy)/15 - (4*etax*etax*nu*psiy*psiy)/15 - (4*etay*etay*nu*psix*psix)/15 + etax*etay*etay*psix + etax*etax*etay*psiy + (8*etax*etay*psix*psiy)/15 + (8*etax*etay*nu*psix*psiy)/15);
@@ -201,6 +203,12 @@ void CPlate::ElementStiffness(double* Matrix)
 	Matrix[77] = k*(etax*psix*psix*psix + etay*psiy*psiy*psiy - psix*psix*psix*psix/2 - psiy*psiy*psiy*psiy/2 + (7*etax*etax*psix*psix)/10 + (etax*etax*psiy*psiy)/10 + (etay*etay*psix*psix)/10 + (7*etay*etay*psiy*psiy)/10 - psix*psix*psiy*psiy + etax*psix*psiy*psiy + etay*psix*psix*psiy + (2*etax*etax*nu*psiy*psiy)/5 + (2*etay*etay*nu*psix*psix)/5 + (6*etax*etay*psix*psiy)/5 - (4*etax*etay*nu*psix*psiy)/5);
 
 
+#ifdef _DEBUG_
+	for (unsigned int i=0;i<78;++i)
+		{
+			cout<<"Matrix element "<<i<<" is "<<Matrix[i]<<endl;
+	};
+#endif
 
 
 }
@@ -224,7 +232,6 @@ void CPlate::ElementStress(double* stress, double* Displacement,double* position
 
 	};
 	
-	CPlateMaterial* material = dynamic_cast<CPlateMaterial*>(ElementMaterial);	// Pointer to material of the element
 
 	double nu=material->nu;
 	double Jacobian=xpsi*yeta-ypsi*xeta;

@@ -86,7 +86,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CTimoshenkoEBMOD);
             MaterialSize_ = sizeof(CTimoshenkoMaterial);
             break;
- 
+        case ElementTypes::Plate:
+            ElementSize_ = sizeof(CPlate);
+            MaterialSize_ = sizeof(CPlateMaterial);
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);

@@ -180,7 +180,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::TimoshenkoEBMOD:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
-
+			case ElementTypes::Plate:
+				PrintPlateElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -423,6 +425,43 @@ void COutputter::PrintHexElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
+void COutputter::PrintPlateElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        THICKNESS        POISSON'S" << endl
+		  << " NUMBER     MODULUS         (HEIGHT)          RATIO" << endl
+		  << "               E               h                nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
 //	Output TimoshenkoEBMOD Beam element data
 void COutputter::PrintTimoshenkoEBMODElementData(unsigned int EleGrp)
 {
@@ -485,7 +524,7 @@ void COutputter::OutputLoadInfo()
 		*this << endl;
 	}
 }
-
+/*
 void COutputter::PrintPlateElementData(unsigned int EleGrp)
 {
 	CDomain* FEMData = CDomain::Instance();
@@ -524,7 +563,7 @@ void COutputter::PrintPlateElementData(unsigned int EleGrp)
 
 	*this << endl;
 }
-
+*/
 
 //	Print nodal displacement
 void COutputter::OutputNodalDisplacement(unsigned int lcase)
@@ -602,8 +641,8 @@ void COutputter::OutputElementStress()
 					<< "              UX            UY           UZ            WEIGHTS"
 					#endif
 					<< endl;
-				double stresses[12];
-				double Positions[12];
+				double stresses4PE[12]; //4PE: for plate element
+				double Positions4PE[12];
 				#ifdef __TEST__
 				double GaussDisplacements[12];
 				double weights[4];
@@ -613,7 +652,7 @@ void COutputter::OutputElementStress()
 				{
 					#ifndef __TEST__
 					dynamic_cast<CQuadrilateral&>(
-						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
+						EleGrp.GetElement(Ele)).ElementStress(stresses4PE, Displacement, Positions4PE);
 					#else
 					dynamic_cast<CQuadrilateral&>(
 						EleGrp.GetElement(Ele)).ElementStress(
@@ -623,8 +662,8 @@ void COutputter::OutputElementStress()
 					for (unsigned i=0; i<4; ++i) { // four gauss points
 						*this << setw(8) << Ele + 1;
 						*this << setw(10) << i+1;
-						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
-						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+						*this << setw(17) << Positions4PE[i*3] << setw(14) << Positions4PE[i*3+1] << setw(14) << Positions4PE[i*3+2];
+						*this << setw(17) << stresses4PE[i*3] << setw(14) << stresses4PE[i*3+1] << setw(14) << stresses4PE[i*3+2];
 						// *this << setw(32) << stresses[i] << std::endl;
 						#ifdef __TEST__
 						*this << setw(17) << GaussDisplacements[i*3] 

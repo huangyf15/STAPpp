@@ -294,6 +294,10 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
         
         if(dof) // The DOF is activated
             Force[dof - 1] += LoadData->load[lnum];
+#ifdef _DEBUG_
+		
+			cout<<"The "<<dof-1<<"th dof of force is now"<<Force[dof-1];
+#endif
 	}
 
 	return true;
