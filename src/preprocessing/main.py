@@ -1,12 +1,12 @@
 import sys
 from optparse import OptionParser
 
-from Parse import Parser
-from Output import Outputter
+import ABAQUSparser
+import outputter
 
 def convert(fin, fout):
-    data = Parser(fin).parse()
-    Outputter(data, fout).print()
+    data = ABAQUSparser.Parser(fin).parse()
+    outputter.Outputter(data, fout).print()
 
 def main():
     parser = OptionParser('Usage: main.py [options] inputFile')
@@ -19,7 +19,7 @@ def main():
     (options, args) = parser.parse_args()
     
     if len(args) != 1:
-        print('input one and only one input file name.')
+        parser.print_help()
         exit()
 
     fin = args[0]

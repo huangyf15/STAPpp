@@ -18,4 +18,4 @@ class Node():
         return res
 
     def __repr__(self):
-        return '<Node %d %s>' % (self.index, str(self.pos))
+        return '<Node %d %s %s>' % (self.index, str(self.pos), str(self.bounds))

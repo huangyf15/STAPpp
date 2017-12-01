@@ -363,6 +363,7 @@ class Parser():
                         self.nodeCount += 1
                         globalNode = Node(globalPos)
                         globalNode.index = self.nodeCount
+                        globalNode.bounds = (0, 0, 0)
                         instance.globalNodesDict[nodeLocalIndex] = globalNode
                         self.globalNodesDict[self.nodeCount] = globalNode
                         self.linkedNodes.append(globalNode)
@@ -371,6 +372,7 @@ class Parser():
                     self.nodeCount += 1
                     globalNode = Node(globalPos)
                     globalNode.index = self.nodeCount
+                    globalNode.bounds = (0, 0, 0)
                     instance.globalNodesDict[nodeLocalIndex] = globalNode
                     self.globalNodesDict[self.nodeCount] = globalNode
 
@@ -406,10 +408,11 @@ class Parser():
                 localElement = part.localElementsDict[localElementIndex]
                 globalElement = Element()
                 self.elementCount += 1
-                globalElement.index = self.elementCount
+                globalElement.index = len(elementGroup.elements) + 1
                 globalElement.material = material  # same material for a instance
                 globalElement.nodes = [instance.globalNodesDict[index]
                                        for index in localElement.nodesIndexs]
+                elementGroup.elements.append(globalElement)
 
     def getElementGroup(self, elementType):
         'elementType as in number'
@@ -438,6 +441,12 @@ class Parser():
         self.indexElements()
 
         # 3. assembly
+        for index, eleGrp in self.eleGrpDict.items():
+            print(
+                'Element Group %d: %d elements, %d materials' % (
+                    index, len(eleGrp.elements), len(eleGrp.materials)
+                )
+            )
 
         print('totle ABAQUS nodes: %d' % self.localPointsSum)
         print('totle STAPpp nodes: %d' % self.nodeCount)
@@ -462,8 +471,8 @@ class Parser():
         return {
             'heading': self.heading,
             'nodes': tuple(self.globalNodesDict.values()),
-            'elementGroups': self.eleGrpDict,
-            'loads': self.loads
+            'elementGroups': tuple(self.eleGrpDict.values()),
+            'loads': []
         }
 
 
