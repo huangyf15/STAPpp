@@ -28,7 +28,7 @@ class Instance():
         self.offset = None
         self.rotation = None
 
-        self.nsets = []
+        self.linkedNsets = []
         self.globalNodesDict = dict()
 
     def __repr__(self):

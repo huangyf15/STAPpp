@@ -7,6 +7,8 @@ from material import *
 from element import *
 import ABAQUS
 
+from ProgressBar import ProgressBar
+
 
 class Parser():
     def __init__(self, fin):
@@ -29,6 +31,7 @@ class Parser():
 
         with open(self.fin, 'r') as fp:
             self.lines = fp.readlines()
+        self.bar = ProgressBar(len(self.lines))
         self.index = -1
 
         self.parseHeading()
@@ -37,6 +40,8 @@ class Parser():
         self.parseMaterials()
         # self.parseLoad()
 
+        self.bar.update(len(self.lines))
+        del self.bar
         del self.lines
 
         self.analyse()
@@ -52,14 +57,14 @@ class Parser():
         while True:
             line = self.getNextLine()
             if '*Part' in line:
-                print('parsing %s' % line)
+                # print('parsing %s' % line)
                 self.goBack()
                 part = self.parsePart()
                 self.partsDict[part.name] = part
             elif '*Assembly' in line:
                 self.goBack()
                 break
-        print('%d part parsed.' % len(self.partsDict))
+        # print('%d part parsed.' % len(self.partsDict))
 
     def parsePart(self):
         part = ABAQUS.Part()
@@ -82,7 +87,7 @@ class Parser():
                 material = re.findall(r'material=(\w+)', self.getLine())[0]
                 part.materialName = material
 
-        print('part parsed')
+        # print('part parsed')
         # print(part)
         return part
 
@@ -157,7 +162,7 @@ class Parser():
         name, partName = re.match(
             r'\*Instance, name=([^,]+), part=([\w\-]+)', line).groups()
 
-        print('parsing instance %s' % name)
+        # print('parsing instance %s' % name)
 
         instance.name = name
         instance.part = self.partsDict[partName]
@@ -175,8 +180,7 @@ class Parser():
                                           for item in self.getLine().split(','))
                 assert '*End Instance' in self.getNextLine()
 
-        print('Instance parsed.')
-        print(instance)
+        # print('Instance parsed. %s' % instance)
         return instance
 
     def parseMaterials(self):
@@ -190,7 +194,7 @@ class Parser():
             if '*Step' in line:
                 self.goBack()
                 break
-        print(self.materialsDict)
+        # print(self.materialsDict)
 
     def parseMaterial(self):
         material = ABAQUS.Material()
@@ -230,7 +234,7 @@ class Parser():
                 else:
                     raise
         nset.nodeIndexs = tuple(indexs)
-        print('Nset parsed. %s' % nset)
+        # print('Nset parsed. %s' % nset)
         return nset
 
     def parseElset(self):
@@ -254,7 +258,7 @@ class Parser():
                 else:
                     print(line)
                     raise
-        print('Elset parsed.')
+        # print('Elset parsed.')
         return elset
 
     def parseSurface(self):
@@ -263,7 +267,7 @@ class Parser():
             r'\*Surface, type=NODE, name=([^,]+), internal', self.getLine()
         ).groups()[0]
         surface.nsetName = re.match(r'[^,]+', self.getNextLine())[0]
-        print('Surface parsed. %s' % surface)
+        # print('Surface parsed. %s' % surface)
         return surface
 
     def parseTie(self):
@@ -279,7 +283,7 @@ class Parser():
         tie.surfaceName1 = surf1.replace(' ', '')
         tie.surfaceName2 = surf2.replace(' ', '')
 
-        print('tie parsed %s' % tie)
+        # print('tie parsed %s' % tie)
         return tie
 
     def data(self):
@@ -304,6 +308,7 @@ class Parser():
 
     def getLine(self):
         res = self.lines[self.index][:-1]
+        self.bar.update(self.index)
         if '**' in res:
             self.index += 1
             return self.getLine()
@@ -318,6 +323,8 @@ class Parser():
             surfaceDict, ties, materialDict
         '''
 
+        self.linkedNodes = []
+
         # 0. bond ties-surf-nset to instance
         for tie in self.ties:
             surf1 = self.surfacesDict[tie.surfaceName1]
@@ -326,17 +333,14 @@ class Parser():
             nsets1 = self.nsetsDict[surf1.nsetName]
             nsets2 = self.nsetsDict[surf2.nsetName]
 
-            # print('len(nsets1) = %d' % (len(nsets1)))
-            # print('len(nsets2) = %d' % (len(nsets2)))
-
             for nset in nsets1:  # left surface node sets
                 # print('len(nset) = %d' % len(nset.nodeIndexs))
                 instance = nset.instance
-                instance.nsets.append(nset)
+                instance.linkedNsets.append(nset)
 
             for nset in nsets2:
                 instance = nset.instance
-                instance.nsets.append(nset)
+                instance.linkedNsets.append(nset)
 
         # 1. indexing
         nodeCount = 0
@@ -347,25 +351,39 @@ class Parser():
             part = instance.part
             for nodeLocalIndex in part.localNodesDict:
                 localNode = part.localNodesDict[nodeLocalIndex]
-                # first calculate pos
                 globalPos = calculatePos(instance, nodeLocalIndex)
-                #  see if node has shown in other instances, that is,
-                # show up in ties
-                #  if so, skip new index
                 if isLocalNodeIndexInInstanceNsets(nodeLocalIndex, instance):
-                    pass
-                    # TODO
-                else:
+                    globalNode = self.matchGlobalNode(globalPos)
+                    if globalNode:  # already counted
+                        instance.globalNodesDict[nodeLocalIndex] = globalNode
+                    else:  # new boundary node
+                        nodeCount += 1
+                        globalNode = Node(globalPos)
+                        globalNode.index = nodeCount
+                        instance.globalNodesDict[nodeLocalIndex] = globalNode
+                        self.linkedNodes.append(globalNode)
+                else:  # inside nodes
                     nodeCount += 1
-                    globalNode = Node()
+                    globalNode = Node(globalPos)
                     globalNode.index = nodeCount
-                    # TODO: calculate pos
                     instance.globalNodesDict[nodeLocalIndex] = globalNode
 
-            for elementLocalIndex in part.localElementsDict:
-                pass
-                # calculate gravity force
-        print(nodeCount)
+            # print('instance = %s' % instance)
+            # for localNodeIndex in instance.part.localNodesDict:
+            #     print('gNode[%d] = %s' % (localNodeIndex,
+            #                               instance.globalNodesDict[localNodeIndex]))
+
+        print('totle nodes: %d' % nodeCount)
+        print('  linked nodes: %d' % len(self.linkedNodes))
+        print('  unlinked nodes: %d' % (nodeCount - len(self.linkedNodes)))
+
+    def matchGlobalNode(self, gPos):
+        for node in self.linkedNodes:
+            pos = node.pos
+            err = sum((gPos[i] - pos[i])**2 for i in range(3))
+            if err < 1e-10:
+                return node
+        return None
 
 
 class Vector():
@@ -435,11 +453,15 @@ def calculatePos(instance, index):
 
 
 def isLocalNodeIndexInInstanceNsets(localNodeIndex, instance):
-    for nset in instance.nsets:
+    for nset in instance.linkedNsets:
         if localNodeIndex in nset.nodeIndexs:
-            return True
+            return nset
     return False
 
 
 if __name__ == '__main__':
     print(Parser('data/Job-1.inp').parse())
+    # Job-1: 4163 nodes
+    # Job-2: 37185
+    # Job-3: 232720??
+    # Job-4: 1910327

@@ -1,8 +1,13 @@
 class Node():
     def __init__(self):
         self.index = None
-        self.bounds = []
-        self.pos = []
+        self.bounds = None
+        self.pos = None
+
+    def __init__(self, pos):
+        self.index = None
+        self.bounds = None
+        self.pos = pos
 
     def format(self):
         res = '%d' % self.index
@@ -11,6 +16,6 @@ class Node():
         for item in self.pos:
             res += '\t%lf' % item
         return res
-    
+
     def __repr__(self):
-        return '<' + self.format() + '>'
+        return '<Node %d %s>' % (self.index, str(self.pos))
