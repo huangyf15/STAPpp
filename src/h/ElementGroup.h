@@ -37,8 +37,7 @@ enum ElementTypes
     Plate,
     Shell,
     TimoshenkoSRINT,
-    TimoshenkoEBMOD,
-    Plate
+    TimoshenkoEBMOD
 };
 
 //! Element group class
