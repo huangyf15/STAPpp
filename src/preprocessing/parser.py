@@ -1,4 +1,5 @@
 import re
+import math
 
 from node import *
 from load import *
@@ -11,7 +12,7 @@ class Parser():
     def __init__(self, fin):
         self.fin = fin
         self.heading = None
-        self.nodes = []
+        self.nodesDict = dict()
         self.eleGrp = []
         self.loads = []
 
@@ -35,6 +36,10 @@ class Parser():
         self.parseAssembly()
         self.parseMaterials()
         # self.parseLoad()
+
+        del self.lines
+
+        self.analyse()
 
         return self.data()
 
@@ -273,17 +278,18 @@ class Parser():
         surf1, surf2 = line.split(',')
         tie.surfaceName1 = surf1.replace(' ', '')
         tie.surfaceName2 = surf2.replace(' ', '')
-        
+
         print('tie parsed %s' % tie)
         return tie
 
     def data(self):
-        return {
-            'heading': self.heading,
-            'nodes': self.nodes,
-            'elementGroups': self.eleGrp,
-            'loads': self.loads
-        }
+        pass
+        # return {
+        #     'heading': self.heading,
+        #     'nodes': self.nodes,
+        #     'elementGroups': self.eleGrp,
+        #     'loads': self.loads
+        # }
 
     def gotoKeyWord(self, keyword):
         while keyword not in self.getNextLine():
@@ -303,6 +309,136 @@ class Parser():
             return self.getLine()
         else:
             return res
+
+    def analyse(self):
+        '''
+        vars(self):
+            heading, nodes, eleGrp, loads;
+            partsDict, instancesDict, nsetsDict,
+            surfaceDict, ties, materialDict
+        '''
+
+        # 0. bond ties-surf-nset to instance
+        for tie in self.ties:
+            surf1 = self.surfacesDict[tie.surfaceName1]
+            surf2 = self.surfacesDict[tie.surfaceName2]
+
+            nsets1 = self.nsetsDict[surf1.nsetName]
+            nsets2 = self.nsetsDict[surf2.nsetName]
+
+            # print('len(nsets1) = %d' % (len(nsets1)))
+            # print('len(nsets2) = %d' % (len(nsets2)))
+
+            for nset in nsets1:  # left surface node sets
+                # print('len(nset) = %d' % len(nset.nodeIndexs))
+                instance = nset.instance
+                instance.nsets.append(nset)
+
+            for nset in nsets2:
+                instance = nset.instance
+                instance.nsets.append(nset)
+
+        # 1. indexing
+        nodeCount = 0
+        elementCount = 0
+
+        for insName in self.instancesDict:
+            instance = self.instancesDict[insName]
+            part = instance.part
+            for nodeLocalIndex in part.localNodesDict:
+                localNode = part.localNodesDict[nodeLocalIndex]
+                # first calculate pos
+                globalPos = calculatePos(instance, nodeLocalIndex)
+                #  see if node has shown in other instances, that is,
+                # show up in ties
+                #  if so, skip new index
+                if isLocalNodeIndexInInstanceNsets(nodeLocalIndex, instance):
+                    pass
+                    # TODO
+                else:
+                    nodeCount += 1
+                    globalNode = Node()
+                    globalNode.index = nodeCount
+                    # TODO: calculate pos
+                    instance.globalNodesDict[nodeLocalIndex] = globalNode
+
+            for elementLocalIndex in part.localElementsDict:
+                pass
+                # calculate gravity force
+        print(nodeCount)
+
+
+class Vector():
+    def __init__(self):
+        self.__init__((0., 0., 0.))
+
+    def __init__(self, tup):
+        self.x, self.y, self.z = tup
+
+    def __sub__(self, vec):
+        return Vector((self.x - vec.x, self.y - vec.y, self.z - vec.z))
+
+    def __add__(self, vec):
+        return Vector((self.x + vec.x, self.y + vec.y, self.z + vec.z))
+
+    def __mul__(self, a):
+        return Vector((a * self.x, a * self.y, a * self.z))
+
+    def __abs__(self):
+        return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
+
+    def normalize(self):
+        return self * (1 / abs(self))
+
+    def __repr__(self):
+        return '<Vector %s>' % str((self.x, self.y, self.z))
+
+    def dot(self, vec):
+        return self.x * vec.x + self.y * vec.y + self.z * vec.z
+
+    def cross(self, vec):
+        return Vector((
+            self.y * vec.z - self.z * vec.y,
+            self.z * vec.x - self.x * vec.z,
+            self.x * vec.y - self.y * vec.x
+        ))
+
+
+def calculatePos(instance, index):
+    localNode = instance.part.localNodesDict[index]
+    pos = tuple(localNode.pos)
+    if instance.offset:
+        pos = tuple(pos[i] + instance.offset[i] for i in range(3))
+    if instance.rotation:
+        pa = Vector(instance.rotation[:3])
+        pb = Vector(instance.rotation[3:6])
+        phi = instance.rotation[6] * math.pi / 180
+        p1 = Vector(pos)
+
+        p1a = p1 - pa
+        i = (pb - pa).normalize()
+        pc1 = p1a - i * p1a.dot(i)
+        l = abs(pc1)
+        if l != 0:
+            j = pc1.normalize()
+            n = i.cross(j)
+
+            p2 = pa + i * p1a.dot(i) + j * l * math.cos(phi) + \
+                n * l * math.sin(phi)
+
+            pos = (p2.x, p2.y, p2.z)
+        else:
+            # 1 on line ab, return pos directly
+            pass
+    # print(pos)
+    return pos
+
+
+def isLocalNodeIndexInInstanceNsets(localNodeIndex, instance):
+    for nset in instance.nsets:
+        if localNodeIndex in nset.nodeIndexs:
+            return True
+    return False
 
 
 if __name__ == '__main__':

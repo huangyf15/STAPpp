@@ -28,6 +28,9 @@ class Instance():
         self.offset = None
         self.rotation = None
 
+        self.nsets = []
+        self.globalNodesDict = dict()
+
     def __repr__(self):
         return f'<Instance name={self.name}, part={self.part.name}, ' + \
                f'offset={self.offset}, rotation={self.rotation}'
@@ -56,12 +59,15 @@ class Nset():
 class Elset(Nset):
     pass
 
+
 class Surface():
     def __init__(self):
         self.name = None
         self.nsetName = None
+
     def __repr__(self):
         return f'<Surface name={self.name}, nset={self.nsetName}>'
+
 
 class Tie():
     def __init__(self):
@@ -70,10 +76,11 @@ class Tie():
         self.rotation = None
         self.surfaceName1 = None
         self.surfaceName2 = None
-    
+
     def __repr__(self):
         return f'<Tie name={self.name}>, adjust={self.adjust}, ' + \
                f'rot={self.rotation}, surf1={self.surfaceName1}, surf2={self.surfaceName2}>'
+
 
 class Material():
     def __init__(self):
