@@ -469,20 +469,34 @@ class Parser():
         return self.eleGrpDict[elementType]
 
     def calculateForce(self):
-        direct = Vector(self.dload.direction)
-        g = self.dload.mag
+        load = Load()
+
+        fs = dict()
+        for i in range(3):
+            if self.dload.direction[i]:
+                fs[i + 1] = self.dload.mag * self.dload.direction[i]
 
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
             for elementIndex in part.localElementsDict:
                 element = part.localElementsDict[elementIndex]
-                # calculate force at each node
-                # TODO
-                for localNodeIndex in element.nodesIndexs:
+                section = part.section
+
+                # calculate a unit body force at each node
+                nodeForces = calculateBodyForceAtElement(element, section)
+
+                for localNodeIndex in nodeForces:
                     globalNode = ins.globalNodesDict[localNodeIndex]
-                    # assign force here
-                    # TODO
+                    for direction in fs:
+                        force = Force()
+                        force.direction = direction
+                        force.node = globalNode
+                        force.mag = fs[direction] * nodeForces[localNodeIndex]
+                        load.forces.append(force)
+        
+        # print(load)
+        self.loads.append(load)
 
     def analyse(self):
         '''
@@ -568,6 +582,11 @@ class Vector():
             self.z * vec.x - self.x * vec.z,
             self.x * vec.y - self.y * vec.x
         ))
+
+
+def calculateBodyForceAtElement(element, section):
+    # TODO
+    return {1: 1}
 
 
 def calculatePos(instance, index):
