@@ -8,8 +8,6 @@ from element import *
 import ABAQUS
 
 from ProgressBar import ProgressBar
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 class Parser():
@@ -85,12 +83,11 @@ class Parser():
                 _type, elements = self.parseElement()
                 part.type = _type
                 part.localElementsDict = elements
-            elif '*Solid Section' in line:
+            elif re.match(r'\*\w+ Section', line):
                 material = re.findall(r'material=(\w+)', self.getLine())[0]
                 part.materialName = material
-
-        # print('part parsed')
-        # print(part)
+                # TODO
+                
         return part
 
     def parseNode(self):
@@ -288,15 +285,6 @@ class Parser():
         # print('tie parsed %s' % tie)
         return tie
 
-    def data(self):
-        pass
-        # return {
-        #     'heading': self.heading,
-        #     'nodes': self.nodes,
-        #     'elementGroups': self.eleGrp,
-        #     'loads': self.loads
-        # }
-
     def gotoKeyWord(self, keyword):
         while keyword not in self.getNextLine():
             pass
@@ -336,23 +324,12 @@ class Parser():
                 instance = nset.instance
                 instance.linkedNsets.append(nset)
 
-    def analyse(self):
-        '''
-        vars(self):
-            heading, nodes, eleGrp, loads;
-            partsDict, instancesDict, nsetsDict,
-            surfaceDict, ties, materialDict
-        '''
-
-        # 0. bond ties-surf-nset to instance
-        self.bondTieToInstance()
-
-        # 1. indexing nodes
+    def indexNodes(self):
         self.linkedNodes = []
-        nodeCount = 0
-        elementCount = 0
+        self.nodeCount = 0
+        self.elementCount = 0
 
-        localPointsSum = sum(
+        self.localPointsSum = sum(
             len(self.instancesDict[insindex].part.localNodesDict)
             for insindex in self.instancesDict)
         localPointsCount = 0
@@ -369,51 +346,80 @@ class Parser():
                     if globalNode:  # already counted
                         instance.globalNodesDict[nodeLocalIndex] = globalNode
                     else:  # new boundary node
-                        nodeCount += 1
+                        self.nodeCount += 1
                         globalNode = Node(globalPos)
-                        globalNode.index = nodeCount
+                        globalNode.index = self.nodeCount
                         instance.globalNodesDict[nodeLocalIndex] = globalNode
-                        self.nodesDict[nodeCount] = globalNode
+                        self.nodesDict[self.nodeCount] = globalNode
                         self.linkedNodes.append(globalNode)
 
                 else:  # inside nodes
-                    nodeCount += 1
+                    self.nodeCount += 1
                     globalNode = Node(globalPos)
-                    globalNode.index = nodeCount
+                    globalNode.index = self.nodeCount
                     instance.globalNodesDict[nodeLocalIndex] = globalNode
-                    self.nodesDict[nodeCount] = globalNode
+                    self.nodesDict[self.nodeCount] = globalNode
 
                 localPointsCount += 1
-                if localPointsCount / localPointsSum > bar.currentCount / bar.maxCount:
+                if localPointsCount / self.localPointsSum > bar.currentCount / bar.maxCount:
                     bar.grow()
-        del bar
 
-        # print('instance = %s' % instance)
-        # for localNodeIndex in instance.part.localNodesDict:
-        #     print('gNode[%d] = %s' % (localNodeIndex,
-        #                               instance.globalNodesDict[localNodeIndex]))
+    def indexElements(self):
+        elementTypeDict = {
+            'S4R': 6,  # Plate
+            'C3D8R': 4,  # 8H
+            'B31': 5,  # Beam
+            'T3D2': 1  # Bar
+        }
 
-        print('totle ABAQUS nodes: %d' % localPointsSum)
-        print('totle STAPpp nodes: %d' % nodeCount)
+        self.partCount = 0
+        for insIndex in self.instancesDict:
+            instance = self.instancesDict[insIndex]
+            part = instance.part
+            
+            section = self.materialsDict[part.materialName]
+            material = convertSection2Material(section)
+
+            elementGroup = ElementGroup()
+            elementGroup.type = elementTypeDict[part.type]
+            elementGroup.materials = [material,]
+
+            for elementIndex in part.localElementsDict:
+                localElement = part.localElementsDict[elementIndex]
+                globalElement = Element()
+
+    def analyse(self):
+        '''
+        vars(self):
+            heading, nodes, eleGrp, loads;
+            partsDict, instancesDict, nsetsDict,
+            surfaceDict, ties, materialDict
+        '''
+
+        # 0. bond ties-surf-nset to instance
+        self.bondTieToInstance()
+
+        # 1. indexing nodes
+        self.indexNodes()
+
+        # 2. index elements
+        self.indexElements()
+
+        # 3. assembly
+
+        print('totle ABAQUS nodes: %d' % self.localPointsSum)
+        print('totle STAPpp nodes: %d' % self.nodeCount)
         print('  linked nodes: %d' % len(self.linkedNodes))
-        print('  unlinked nodes: %d' % (nodeCount - len(self.linkedNodes)))
+        print('  unlinked nodes: %d' %
+              (self.nodeCount - len(self.linkedNodes)))
 
         x = []
         y = []
         z = []
         with open('mma.dat', 'w') as f:
-            for index in range(nodeCount):
+            for index in range(self.nodeCount):
                 node = self.nodesDict[index + 1]
                 f.write('%f\t%f\t%f\n' % node.pos)
-
-            # x.append(node.pos[0])
-            # y.append(node.pos[1])
-            # z.append(node.pos[2])
-        # fig = plt.figure()
-        # ax = fig.gca(projection='3d')
-        # ax.set_aspect(1)
-        # ax.scatter(x, y, z)
-        # plt.show()
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
@@ -422,6 +428,14 @@ class Parser():
             if err < 1e-10:
                 return node
         return None
+
+    def data(self):
+        return {
+            'heading': self.heading,
+            'nodes': tuple(self.nodesDict.values()),
+            'elementGroups': self.eleGrp,
+            'loads': self.loads
+        }
 
 
 class Vector():
@@ -496,9 +510,11 @@ def isLocalNodeIndexInInstanceNsets(localNodeIndex, instance):
             return nset
     return False
 
+def convertSection2Material(section):
+    pass
 
 if __name__ == '__main__':
-    print(Parser('data/Job-1.inp').parse())
+    Parser('data/Job-1.inp').parse()
     # Job-1: 4163 nodes
     # Job-2: 37185
     # Job-3: 232720??
