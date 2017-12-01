@@ -10,11 +10,11 @@ class Node():
         self.pos = pos
 
     def format(self):
-        res = '%d' % self.index
+        res = '%8d' % self.index
         for item in self.bounds:
-            res += '\t%d' % item
+            res += ' %3d' % item
         for item in self.pos:
-            res += '\t%lf' % item
+            res += ' %12lf' % item
         return res
 
     def __repr__(self):

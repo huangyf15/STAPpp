@@ -2,19 +2,18 @@ from element import *
 from load import *
 from node import *
 from material import *
-from Output import Outputter
+from outputter import Outputter
 
 nodes = []
 for i in range(4):
-    node = Node()
+    node = Node((i, i + 1, i + 2))
     node.index = i + 1
     node.bounds = [1, 1, 1]
-    node.pos = [i, i + 1, i + 2]
     nodes.append(node)
 
 material = Material()
 material.index = 1
-material.attributes = {'E': 1e6, 'v': 0.3}
+material.attributes = (1e6, 0.3)
 
 element = Element()
 element.index = 1

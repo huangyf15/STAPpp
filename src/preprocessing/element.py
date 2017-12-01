@@ -15,8 +15,8 @@ class Element():
         return f'<Element {self.index}, material={self.material}, nodes={self.nodes}>'
 
     def format(self):
-        res = '%d' % self.index
+        res = '%5d' % self.index
         for node in self.nodes:
-            res += '\t%d' % node.index
-        res += '\t%d' % self.material.index
+            res += '%8d' % node.index
+        res += '%5d' % self.material.index
         return res

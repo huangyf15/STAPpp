@@ -7,7 +7,7 @@ class Material():
         return f'<Material %d, attr: %s>' % (self.index, str(self.attributes))
 
     def format(self):
-        res = '%d' % self.index
+        res = '%5d' % self.index
         for attr in self.attributes:
-            res += '\t%lf' % attr
+            res += ' %12lf' % attr
         return res

@@ -10,4 +10,4 @@ class Force():
         self.mag = None
 
     def format(self):
-        return '%d\t%d\t%lf' % (self.node.index, self.direction, self.mag)
+        return '%8d%4d%20lf' % (self.node.index, self.direction, self.mag)

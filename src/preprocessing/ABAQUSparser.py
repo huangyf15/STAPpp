@@ -454,11 +454,6 @@ class Parser():
         print('  unlinked nodes: %d' %
               (self.nodeCount - len(self.linkedNodes)))
 
-        # with open('mma.dat', 'w') as f:
-        #     for index in range(self.nodeCount):
-        #         node = self.globalNodesDict[index + 1]
-        #         f.write('%f\t%f\t%f\n' % node.pos)
-
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
             pos = node.pos

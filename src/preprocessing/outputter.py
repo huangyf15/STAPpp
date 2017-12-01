@@ -17,10 +17,11 @@ class Outputter():
         print(file=self.f)
 
     def printControlLines(self):
-        print('%d\t%d\t%d\t1' % (
+        print('%8d %8d %8d %8d' % (
             len(self.data['nodes']),
             len(self.data['elementGroups']),
-            len(self.data['loads'])
+            len(self.data['loads']),
+            1
         ), file=self.f)
         print(file=self.f)
 
@@ -32,7 +33,7 @@ class Outputter():
     def printLoadDataLines(self):
         count = 1
         for load in self.data['loads']:
-            print('%d\t%d' % (count, len(load.forces)), file=self.f)
+            print('%8d %8d' % (count, len(load.forces)), file=self.f)
             count += 1
             for force in load.forces:
                 print(force.format(), file=self.f)
@@ -40,7 +41,7 @@ class Outputter():
 
     def printElementDataLines(self):
         for elementGroup in self.data['elementGroups']:
-            print('%d\t%d\t%d' % (
+            print('%3d %8d %8d' % (
                 elementGroup.type,
                 len(elementGroup.elements),
                 len(elementGroup.materials)
