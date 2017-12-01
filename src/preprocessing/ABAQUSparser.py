@@ -260,7 +260,7 @@ class Parser():
                 x, y, z = float(x), float(y), float(z)
                 self.dload = ABAQUS.DLoad()
                 self.dload.mag = float(mag)
-                self.direction = (x, y, z)
+                self.dload.direction = (x, y, z)
             except:
                 self.goBack()
                 break
@@ -416,13 +416,13 @@ class Parser():
                 localPointsCount += 1
                 if localPointsCount / self.localPointsSum > bar.currentCount / bar.maxCount:
                     bar.grow()
-        
+
         for bound in self.boundaries:
             for nset in bound.nsets:
                 for nodeIndex in nset.nodeIndexs:
                     node = nset.instance.globalNodesDict[nodeIndex]
                     b = list(node.bounds)
-                    b[bound.displacementIndex-1] = 1
+                    b[bound.displacementIndex - 1] = 1
                     node.bounds = tuple(b)
 
     def indexElements(self):
@@ -469,7 +469,20 @@ class Parser():
         return self.eleGrpDict[elementType]
 
     def calculateForce(self):
-        pass
+        direct = Vector(self.dload.direction)
+        g = self.dload.mag
+
+        for insIndex in self.instancesDict:
+            ins = self.instancesDict[insIndex]
+            part = ins.part
+            for elementIndex in part.localElementsDict:
+                element = part.localElementsDict[elementIndex]
+                # calculate force at each node
+                # TODO
+                for localNodeIndex in element.nodesIndexs:
+                    globalNode = ins.globalNodesDict[localNodeIndex]
+                    # assign force here
+                    # TODO
 
     def analyse(self):
         '''

@@ -9,7 +9,7 @@ class Part():
     def __repr__(self):
         return f'<Part name={self.name}, ' + \
             f'type={self.type}, nodes={self.localNodesDict}, ' + \
-            f'elements={self.localElementsDict}, material={self.materialName}'
+            f'elements={self.localElementsDict}, material={self.section.materialName}'
 
 
 class Node():
