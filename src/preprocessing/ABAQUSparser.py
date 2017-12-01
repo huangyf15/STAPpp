@@ -39,7 +39,7 @@ class Parser():
         self.parseParts()
         self.parseAssembly()
         self.parseMaterials()
-        # self.parseLoad()
+        self.parseLoad()
 
         self.bar.update(self.bar.maxCount)
         del self.bar
@@ -226,7 +226,44 @@ class Parser():
         return material
 
     def parseLoad(self):
-        pass
+        while True:
+            try:
+                line = self.getNextLine()
+            except:
+                break
+            if '*Boundary' in line:
+                self.parseBoundary()
+            elif '*Dload' in line:
+                self.parseDLoad()
+
+    def parseBoundary(self):
+        self.boundaries = []
+        while True:
+            line = self.getNextLine()
+            try:
+                nset, dis, rot = line.split(',')
+                boundary = ABAQUS.Boundary()
+                boundary.nsets = self.nsetsDict[nset]
+                boundary.displacementIndex = int(dis)
+                boundary.rotationIndex = int(rot)
+                self.boundaries.append(boundary)
+            except:
+                self.goBack()
+                break
+        # print(self.boundaries)
+
+    def parseDLoad(self):
+        while True:
+            line = self.getNextLine()
+            try:
+                _, __, mag, x, y, z = line.split(',')
+                x, y, z = float(x), float(y), float(z)
+                self.dload = ABAQUS.DLoad()
+                self.dload.mag = float(mag)
+                self.direction = (x, y, z)
+            except:
+                self.goBack()
+                break
 
     def parseNset(self):
         line = self.getLine()
@@ -379,6 +416,14 @@ class Parser():
                 localPointsCount += 1
                 if localPointsCount / self.localPointsSum > bar.currentCount / bar.maxCount:
                     bar.grow()
+        
+        for bound in self.boundaries:
+            for nset in bound.nsets:
+                for nodeIndex in nset.nodeIndexs:
+                    node = nset.instance.globalNodesDict[nodeIndex]
+                    b = list(node.bounds)
+                    b[bound.displacementIndex-1] = 1
+                    node.bounds = tuple(b)
 
     def indexElements(self):
         elementTypeDict = {
@@ -423,6 +468,9 @@ class Parser():
 
         return self.eleGrpDict[elementType]
 
+    def calculateForce(self):
+        pass
+
     def analyse(self):
         '''
         vars(self):
@@ -440,7 +488,9 @@ class Parser():
         # 2. index elements
         self.indexElements()
 
-        # 3. assembly
+        # 3. assembly force
+        self.calculateForce()
+
         for index, eleGrp in self.eleGrpDict.items():
             print(
                 'Element Group %d: %d elements, %d materials' % (

@@ -104,3 +104,16 @@ class Section():
         return f'<Section material=%s, args=%s>' % (
             self.materialName, str(self.args)
         )
+
+
+class Boundary():
+    def __init__(self):
+        self.nsets = None
+        self.displacementIndex = None
+        self.rotationIndex = None
+
+
+class DLoad():
+    def __init__(self):
+        self.mag = None
+        self.direction = None
