@@ -10,6 +10,9 @@ class Element():
         self.index = None
         self.nodes = []
         self.material = None
+    
+    def __repr__(self):
+        return f'<Element {self.index}, material={self.material}, nodes={self.nodes}>'
 
     def format(self):
         res = '%d' % self.index

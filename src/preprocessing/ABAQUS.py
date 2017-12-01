@@ -4,7 +4,7 @@ class Part():
         self.type = None
         self.localNodesDict = []
         self.localElementsDict = None
-        self.materialName = None
+        self.section = None
 
     def __repr__(self):
         return f'<Part name={self.name}, ' + \
@@ -92,4 +92,15 @@ class Material():
     def __repr__(self):
         return '<Material %s, rho=%f, E=%f, v=%f>' % (
             self.name, self.density, self.E, self.v
+        )
+
+
+class Section():
+    def __init__(self):
+        self.materialName = None
+        self.args = tuple()
+
+    def __repr__(self):
+        return f'<Section material=%s, args=%s>' % (
+            self.materialName, str(self.args)
         )

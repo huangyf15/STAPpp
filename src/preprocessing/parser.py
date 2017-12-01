@@ -14,8 +14,9 @@ class Parser():
     def __init__(self, fin):
         self.fin = fin
         self.heading = None
-        self.nodesDict = dict()
-        self.eleGrp = []
+        self.globalNodesDict = dict()
+        self.eleGrpDict = dict()
+        self.stapppMaterialsDictByPartName = dict()
         self.loads = []
 
     def parse(self):
@@ -84,11 +85,26 @@ class Parser():
                 part.type = _type
                 part.localElementsDict = elements
             elif re.match(r'\*\w+ Section', line):
-                material = re.findall(r'material=(\w+)', self.getLine())[0]
-                part.materialName = material
-                # TODO
-                
+                section = self.parseSection()
+                part.section = section
+
         return part
+
+    def parseSection(self):
+        line = self.getLine()
+        section = ABAQUS.Section()
+        section.materialName = re.findall(r'material=(\w+)', self.getLine())[0]
+
+        while True:
+            line = self.getNextLine()
+            try:
+                section.args += tuple(float(item)
+                                      for item in line.split(',') if item)
+            except Exception as ex:
+                self.goBack()
+                break
+
+        return section
 
     def parseNode(self):
         'returns a dict of node {localIndex: ABAQUS.Node}'
@@ -214,7 +230,6 @@ class Parser():
 
     def parseNset(self):
         line = self.getLine()
-        # print(line)
         nset = ABAQUS.Nset()
         res = re.match(r'\*Nset, nset=([\_\-\w]+), instance=([\w+\-]+)', line)
         assert res
@@ -327,7 +342,6 @@ class Parser():
     def indexNodes(self):
         self.linkedNodes = []
         self.nodeCount = 0
-        self.elementCount = 0
 
         self.localPointsSum = sum(
             len(self.instancesDict[insindex].part.localNodesDict)
@@ -350,7 +364,7 @@ class Parser():
                         globalNode = Node(globalPos)
                         globalNode.index = self.nodeCount
                         instance.globalNodesDict[nodeLocalIndex] = globalNode
-                        self.nodesDict[self.nodeCount] = globalNode
+                        self.globalNodesDict[self.nodeCount] = globalNode
                         self.linkedNodes.append(globalNode)
 
                 else:  # inside nodes
@@ -358,7 +372,7 @@ class Parser():
                     globalNode = Node(globalPos)
                     globalNode.index = self.nodeCount
                     instance.globalNodesDict[nodeLocalIndex] = globalNode
-                    self.nodesDict[self.nodeCount] = globalNode
+                    self.globalNodesDict[self.nodeCount] = globalNode
 
                 localPointsCount += 1
                 if localPointsCount / self.localPointsSum > bar.currentCount / bar.maxCount:
@@ -372,21 +386,39 @@ class Parser():
             'T3D2': 1  # Bar
         }
 
-        self.partCount = 0
+        self.elementCount = 0
         for insIndex in self.instancesDict:
             instance = self.instancesDict[insIndex]
             part = instance.part
-            
-            section = self.materialsDict[part.materialName]
-            material = convertSection2Material(section)
+            elementType = elementTypeDict[part.type]
+            elementGroup = self.getElementGroup(elementType)
 
-            elementGroup = ElementGroup()
-            elementGroup.type = elementTypeDict[part.type]
-            elementGroup.materials = [material,]
+            # get material for this part
+            material = self.stapppMaterialsDictByPartName.get(part.name)
+            if not material:
+                materialIndex = len(elementGroup.materials) + 1
+                material = convertSection2Material(
+                    part.section, self.materialsDict, materialIndex)
+                self.stapppMaterialsDictByPartName[part.name] = material
+                elementGroup.materials.append(material)
 
-            for elementIndex in part.localElementsDict:
-                localElement = part.localElementsDict[elementIndex]
+            for localElementIndex in part.localElementsDict:
+                localElement = part.localElementsDict[localElementIndex]
                 globalElement = Element()
+                self.elementCount += 1
+                globalElement.index = self.elementCount
+                globalElement.material = material  # same material for a instance
+                globalElement.nodes = [instance.globalNodesDict[index]
+                                       for index in localElement.nodesIndexs]
+
+    def getElementGroup(self, elementType):
+        'elementType as in number'
+        if elementType not in self.eleGrpDict:
+            eleGrp = ElementGroup()
+            eleGrp.type = elementType
+            self.eleGrpDict[elementType] = eleGrp
+
+        return self.eleGrpDict[elementType]
 
     def analyse(self):
         '''
@@ -413,13 +445,10 @@ class Parser():
         print('  unlinked nodes: %d' %
               (self.nodeCount - len(self.linkedNodes)))
 
-        x = []
-        y = []
-        z = []
-        with open('mma.dat', 'w') as f:
-            for index in range(self.nodeCount):
-                node = self.nodesDict[index + 1]
-                f.write('%f\t%f\t%f\n' % node.pos)
+        # with open('mma.dat', 'w') as f:
+        #     for index in range(self.nodeCount):
+        #         node = self.globalNodesDict[index + 1]
+        #         f.write('%f\t%f\t%f\n' % node.pos)
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
@@ -432,8 +461,8 @@ class Parser():
     def data(self):
         return {
             'heading': self.heading,
-            'nodes': tuple(self.nodesDict.values()),
-            'elementGroups': self.eleGrp,
+            'nodes': tuple(self.globalNodesDict.values()),
+            'elementGroups': self.eleGrpDict,
             'loads': self.loads
         }
 
@@ -510,8 +539,14 @@ def isLocalNodeIndexInInstanceNsets(localNodeIndex, instance):
             return nset
     return False
 
-def convertSection2Material(section):
-    pass
+
+def convertSection2Material(section, materialsDict, index):
+    material = materialsDict[section.materialName]
+    res = Material()
+    res.index = index
+    res.attributes += (material.E, material.v) + section.args
+    return res
+
 
 if __name__ == '__main__':
     Parser('data/Job-1.inp').parse()
