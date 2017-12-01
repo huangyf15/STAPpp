@@ -8,6 +8,8 @@ from element import *
 import ABAQUS
 
 from ProgressBar import ProgressBar
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 class Parser():
@@ -31,7 +33,7 @@ class Parser():
 
         with open(self.fin, 'r') as fp:
             self.lines = fp.readlines()
-        self.bar = ProgressBar(len(self.lines))
+        self.bar = ProgressBar(1000, printCount=False, printTime=True)
         self.index = -1
 
         self.parseHeading()
@@ -40,7 +42,7 @@ class Parser():
         self.parseMaterials()
         # self.parseLoad()
 
-        self.bar.update(len(self.lines))
+        self.bar.update(self.bar.maxCount)
         del self.bar
         del self.lines
 
@@ -308,24 +310,16 @@ class Parser():
 
     def getLine(self):
         res = self.lines[self.index][:-1]
-        self.bar.update(self.index)
+        # self.bar.update(self.index)
+        if (self.index / len(self.lines)) > (self.bar.currentCount / self.bar.maxCount):
+            self.bar.grow()
         if '**' in res:
             self.index += 1
             return self.getLine()
         else:
             return res
 
-    def analyse(self):
-        '''
-        vars(self):
-            heading, nodes, eleGrp, loads;
-            partsDict, instancesDict, nsetsDict,
-            surfaceDict, ties, materialDict
-        '''
-
-        self.linkedNodes = []
-
-        # 0. bond ties-surf-nset to instance
+    def bondTieToInstance(self):
         for tie in self.ties:
             surf1 = self.surfacesDict[tie.surfaceName1]
             surf2 = self.surfacesDict[tie.surfaceName2]
@@ -342,10 +336,28 @@ class Parser():
                 instance = nset.instance
                 instance.linkedNsets.append(nset)
 
-        # 1. indexing
+    def analyse(self):
+        '''
+        vars(self):
+            heading, nodes, eleGrp, loads;
+            partsDict, instancesDict, nsetsDict,
+            surfaceDict, ties, materialDict
+        '''
+
+        # 0. bond ties-surf-nset to instance
+        self.bondTieToInstance()
+
+        # 1. indexing nodes
+        self.linkedNodes = []
         nodeCount = 0
         elementCount = 0
 
+        localPointsSum = sum(
+            len(self.instancesDict[insindex].part.localNodesDict)
+            for insindex in self.instancesDict)
+        localPointsCount = 0
+        bar = ProgressBar(1000, printCount=False, printTime=True)
+        bar.begin()
         for insName in self.instancesDict:
             instance = self.instancesDict[insName]
             part = instance.part
@@ -361,21 +373,47 @@ class Parser():
                         globalNode = Node(globalPos)
                         globalNode.index = nodeCount
                         instance.globalNodesDict[nodeLocalIndex] = globalNode
+                        self.nodesDict[nodeCount] = globalNode
                         self.linkedNodes.append(globalNode)
+
                 else:  # inside nodes
                     nodeCount += 1
                     globalNode = Node(globalPos)
                     globalNode.index = nodeCount
                     instance.globalNodesDict[nodeLocalIndex] = globalNode
+                    self.nodesDict[nodeCount] = globalNode
 
-            # print('instance = %s' % instance)
-            # for localNodeIndex in instance.part.localNodesDict:
-            #     print('gNode[%d] = %s' % (localNodeIndex,
-            #                               instance.globalNodesDict[localNodeIndex]))
+                localPointsCount += 1
+                if localPointsCount / localPointsSum > bar.currentCount / bar.maxCount:
+                    bar.grow()
+        del bar
 
-        print('totle nodes: %d' % nodeCount)
+        # print('instance = %s' % instance)
+        # for localNodeIndex in instance.part.localNodesDict:
+        #     print('gNode[%d] = %s' % (localNodeIndex,
+        #                               instance.globalNodesDict[localNodeIndex]))
+
+        print('totle ABAQUS nodes: %d' % localPointsSum)
+        print('totle STAPpp nodes: %d' % nodeCount)
         print('  linked nodes: %d' % len(self.linkedNodes))
         print('  unlinked nodes: %d' % (nodeCount - len(self.linkedNodes)))
+
+        x = []
+        y = []
+        z = []
+        with open('mma.dat', 'w') as f:
+            for index in range(nodeCount):
+                node = self.nodesDict[index + 1]
+                f.write('%f\t%f\t%f\n' % node.pos)
+
+            # x.append(node.pos[0])
+            # y.append(node.pos[1])
+            # z.append(node.pos[2])
+        # fig = plt.figure()
+        # ax = fig.gca(projection='3d')
+        # ax.set_aspect(1)
+        # ax.scatter(x, y, z)
+        # plt.show()
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
