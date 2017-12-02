@@ -10,7 +10,7 @@ class Force():
     def __init__(self):
         self.node = None
         self.direction = None
-        self.mag = None
+        self.mag = 0.0
 
     def format(self):
         return '%8d %4d %20lf' % (self.node.index, self.direction, self.mag)

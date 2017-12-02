@@ -135,7 +135,7 @@ class Parser():
                 element = ABAQUS.Element()
                 element.index = int(index)
                 element.nodesIndexs = tuple(int(item) for item in nodeIndex)
-                elements[index] = element
+                elements[element.index] = element
             except:
                 self.goBack()
                 break
@@ -471,10 +471,13 @@ class Parser():
     def calculateForce(self):
         load = Load()
 
-        fs = dict()
+        fs = dict()  # fs marks every direction's force as {1:2.0, 2:3.0}
         for i in range(3):
             if self.dload.direction[i]:
                 fs[i + 1] = self.dload.mag * self.dload.direction[i]
+
+        # {index: {direction: force, }}
+        self.globalForcesByGlobalNodeIndexDict = dict()
 
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
@@ -484,18 +487,28 @@ class Parser():
                 section = part.section
 
                 # calculate a unit body force at each node
+                # returns as {1:3.2, 2:2.4}
                 nodeForces = calculateBodyForceAtElement(element, section)
 
                 for localNodeIndex in nodeForces:
                     globalNode = ins.globalNodesDict[localNodeIndex]
                     for direction in fs:
-                        force = Force()
-                        force.direction = direction
-                        force.node = globalNode
-                        force.mag = fs[direction] * nodeForces[localNodeIndex]
-                        load.forces.append(force)
-        
-        # print(load)
+                        # get forces for global node
+                        forces = self.globalForcesByGlobalNodeIndexDict.get(
+                            globalNode.index)
+                        if not forces:
+                            forces = dict()
+                            self.globalForcesByGlobalNodeIndexDict[globalNode.index] = forces
+                        # get direction force from this node forces
+                        force = forces.get(direction)
+                        if not force:
+                            force = Force()
+                            force.direction = direction
+                            force.node = globalNode
+                            forces[direction] = force
+                            load.forces.append(force)  # append new force only
+                        force.mag += fs[direction] * nodeForces[localNodeIndex]
+
         self.loads.append(load)
 
     def analyse(self):
@@ -518,18 +531,19 @@ class Parser():
         # 3. assembly force
         self.calculateForce()
 
-        for index, eleGrp in self.eleGrpDict.items():
+        for index, eleGrp in sorted(self.eleGrpDict.items(), key=lambda x: x[0]):
             print(
-                'Element Group %d: %d elements, %d materials' % (
+                'Element Group %4d : %8d elements, %2d materials' % (
                     index, len(eleGrp.elements), len(eleGrp.materials)
                 )
             )
 
-        print('total ABAQUS nodes: %d' % self.localPointsSum)
-        print('total STAPpp nodes: %d' % self.nodeCount)
-        print('  linked nodes    : %d' % len(self.linkedNodes))
-        print('  unlinked nodes  : %d' %
+        print('Total ABAQUS nodes : %d' % self.localPointsSum)
+        print('Total STAPpp nodes : %d' % self.nodeCount)
+        print('  boundary nodes   : %d' % len(self.linkedNodes))
+        print('  inside nodes     : %d' %
               (self.nodeCount - len(self.linkedNodes)))
+        print('Total forces       : %d' % len(self.loads[0].forces))
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
@@ -586,7 +600,7 @@ class Vector():
 
 def calculateBodyForceAtElement(element, section):
     # TODO
-    return {1: 1}
+    return {index: 1 for index in element.nodesIndexs}
 
 
 def calculatePos(instance, index):
@@ -635,8 +649,9 @@ def convertSection2Material(section, materialsDict, index):
 
 
 if __name__ == '__main__':
-    Parser('data/Job-1.inp').parse()
-    # Job-1: 4163 nodes
+    Parser('data/Job-3.inp').parse()
+    # ABAQUS nodes:
+    # Job-1: 4163
     # Job-2: 37185
-    # Job-3: 232720??
+    # Job-3: 259567
     # Job-4: 1910327
