@@ -121,7 +121,7 @@ void CPlate::ElementStiffness(double* Matrix)
 	CPlateMaterial* material = dynamic_cast<CPlateMaterial*>(ElementMaterial);	// Pointer to material of the element
 
 	double nu=material->nu;
-	const double k= material->E*material->h*material->h*material->h*0.0833333333333333/(1-nu*nu)*LX*LY;
+	const double k= material->E*material->h*material->h*material->h*0.0833333333333333/(1-nu*nu)*LX*LY/4;
 
 	double xpsi=LX/2;
 	double yeta=LY/2;
