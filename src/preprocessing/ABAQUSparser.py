@@ -484,11 +484,10 @@ class Parser():
             part = ins.part
             for elementIndex in part.localElementsDict:
                 element = part.localElementsDict[elementIndex]
-                section = part.section
 
                 # calculate a unit body force at each node
                 # returns as {1:3.2, 2:2.4}
-                nodeForces = calculateBodyForceAtElement(element, section)
+                nodeForces = self.calculateBodyForceAtElement(element, ins)
 
                 for localNodeIndex in nodeForces:
                     globalNode = ins.globalNodesDict[localNodeIndex]
@@ -561,6 +560,38 @@ class Parser():
             'loads': []
         }
 
+    def calculateBodyForceAtElement(self, element, ins):
+        part = ins.part
+        _type = part.type
+        section = part.section
+        material = self.materialsDict[section.materialName]
+
+        if _type == 'S4R':  # Plate
+            # TODO
+            return {index: 1 for index in element.nodesIndexs}
+        elif _type == 'C3D8R':  # 8H
+            # TODO
+            return {index: 1 for index in element.nodesIndexs}
+        elif _type == 'B31':  # Beam
+            nodes = [part.localNodesDict[index]
+                     for index in element.nodesIndexs]
+            length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
+
+            args = section.args
+            area = (args[0] - args[2] - args[4]) * \
+                (args[1] - args[3] - args[5])
+
+            grav = length * area * material.density
+            return {index: grav / 2 for index in element.nodesIndexs}
+        elif _type == 'T3D2':  # Bar
+            nodes = [part.localNodesDict[index]
+                     for index in element.nodesIndexs]
+            length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
+            grav = length * section.args[0] * material.density
+            return {index: grav / 2 for index in element.nodesIndexs}
+        else:
+            raise Exception
+
 
 class Vector():
     def __init__(self):
@@ -596,11 +627,6 @@ class Vector():
             self.z * vec.x - self.x * vec.z,
             self.x * vec.y - self.y * vec.x
         ))
-
-
-def calculateBodyForceAtElement(element, section):
-    # TODO
-    return {index: 1 for index in element.nodesIndexs}
 
 
 def calculatePos(instance, index):
@@ -649,7 +675,7 @@ def convertSection2Material(section, materialsDict, index):
 
 
 if __name__ == '__main__':
-    Parser('data/Job-3.inp').parse()
+    Parser('data/Job-1.inp').parse()
     # ABAQUS nodes:
     # Job-1: 4163
     # Job-2: 37185
