@@ -1,3 +1,0 @@
-function res=vecpos(a,b)
-if (b>=a)
-    res=b*(b+1)/2

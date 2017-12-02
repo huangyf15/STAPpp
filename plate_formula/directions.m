@@ -10,13 +10,13 @@ for j=1:24
         if (modj ==0)
             modj = 6;
         end
-        parti=fix(i/6); %begin from 0
-        partj=fix(j/6);
+        parti=fix((i-1)/6); %begin from 0
+        partj=fix((j-1)/6);
         if (modi>=1 && modi<=3)
             if (modj>=1 && modj<=3)
                 fprintf(fid1,'%s%i%s%i%s%s%s%s%s\n',"Matrix[",j*(j+1)/2-i,"] = MatrixLit[",vecpos(3*parti+1,3*partj+1),"] * ",strings_o(6+modi),"*",strings_o(6+modj),";");
             else
-                fprintf(fid1,'%s%i%s%i%s%s%s%s%s%i%s%s%s%s%s\n',"Matrix[",j*(j+1)/2-i,"] = MatrixLit[",vecpos(3*parti+1,3*partj+2),"] * ",strings_o(6+modi),"*",strings_o(modj-3)," + MatrixLit[",vecpos(3*parti+1,3*parti+3),"] * ",strings_o(6+modi),"*",strings_o(modj),";");
+                fprintf(fid1,'%s%i%s%i%s%s%s%s%s%i%s%s%s%s%s\n',"Matrix[",j*(j+1)/2-i,"] = MatrixLit[",vecpos(3*parti+1,3*partj+2),"] * ",strings_o(6+modi),"*",strings_o(modj-3)," + MatrixLit[",vecpos(3*parti+1,3*partj+3),"] * ",strings_o(6+modi),"*",strings_o(modj),";");
             end
         else
             if (modj>=1 && modj <=3)
