@@ -565,16 +565,26 @@ class Parser():
         _type = part.type
         section = part.section
         material = self.materialsDict[section.materialName]
+        nodes = [part.localNodesDict[index]
+                 for index in element.nodesIndexs]
 
         if _type == 'S4R':  # Plate
-            # TODO
-            return {index: 1 for index in element.nodesIndexs}
+            p = [Vector(node.pos) for node in nodes]
+            p += p  # double p
+            f = [
+                abs((p[i].cross(p[i + 1] - p[i + 3]) * 2) +
+                    p[i + 1].cross(p[i + 2] + p[i + 3]) +
+                    p[i + 2].cross(p[i + 3])) / 12
+                for i in range(4)
+            ]
+
+            return {element.nodesIndexs[i]: f[i] for i in range(4)}
+
         elif _type == 'C3D8R':  # 8H
             # TODO
             return {index: 1 for index in element.nodesIndexs}
+
         elif _type == 'B31':  # Beam
-            nodes = [part.localNodesDict[index]
-                     for index in element.nodesIndexs]
             length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
 
             args = section.args
@@ -583,12 +593,12 @@ class Parser():
 
             grav = length * area * material.density
             return {index: grav / 2 for index in element.nodesIndexs}
+
         elif _type == 'T3D2':  # Bar
-            nodes = [part.localNodesDict[index]
-                     for index in element.nodesIndexs]
             length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
             grav = length * section.args[0] * material.density
             return {index: grav / 2 for index in element.nodesIndexs}
+
         else:
             raise Exception
 
