@@ -123,8 +123,8 @@ void CPlate::ElementStiffness(double* Matrix)
 	double nu=material->nu;
 	const double k= material->E*material->h*material->h*material->h*0.0833333333333333/(1-nu*nu)*LX*LY;
 
-	double xpsi(LX);
-	double yeta(LY);
+	double xpsi=LX/2;
+	double yeta=LY/2;
 
 #ifdef _DEBUG_
 	cout<<"Jacobian"<<setw(20)<<LX<<setw(20)<<LY;
@@ -208,6 +208,13 @@ void CPlate::ElementStiffness(double* Matrix)
 	MatrixLit[75] = k*((4*(nu - 1))/(15*(yeta*yeta)) + 2/(3*(xpsi*xpsi)));
 	MatrixLit[76] = 0;
 	MatrixLit[77] = (k*((xpsi*xpsi)*((2*nu)/5 + 1/10) - (yeta*yeta)/2))/((xpsi*xpsi*xpsi)*(yeta*yeta));
+
+#ifdef _DEBUG_
+	for (unsigned int i=0;i<78;++i)
+		{
+			cout<<"Matrix element "<<i<<" is "<<MatrixLit[i]<<endl;
+	};
+#endif
 
 	Matrix[0] = MatrixLit[0] * zdir[0]*zdir[0];
 	Matrix[1] = MatrixLit[0] * zdir[1]*zdir[1];
@@ -509,12 +516,12 @@ void CPlate::ElementStiffness(double* Matrix)
 	Matrix[297] = MatrixLit[104] * zdir[2]*xdir[2] + MatrixLit[5] * zdir[2]*ydir[2];
 	Matrix[298] = MatrixLit[104] * zdir[1]*xdir[2] + MatrixLit[5] * zdir[1]*ydir[2];
 	Matrix[299] = MatrixLit[104] * zdir[0]*xdir[2] + MatrixLit[5] * zdir[0]*ydir[2];
-#ifdef _DEBUG_
+/*#ifdef _DEBUG_
 	for (unsigned int i=0;i<78;++i)
 		{
 			cout<<"Matrix element "<<i<<" is "<<Matrix[i]<<endl;
 	};
-#endif
+#endif*/
 
 
 }
