@@ -571,6 +571,7 @@ class Parser():
         if _type == 'S4R':  # Plate
             p = [Vector(node.pos) for node in nodes]
             p += p  # double p
+            thickness = section.args[0]
             f = [
                 abs((p[i].cross(p[i + 1] - p[i + 3]) * 2) +
                     p[i + 1].cross(p[i + 2] + p[i + 3]) +
@@ -578,7 +579,8 @@ class Parser():
                 for i in range(4)
             ]
 
-            return {element.nodesIndexs[i]: f[i] for i in range(4)}
+            return {element.nodesIndexs[i]: f[i] * thickness * material.density
+                    for i in range(4)}
 
         elif _type == 'C3D8R':  # 8H
             # TODO
