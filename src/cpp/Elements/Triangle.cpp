@@ -29,7 +29,8 @@ CTriangle::CTriangle()
 }
 
 //  Desconstructor
-CTriangle::~CTriangle() {
+CTriangle::~CTriangle()
+{
     delete[] nodes;
     delete[] LocationMatrix;
 }
@@ -95,45 +96,45 @@ inline double dot(const double* p1, const double* p2)
 
 void Convert2d23d3T(const double* ke, double* Matrix, const double i[3], const double j[3])
 {
-    Matrix[0] = i[0] * (i[0] * ke[0] + j[0] * ke[2]) + j[0] * j[0] * ke[1];
-    Matrix[1] = i[1] * (i[1] * ke[0] + j[1] * ke[2]) + j[1] * j[1] * ke[1];
-    Matrix[2] = j[0] * j[1] * ke[1] + i[0] * (i[1] * ke[0] + j[1] * ke[2]);
-    Matrix[3] = i[2] * i[2] * ke[0] + j[2] * j[2] * ke[1] + i[2] * j[2] * ke[2];
-    Matrix[4] = j[1] * j[2] * ke[1] + i[1] * (i[2] * ke[0] + j[2] * ke[2]);
-    Matrix[5] = j[0] * j[2] * ke[1] + i[0] * (i[2] * ke[0] + j[2] * ke[2]);
-    Matrix[6] = i[0] * i[0] * ke[3] + j[0] * j[0] * ke[6] + i[0] * j[0] * ke[7];
+    Matrix[0] = i[0] * i[0] * ke[0] + j[0] * j[0] * ke[1] + 2 * i[0] * j[0] * ke[2];
+    Matrix[1] = i[1] * i[1] * ke[0] + j[1] * j[1] * ke[1] + 2 * i[1] * j[1] * ke[2];
+    Matrix[2] = j[0] * (j[1] * ke[1] + i[1] * ke[2]) + i[0] * (i[1] * ke[0] + j[1] * ke[2]);
+    Matrix[3] = i[2] * i[2] * ke[0] + j[2] * j[2] * ke[1] + 2 * i[2] * j[2] * ke[2];
+    Matrix[4] = j[1] * (j[2] * ke[1] + i[2] * ke[2]) + i[1] * (i[2] * ke[0] + j[2] * ke[2]);
+    Matrix[5] = j[0] * (j[2] * ke[1] + i[2] * ke[2]) + i[0] * (i[2] * ke[0] + j[2] * ke[2]);
+    Matrix[6] = i[0] * i[0] * ke[3] + j[0] * j[0] * ke[6] + 2 * i[0] * j[0] * ke[7];
     Matrix[7] = i[0] * (j[2] * ke[4] + i[2] * ke[5]) + j[0] * (j[2] * ke[8] + i[2] * ke[9]);
     Matrix[8] = i[0] * (j[1] * ke[4] + i[1] * ke[5]) + j[0] * (j[1] * ke[8] + i[1] * ke[9]);
     Matrix[9] = i[0] * i[0] * ke[5] + j[0] * j[0] * ke[8] + i[0] * j[0] * (ke[4] + ke[9]);
-    Matrix[10] = i[1] * i[1] * ke[3] + j[1] * j[1] * ke[6] + i[1] * j[1] * ke[7];
-    Matrix[11] = j[0] * j[1] * ke[6] + i[0] * (i[1] * ke[3] + j[1] * ke[7]);
+    Matrix[10] = i[1] * i[1] * ke[3] + j[1] * j[1] * ke[6] + 2 * i[1] * j[1] * ke[7];
+    Matrix[11] = j[0] * (j[1] * ke[6] + i[1] * ke[7]) + i[0] * (i[1] * ke[3] + j[1] * ke[7]);
     Matrix[12] = i[1] * (j[2] * ke[4] + i[2] * ke[5]) + j[1] * (j[2] * ke[8] + i[2] * ke[9]);
     Matrix[13] = i[1] * i[1] * ke[5] + j[1] * j[1] * ke[8] + i[1] * j[1] * (ke[4] + ke[9]);
     Matrix[14] = j[0] * (i[1] * ke[4] + j[1] * ke[8]) + i[0] * (i[1] * ke[5] + j[1] * ke[9]);
-    Matrix[15] = i[2] * i[2] * ke[3] + j[2] * j[2] * ke[6] + i[2] * j[2] * ke[7];
-    Matrix[16] = j[1] * j[2] * ke[6] + i[1] * (i[2] * ke[3] + j[2] * ke[7]);
-    Matrix[17] = j[0] * j[2] * ke[6] + i[0] * (i[2] * ke[3] + j[2] * ke[7]);
+    Matrix[15] = i[2] * i[2] * ke[3] + j[2] * j[2] * ke[6] + 2 * i[2] * j[2] * ke[7];
+    Matrix[16] = j[1] * (j[2] * ke[6] + i[2] * ke[7]) + i[1] * (i[2] * ke[3] + j[2] * ke[7]);
+    Matrix[17] = j[0] * (j[2] * ke[6] + i[2] * ke[7]) + i[0] * (i[2] * ke[3] + j[2] * ke[7]);
     Matrix[18] = i[2] * i[2] * ke[5] + j[2] * j[2] * ke[8] + i[2] * j[2] * (ke[4] + ke[9]);
     Matrix[19] = j[1] * (i[2] * ke[4] + j[2] * ke[8]) + i[1] * (i[2] * ke[5] + j[2] * ke[9]);
     Matrix[20] = j[0] * (i[2] * ke[4] + j[2] * ke[8]) + i[0] * (i[2] * ke[5] + j[2] * ke[9]);
-    Matrix[21] = i[0] * i[0] * ke[10] + j[0] * j[0] * ke[15] + i[0] * j[0] * ke[16];
+    Matrix[21] = i[0] * i[0] * ke[10] + j[0] * j[0] * ke[15] + 2 * i[0] * j[0] * ke[16];
     Matrix[22] = i[0] * (j[2] * ke[11] + i[2] * ke[12]) + j[0] * (j[2] * ke[17] + i[2] * ke[18]);
     Matrix[23] = i[0] * (j[1] * ke[11] + i[1] * ke[12]) + j[0] * (j[1] * ke[17] + i[1] * ke[18]);
     Matrix[24] = i[0] * i[0] * ke[12] + j[0] * j[0] * ke[17] + i[0] * j[0] * (ke[11] + ke[18]);
     Matrix[25] = i[0] * (j[2] * ke[13] + i[2] * ke[14]) + j[0] * (j[2] * ke[19] + i[2] * ke[20]);
     Matrix[26] = i[0] * (j[1] * ke[13] + i[1] * ke[14]) + j[0] * (j[1] * ke[19] + i[1] * ke[20]);
     Matrix[27] = i[0] * i[0] * ke[14] + j[0] * j[0] * ke[19] + i[0] * j[0] * (ke[13] + ke[20]);
-    Matrix[28] = i[1] * i[1] * ke[10] + j[1] * j[1] * ke[15] + i[1] * j[1] * ke[16];
-    Matrix[29] = j[0] * j[1] * ke[15] + i[0] * (i[1] * ke[10] + j[1] * ke[16]);
+    Matrix[28] = i[1] * i[1] * ke[10] + j[1] * j[1] * ke[15] + 2 * i[1] * j[1] * ke[16];
+    Matrix[29] = j[0] * (j[1] * ke[15] + i[1] * ke[16]) + i[0] * (i[1] * ke[10] + j[1] * ke[16]);
     Matrix[30] = i[1] * (j[2] * ke[11] + i[2] * ke[12]) + j[1] * (j[2] * ke[17] + i[2] * ke[18]);
     Matrix[31] = i[1] * i[1] * ke[12] + j[1] * j[1] * ke[17] + i[1] * j[1] * (ke[11] + ke[18]);
     Matrix[32] = j[0] * (i[1] * ke[11] + j[1] * ke[17]) + i[0] * (i[1] * ke[12] + j[1] * ke[18]);
     Matrix[33] = i[1] * (j[2] * ke[13] + i[2] * ke[14]) + j[1] * (j[2] * ke[19] + i[2] * ke[20]);
     Matrix[34] = i[1] * i[1] * ke[14] + j[1] * j[1] * ke[19] + i[1] * j[1] * (ke[13] + ke[20]);
     Matrix[35] = j[0] * (i[1] * ke[13] + j[1] * ke[19]) + i[0] * (i[1] * ke[14] + j[1] * ke[20]);
-    Matrix[36] = i[2] * i[2] * ke[10] + j[2] * j[2] * ke[15] + i[2] * j[2] * ke[16];
-    Matrix[37] = j[1] * j[2] * ke[15] + i[1] * (i[2] * ke[10] + j[2] * ke[16]);
-    Matrix[38] = j[0] * j[2] * ke[15] + i[0] * (i[2] * ke[10] + j[2] * ke[16]);
+    Matrix[36] = i[2] * i[2] * ke[10] + j[2] * j[2] * ke[15] + 2 * i[2] * j[2] * ke[16];
+    Matrix[37] = j[1] * (j[2] * ke[15] + i[2] * ke[16]) + i[1] * (i[2] * ke[10] + j[2] * ke[16]);
+    Matrix[38] = j[0] * (j[2] * ke[15] + i[2] * ke[16]) + i[0] * (i[2] * ke[10] + j[2] * ke[16]);
     Matrix[39] = i[2] * i[2] * ke[12] + j[2] * j[2] * ke[17] + i[2] * j[2] * (ke[11] + ke[18]);
     Matrix[40] = j[1] * (i[2] * ke[11] + j[2] * ke[17]) + i[1] * (i[2] * ke[12] + j[2] * ke[18]);
     Matrix[41] = j[0] * (i[2] * ke[11] + j[2] * ke[17]) + i[0] * (i[2] * ke[12] + j[2] * ke[18]);

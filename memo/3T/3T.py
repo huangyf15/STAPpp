@@ -25,7 +25,7 @@ for i in range(6):
         item = items[i*6 + j]
         item = item.replace('-(-1 + v)', '+ va') # va = 1 - v
         item = item.replace('- (-1 + v)', '+ va') # va = 1 - v
-        if item[1] == '+':
+        if item[:2] == ' +':
             item = item[2:]
         item = re.sub(r'([\w\)]) (\w)', r'\1 * \2', item)
         item = re.sub(r'([\w\)]) (\w)', r'\1 * \2', item)
