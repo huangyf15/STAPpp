@@ -1,7 +1,4 @@
-from element import *
-from load import *
-from node import *
-from material import *
+from STAPpp import *
 from outputter import Outputter
 
 nodes = []

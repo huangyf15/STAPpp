@@ -1,10 +1,7 @@
 import re
 import math
 
-from node import *
-from load import *
-from material import *
-from element import *
+from STAPpp import *
 import ABAQUS
 
 from ProgressBar import ProgressBar
