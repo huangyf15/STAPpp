@@ -391,7 +391,7 @@ class Parser():
             part = instance.part
             for nodeLocalIndex in part.localNodesDict:
                 localNode = part.localNodesDict[nodeLocalIndex]
-                globalPos = calculatePos(instance, nodeLocalIndex)
+                globalPos = calculatePos(instance, localNode)
                 if isLocalNodeIndexInInstanceNsets(nodeLocalIndex, instance):
                     globalNode = self.matchGlobalNode(globalPos)
                     if globalNode:  # already counted
@@ -440,14 +440,30 @@ class Parser():
             elementType = elementTypeDict[part.type]
             elementGroup = self.getElementGroup(elementType)
 
+            
             # get material for this part
-            material = self.stapppMaterialsDictByPartName.get(part.name)
+            if part.type == 'B31': # for each beam instance, create a new material
+                material = None
+            else:
+                material = self.stapppMaterialsDictByPartName.get(part.name)
+            
             if not material:
                 materialIndex = len(elementGroup.materials) + 1
                 material = convertSection2Material(
                     part.section, self.materialsDict, materialIndex)
                 self.stapppMaterialsDictByPartName[part.name] = material
                 elementGroup.materials.append(material)
+
+            if part.type == 'B31': # special material processing for beam
+                fakeNode = ABAQUS.Node()
+                fakeNode.pos = material.attributes[-3:]
+                fakeNode.pos = calculatePos(instance, fakeNode)
+                if instance.offset:
+                    fakeNode.pos = tuple(fakeNode.pos[i] - instance.offset[i]
+                                         for i in range(3))
+                material.attributes = material.attributes[:-3] + fakeNode.pos
+                # print(material.attributes)
+
 
             for localElementIndex in part.localElementsDict:
                 localElement = part.localElementsDict[localElementIndex]
@@ -641,8 +657,7 @@ class Vector():
         ))
 
 
-def calculatePos(instance, index):
-    localNode = instance.part.localNodesDict[index]
+def calculatePos(instance, localNode):
     pos = tuple(localNode.pos)
     if instance.offset:
         pos = tuple(pos[i] + instance.offset[i] for i in range(3))
