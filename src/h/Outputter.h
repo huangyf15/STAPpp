@@ -61,6 +61,9 @@ public:
 //!	Output Quadrilateral element data
 	void PrintQuadrilateralElementData(unsigned int EleGrp);
 
+//!	Output Triangle element data
+	void PrintTriangleElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
