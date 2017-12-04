@@ -1,5 +1,6 @@
 import re
 import math
+import numpy as np
 
 from STAPpp import *
 import ABAQUS
@@ -381,8 +382,8 @@ class Parser():
             len(self.instancesDict[insindex].part.localNodesDict)
             for insindex in self.instancesDict)
         localPointsCount = 0
-        bar = ProgressBar(1000, printCount=False, printTime=True)
-        bar.begin()
+        self.bar = ProgressBar(1000, printCount=False, printTime=True)
+        self.bar.begin()
         for insName in self.instancesDict:
             instance = self.instancesDict[insName]
             part = instance.part
@@ -411,8 +412,9 @@ class Parser():
                     self.globalNodesDict[self.nodeCount] = globalNode
 
                 localPointsCount += 1
-                if localPointsCount / self.localPointsSum > bar.currentCount / bar.maxCount:
-                    bar.grow()
+                if localPointsCount / self.localPointsSum > \
+                        self.bar.currentCount / self.bar.maxCount:
+                    self.bar.grow()
 
         for bound in self.boundaries:
             for nset in bound.nsets:
@@ -421,6 +423,8 @@ class Parser():
                     b = list(node.bounds)
                     b[bound.displacementIndex - 1] = 1
                     node.bounds = tuple(b)
+
+        del self.bar
 
     def indexElements(self):
         elementTypeDict = {
@@ -437,13 +441,12 @@ class Parser():
             elementType = elementTypeDict[part.type]
             elementGroup = self.getElementGroup(elementType)
 
-            
             # get material for this part
-            if part.type == 'B31': # for each beam instance, create a new material
+            if part.type == 'B31':  # for each beam instance, create a new material
                 material = None
             else:
                 material = self.stapppMaterialsDictByPartName.get(part.name)
-            
+
             if not material:
                 materialIndex = len(elementGroup.materials) + 1
                 material = convertSection2Material(
@@ -451,7 +454,7 @@ class Parser():
                 self.stapppMaterialsDictByPartName[part.name] = material
                 elementGroup.materials.append(material)
 
-            if part.type == 'B31': # special material processing for beam
+            if part.type == 'B31':  # special material processing for beam
                 fakeNode = ABAQUS.Node()
                 fakeNode.pos = material.attributes[-3:]
                 fakeNode.pos = calculatePos(instance, fakeNode)
@@ -460,7 +463,6 @@ class Parser():
                                          for i in range(3))
                 material.attributes = material.attributes[:-3] + fakeNode.pos
                 # print(material.attributes)
-
 
             for localElementIndex in part.localElementsDict:
                 localElement = part.localElementsDict[localElementIndex]
@@ -492,6 +494,7 @@ class Parser():
         # {index: {direction: force, }}
         self.globalForcesByGlobalNodeIndexDict = dict()
 
+        print(' calculating forces, this should finish soon...', end='\r')
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
@@ -596,8 +599,7 @@ class Parser():
                     for i in range(4)}
 
         elif _type == 'C3D8R':  # 8H
-            # TODO
-            return {index: 1 for index in element.nodesIndexs}
+            return getGaussIntegrateFor8H(element, nodes)
 
         elif _type == 'B31':  # Beam
             length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
@@ -652,6 +654,68 @@ class Vector():
             self.z * vec.x - self.x * vec.z,
             self.x * vec.y - self.y * vec.x
         ))
+
+
+def getGaussIntegrateFor8H(element, nodes):
+    w = np.array(
+        [list(node.pos) for node in nodes]
+        # [[
+        #     2 * int(i % 4 == 1 or i % 4 == 2),
+        #     (i // 2) % 2,
+        #     (i // 4) % 2
+        #  ] for i in range(8)]
+    )
+    # print(w)
+    a = 1 / math.sqrt(3)
+    b = (-a, a)
+    s = np.array([0.0 for i in range(8)])
+    for i in b:
+        for j in b:
+            for k in b:
+                s += getGaussIntegrateFor8HAtPos((i, j, k), w)
+
+    return {element.nodesIndexs[i]: s[i] for i in range(8)}
+
+
+def getGaussIntegrateFor8HAtPos(pos, w):
+    a, b, c = pos
+    N = np.array(
+        [(1 - a) * (1 - b) * (1 - c),
+         (1 + a) * (1 - b) * (1 - c),
+         (1 + a) * (1 + b) * (1 - c),
+         (1 - a) * (1 + b) * (1 - c),
+         (1 - a) * (1 - b) * (1 + c),
+         (1 + a) * (1 - b) * (1 + c),
+         (1 + a) * (1 + b) * (1 + c),
+         (1 - a) * (1 + b) * (1 + c)]
+    ) / 8
+
+    # print(N)
+
+    GN = np.array(
+        [[- (1 - b) * (1 - c),   (1 - b) * (1 - c),
+            (1 + b) * (1 - c), - (1 + b) * (1 - c),
+          - (1 - b) * (1 + c),   (1 - b) * (1 + c),
+            (1 + b) * (1 + c), - (1 + b) * (1 + c)],
+         [- (1 - a) * (1 - c), - (1 + a) * (1 - c),
+            (1 + a) * (1 - c),   (1 - a) * (1 - c),
+          - (1 - a) * (1 + c), - (1 + a) * (1 + c),
+            (1 + a) * (1 + c),   (1 - a) * (1 + c)],
+         [- (1 - a) * (1 - b), - (1 + a) * (1 - b),
+          - (1 + a) * (1 + b), - (1 - a) * (1 + b),
+            (1 - a) * (1 - b),   (1 + a) * (1 - b),
+            (1 + a) * (1 + b),   (1 - a) * (1 + b)]]) / 8
+    # print(GN)
+
+    J = GN.dot(w)
+    # print(J)
+    Jdet = np.linalg.det(J)
+    assert(Jdet > 0)
+
+    res = N * Jdet
+    # print(res)
+
+    return res
 
 
 def calculatePos(instance, localNode):
