@@ -486,6 +486,8 @@ class Parser():
     def calculateForce(self):
         load = Load()
 
+        self.bar = ProgressBar(1000, printCount=False, printTime=True)
+
         fs = dict()  # fs marks every direction's force as {1:2.0, 2:3.0}
         for i in range(3):
             if self.dload.direction[i]:
@@ -494,7 +496,6 @@ class Parser():
         # {index: {direction: force, }}
         self.globalForcesByGlobalNodeIndexDict = dict()
 
-        print(' calculating forces, this should finish soon...', end='\r')
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
@@ -514,6 +515,10 @@ class Parser():
                         if not forces:
                             forces = dict()
                             self.globalForcesByGlobalNodeIndexDict[globalNode.index] = forces
+                            if len(self.globalForcesByGlobalNodeIndexDict) / self.nodeCount > \
+                                    self.bar.currentCount / self.bar.maxCount:
+                                self.bar.grow()
+
                         # get direction force from this node forces
                         force = forces.get(direction)
                         if not force:
@@ -525,6 +530,7 @@ class Parser():
                         force.mag += fs[direction] * nodeForces[localNodeIndex]
 
         self.loads.append(load)
+        del self.bar
 
     def analyse(self):
         '''
@@ -677,34 +683,40 @@ def getGaussIntegrateFor8H(element, nodes):
     return {element.nodesIndexs[i]: s[i] for i in range(8)}
 
 
+NGNs = dict()
+
+
 def getGaussIntegrateFor8HAtPos(pos, w):
-    a, b, c = pos
-    N = np.array(
-        [(1 - a) * (1 - b) * (1 - c),
-         (1 + a) * (1 - b) * (1 - c),
-         (1 + a) * (1 + b) * (1 - c),
-         (1 - a) * (1 + b) * (1 - c),
-         (1 - a) * (1 - b) * (1 + c),
-         (1 + a) * (1 - b) * (1 + c),
-         (1 + a) * (1 + b) * (1 + c),
-         (1 - a) * (1 + b) * (1 + c)]
-    ) / 8
-
-    # print(N)
-
-    GN = np.array(
-        [[- (1 - b) * (1 - c),   (1 - b) * (1 - c),
-            (1 + b) * (1 - c), - (1 + b) * (1 - c),
-          - (1 - b) * (1 + c),   (1 - b) * (1 + c),
-            (1 + b) * (1 + c), - (1 + b) * (1 + c)],
-         [- (1 - a) * (1 - c), - (1 + a) * (1 - c),
-            (1 + a) * (1 - c),   (1 - a) * (1 - c),
-          - (1 - a) * (1 + c), - (1 + a) * (1 + c),
-            (1 + a) * (1 + c),   (1 - a) * (1 + c)],
-         [- (1 - a) * (1 - b), - (1 + a) * (1 - b),
-          - (1 + a) * (1 + b), - (1 - a) * (1 + b),
-            (1 - a) * (1 - b),   (1 + a) * (1 - b),
-            (1 + a) * (1 + b),   (1 - a) * (1 + b)]]) / 8
+    global NGNs
+    if pos in NGNs:
+        N, GN = NGNs[pos]
+    else:
+        a, b, c = pos
+        N = np.array(
+            [(1 - a) * (1 - b) * (1 - c),
+             (1 + a) * (1 - b) * (1 - c),
+             (1 + a) * (1 + b) * (1 - c),
+             (1 - a) * (1 + b) * (1 - c),
+             (1 - a) * (1 - b) * (1 + c),
+             (1 + a) * (1 - b) * (1 + c),
+             (1 + a) * (1 + b) * (1 + c),
+             (1 - a) * (1 + b) * (1 + c)]
+        ) / 8
+        GN = np.array(
+            [[- (1 - b) * (1 - c),   (1 - b) * (1 - c),
+                (1 + b) * (1 - c), - (1 + b) * (1 - c),
+              - (1 - b) * (1 + c),   (1 - b) * (1 + c),
+                (1 + b) * (1 + c), - (1 + b) * (1 + c)],
+             [- (1 - a) * (1 - c), - (1 + a) * (1 - c),
+                (1 + a) * (1 - c),   (1 - a) * (1 - c),
+              - (1 - a) * (1 + c), - (1 + a) * (1 + c),
+                (1 + a) * (1 + c),   (1 - a) * (1 + c)],
+             [- (1 - a) * (1 - b), - (1 + a) * (1 - b),
+              - (1 + a) * (1 + b), - (1 - a) * (1 + b),
+                (1 - a) * (1 - b),   (1 + a) * (1 - b),
+                (1 + a) * (1 + b),   (1 - a) * (1 + b)]]) / 8
+        NGNs[pos] = N, GN
+        assert len(NGNs) <= 8
     # print(GN)
 
     J = GN.dot(w)
@@ -763,7 +775,7 @@ def convertSection2Material(section, materialsDict, index):
 
 
 if __name__ == '__main__':
-    Parser('data/Job-1.inp').parse()
+    Parser('data/Job-4.inp').parse()
     # ABAQUS nodes:
     # Job-1: 4163
     # Job-2: 37185
