@@ -581,7 +581,7 @@ class Parser():
             'heading': self.heading,
             'nodes': tuple(self.globalNodesDict.values()),
             'elementGroups': tuple(self.eleGrpDict.values()),
-            'loads': []
+            'loads': self.loads
         }
 
     def calculateBodyForceAtElement(self, element, ins):
