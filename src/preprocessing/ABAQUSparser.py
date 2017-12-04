@@ -594,14 +594,15 @@ class Parser():
 
         if _type == 'S4R':  # Plate
             thickness = section.args[0]
-            res = getGaussIntegrateFor4Q(element, nodes, thickness)
+            res = getGaussIntegrateFor4Q(
+                element, nodes, thickness * material.density)
 
             # return {element.nodesIndexs[i]: f[i] * thickness * material.density
             #         for i in range(4)}
             return res
 
         elif _type == 'C3D8R':  # 8H
-            return getGaussIntegrateFor8H(element, nodes)
+            return getGaussIntegrateFor8H(element, nodes, material.density)
 
         elif _type == 'B31':  # Beam
             length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
@@ -676,7 +677,7 @@ def getGaussIntegrateFor4Q(element, nodes, thickness):
     return {element.nodesIndexs[i]: s[i] for i in range(4)}
 
 
-def getGaussIntegrateFor8H(element, nodes):
+def getGaussIntegrateFor8H(element, nodes, c):
     w = np.array([list(node.pos) for node in nodes])
     # print(w)
     a = 1 / math.sqrt(3)
@@ -687,7 +688,7 @@ def getGaussIntegrateFor8H(element, nodes):
             for k in b:
                 s += getGaussIntegrateFor8HAtPos((i, j, k), w)
 
-    return {element.nodesIndexs[i]: s[i] for i in range(8)}
+    return {element.nodesIndexs[i]: s[i] * c for i in range(8)}
 
 
 NGNs = dict()
