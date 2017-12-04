@@ -496,6 +496,7 @@ class Parser():
         # {index: {direction: force, }}
         self.globalForcesByGlobalNodeIndexDict = dict()
 
+        count = 0 # for progress bar
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
@@ -515,9 +516,6 @@ class Parser():
                         if not forces:
                             forces = dict()
                             self.globalForcesByGlobalNodeIndexDict[globalNode.index] = forces
-                            if len(self.globalForcesByGlobalNodeIndexDict) / self.nodeCount > \
-                                    self.bar.currentCount / self.bar.maxCount:
-                                self.bar.grow()
 
                         # get direction force from this node forces
                         force = forces.get(direction)
@@ -528,6 +526,10 @@ class Parser():
                             forces[direction] = force
                             load.forces.append(force)  # append new force only
                         force.mag += fs[direction] * nodeForces[localNodeIndex]
+                
+                count += 1
+                if count / self.elementCount > self.bar.currentCount / self.bar.maxCount:
+                    self.bar.grow()
 
         self.loads.append(load)
         del self.bar
@@ -663,14 +665,7 @@ class Vector():
 
 
 def getGaussIntegrateFor8H(element, nodes):
-    w = np.array(
-        [list(node.pos) for node in nodes]
-        # [[
-        #     2 * int(i % 4 == 1 or i % 4 == 2),
-        #     (i // 2) % 2,
-        #     (i // 4) % 2
-        #  ] for i in range(8)]
-    )
+    w = np.array([list(node.pos) for node in nodes])
     # print(w)
     a = 1 / math.sqrt(3)
     b = (-a, a)
@@ -775,7 +770,7 @@ def convertSection2Material(section, materialsDict, index):
 
 
 if __name__ == '__main__':
-    Parser('data/Job-4.inp').parse()
+    Parser('data/Job-3.inp').parse()
     # ABAQUS nodes:
     # Job-1: 4163
     # Job-2: 37185
