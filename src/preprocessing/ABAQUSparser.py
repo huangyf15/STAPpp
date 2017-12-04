@@ -706,7 +706,7 @@ def getGaussIntegrateFor4QAtPos(pos, w):
             (1 + a) * (1 + b),
             (1 - a) * (1 + b)]) / 4
         GN = np.array([
-            [-1 + b, 1 - b, 1 + b, -1 - b], 
+            [-1 + b, 1 - b, 1 + b, -1 - b],
             [-1 + a, -1 - a, 1 + a, 1 - a]]) / 4
         NGN4Qs[pos] = N, GN
         assert len(NGN4Qs) <= 4
