@@ -606,8 +606,8 @@ class Parser():
             length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
 
             args = section.args
-            area = (args[0] - args[2] - args[4]) * \
-                (args[1] - args[3] - args[5])
+            area = args[0] * args[1] - \
+                (args[0] - args[2] - args[4]) * (args[1] - args[3] - args[5])
 
             grav = length * area * material.density
             return {index: grav / 2 for index in element.nodesIndexs}
