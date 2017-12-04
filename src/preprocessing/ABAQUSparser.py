@@ -496,7 +496,7 @@ class Parser():
         # {index: {direction: force, }}
         self.globalForcesByGlobalNodeIndexDict = dict()
 
-        count = 0 # for progress bar
+        count = 0  # for progress bar
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
@@ -526,7 +526,7 @@ class Parser():
                             forces[direction] = force
                             load.forces.append(force)  # append new force only
                         force.mag += fs[direction] * nodeForces[localNodeIndex]
-                
+
                 count += 1
                 if count / self.elementCount > self.bar.currentCount / self.bar.maxCount:
                     self.bar.grow()
@@ -593,18 +593,12 @@ class Parser():
                  for index in element.nodesIndexs]
 
         if _type == 'S4R':  # Plate
-            p = [Vector(node.pos) for node in nodes]
-            p += p  # double p
             thickness = section.args[0]
-            f = [
-                abs((p[i].cross(p[i + 1] - p[i + 3]) * 2) +
-                    p[i + 1].cross(p[i + 2] + p[i + 3]) +
-                    p[i + 2].cross(p[i + 3])) / 12
-                for i in range(4)
-            ]
+            res = getGaussIntegrateFor4Q(element, nodes, thickness)
 
-            return {element.nodesIndexs[i]: f[i] * thickness * material.density
-                    for i in range(4)}
+            # return {element.nodesIndexs[i]: f[i] * thickness * material.density
+            #         for i in range(4)}
+            return res
 
         elif _type == 'C3D8R':  # 8H
             return getGaussIntegrateFor8H(element, nodes)
@@ -664,6 +658,24 @@ class Vector():
         ))
 
 
+def getGaussIntegrateFor4Q(element, nodes, thickness):
+    # convert w from 3d to 2d
+    if all(node.pos[2] == 0 for node in nodes):
+        w = np.array([list(node.pos[:2]) for node in nodes])
+    else:
+        # for this particular case, there is no need to calc.
+        raise
+    # print(w)
+    a = 1 / math.sqrt(3)
+    b = (-a, a)
+    s = np.array([0.0 for i in range(4)])
+    for i in b:
+        for j in b:
+            s += (getGaussIntegrateFor4QAtPos((i, j), w) * 4)
+
+    return {element.nodesIndexs[i]: s[i] for i in range(4)}
+
+
 def getGaussIntegrateFor8H(element, nodes):
     w = np.array([list(node.pos) for node in nodes])
     # print(w)
@@ -679,6 +691,33 @@ def getGaussIntegrateFor8H(element, nodes):
 
 
 NGNs = dict()
+NGN4Qs = dict()
+
+
+def getGaussIntegrateFor4QAtPos(pos, w):
+    global NGN4Qs
+    if pos in NGN4Qs:
+        N, GN = NGN4Qs[pos]
+    else:
+        a, b = pos
+        N = np.array([
+            (1 - a) * (1 - b),
+            (1 + a) * (1 - b),
+            (1 + a) * (1 + b),
+            (1 - a) * (1 + b)]) / 4
+        GN = np.array([
+            [-1 + b, 1 - b, 1 + b, -1 - b], 
+            [-1 + a, -1 - a, 1 + a, 1 - a]]) / 4
+        NGN4Qs[pos] = N, GN
+        assert len(NGN4Qs) <= 4
+
+    J = GN.dot(w)
+    Jdet = np.linalg.det(J)
+    assert(Jdet > 0)
+
+    res = N * Jdet
+
+    return res
 
 
 def getGaussIntegrateFor8HAtPos(pos, w):
@@ -770,7 +809,7 @@ def convertSection2Material(section, materialsDict, index):
 
 
 if __name__ == '__main__':
-    Parser('data/Job-3.inp').parse()
+    Parser('data/Job-2.inp').parse()
     # ABAQUS nodes:
     # Job-1: 4163
     # Job-2: 37185
