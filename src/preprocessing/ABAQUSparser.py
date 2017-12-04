@@ -594,11 +594,9 @@ class Parser():
 
         if _type == 'S4R':  # Plate
             thickness = section.args[0]
+            # print(thickness)
             res = getGaussIntegrateFor4Q(
                 element, nodes, thickness * material.density)
-
-            # return {element.nodesIndexs[i]: f[i] * thickness * material.density
-            #         for i in range(4)}
             return res
 
         elif _type == 'C3D8R':  # 8H
@@ -659,7 +657,7 @@ class Vector():
         ))
 
 
-def getGaussIntegrateFor4Q(element, nodes, thickness):
+def getGaussIntegrateFor4Q(element, nodes, c):
     # convert w from 3d to 2d
     if all(node.pos[2] == 0 for node in nodes):
         w = np.array([list(node.pos[:2]) for node in nodes])
@@ -674,7 +672,7 @@ def getGaussIntegrateFor4Q(element, nodes, thickness):
         for j in b:
             s += (getGaussIntegrateFor4QAtPos((i, j), w) * 4)
 
-    return {element.nodesIndexs[i]: s[i] for i in range(4)}
+    return {element.nodesIndexs[i]: s[i] * c for i in range(4)}
 
 
 def getGaussIntegrateFor8H(element, nodes, c):
