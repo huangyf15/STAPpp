@@ -12,9 +12,9 @@
 
 #include "Outputter.h"
 
-#include <stddef.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <stddef.h>
 
 using namespace std;
 
@@ -23,38 +23,33 @@ using namespace std;
 class CMaterial
 {
 public:
+    unsigned int nset; //!< Number of set
 
-	unsigned int nset;	//!< Number of set
-	
-	double E;  //!< Young's modulus
+    double E; //!< Young's modulus
 
 public:
+    //! Virtual deconstructor
+    virtual ~CMaterial(){};
 
-//! Virtual deconstructor
-    virtual ~CMaterial() {};
+    //!	Read material data from stream Input
+    virtual bool Read(ifstream& Input, unsigned int mset) = 0;
 
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input, unsigned int mset) = 0;
-
-//!	Write material data to Stream
+    //!	Write material data to Stream
     virtual void Write(COutputter& output, unsigned int mset) = 0;
-
 };
 
 //!	Material class for bar element
 class CBarMaterial : public CMaterial
 {
 public:
-
-	double Area;	//!< Sectional area of a bar element
+    double Area; //!< Sectional area of a bar element
 
 public:
-	
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input, unsigned int mset);
+    //!	Read material data from stream Input
+    virtual bool Read(ifstream& Input, unsigned int mset);
 
-//!	Write material data to Stream
-	virtual void Write(COutputter& output, unsigned int mset);
+    //!	Write material data to Stream
+    virtual void Write(COutputter& output, unsigned int mset);
 };
 
 //!	Material class for bar element
@@ -77,16 +72,14 @@ public:
 class CQuadrilateralMaterial : public CMaterial
 {
 public:
-
-	double nu; // Poisson's ratio
+    double nu; // Poisson's ratio
 
 public:
-	
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input, unsigned int mset);
+    //!	Read material data from stream Input
+    virtual bool Read(ifstream& Input, unsigned int mset);
 
-//!	Write material data to Stream
-	virtual void Write(COutputter& output, unsigned int mset);
+    //!	Write material data to Stream
+    virtual void Write(COutputter& output, unsigned int mset);
 };
 
 class CHexMaterial : public CMaterial
@@ -132,18 +125,16 @@ public:
 class CPlateMaterial : public CMaterial
 {
 public:
+    double h; // thickness or height
 
-	double h; //thickness or height
-
-	double nu; // Poisson's ratio
+    double nu; // Poisson's ratio
 
 public:
-	
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input, unsigned int mset);
+    //!	Read material data from stream Input
+    virtual bool Read(ifstream& Input, unsigned int mset);
 
-//!	Write material data to Stream
-	virtual void Write(COutputter& output, unsigned int mset);
+    //!	Write material data to Stream
+    virtual void Write(COutputter& output, unsigned int mset);
 };
 
 
