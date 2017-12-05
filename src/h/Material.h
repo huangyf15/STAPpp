@@ -78,27 +78,19 @@ class CTimoshenkoMaterial : public CMaterial
 {
 public:
 
-	double G;       // Shear modulus
+	double nu;      // Poisson's ratio
 
-	double Area;    // Sectional area of a bar element
+	double Area;    // Sectional area of a beam element
 
 	double Iyy;     // Moment of inertia for bending about local y-axis
 
 	double Izz;     // Moment of inertia for bending about local z-axis
-
-	double J;       // Torsional constant
 
 	double Thetay1; // 1st direction cosine of local y-axis
 
 	double Thetay2; // 2nd direction cosine of local y-axis
 
 	double Thetay3; // 3rd direction cosine of local y-axis
-
-	double Thetaz1; // 1st direction cosine of local z-axis
-
-	double Thetaz2; // 2nd direction cosine of local z-axis
-
-	double Thetaz3; // 3rd direction cosine of local z-axis
 
 public:
 

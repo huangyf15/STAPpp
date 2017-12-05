@@ -165,6 +165,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
+			case ElementTypes::TimoshenkoSRINT:
+				PrintTimoshenkoSRINTElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -265,15 +268,11 @@ void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 		<< endl
 		<< endl;
 
-/*! ============== NEED TO BE IMPROVED ============== !*/
-	*this << "  SET      YOUNG'S        SHEAR   CROSS-SECTIONAL MOMENT-INER  MOMENT-INER  TORSIONAL" << endl
-		  << " NUMBER    MODULUS       MODULUS       AREA      LOCAL Y-AXIS LOCAL Z-AXIS  CONSTANT" << endl
-		  << "              E             G          Area          Iyy          Izz          J" << endl << endl;
+	*this << "  SET      YOUNG'S      POISSON'S  CROSS-SECTIONAL MOMENT-INER  MOMENT-INER   1ST COORD     2ND COORD     3RD COORD" << endl
+		  << " NUMBER    MODULUS        RATIO         AREA      LOCAL Y-AXIS LOCAL Z-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS" << endl
+		  << "              E             nu          Area          Iyy          Izz         THETAY1       THETAY2       THETAY3" << endl << endl;
 
-	*this << "THETAY1       THETAY2       THETAY3       THETAZ1       THETAZ2       THETAZ3" << endl << endl;
-/*! ============== NEED TO BE IMPROVED ============== !*/
-
-	*this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(4);
 
 	//	Loop over for all property sets
 	for (unsigned int mset = 0; mset < NUMMAT; mset++)
@@ -320,7 +319,7 @@ void COutputter::OutputNodalDisplacement(unsigned int lcase)
 
 	*this << " D I S P L A C E M E N T S" << endl
 		  << endl;
-	*this << "  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT" << endl;
+	*this << "  NODE             X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT      X-ROTATION        Y-ROTATION        Z-ROTATION" << endl;
 
 	for (unsigned int np = 0; np < FEMData->GetNUMNP(); np++)
 		NodeList[np].WriteNodalDisplacement(*this, np, Displacement);
@@ -419,52 +418,34 @@ void COutputter::OutputElementStress()
 				break;
 
 			case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
-				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
-					<< "                       GUASS POINTS STRESSES"
-#ifdef __TEST__
-					<< "                      GUASS POINTS DISPLACEMENTS            INTEGRATE"
-#endif
-					<< endl;
-				*this << "     NUMBER    INDEX        X             Y             Z"
-					<< "               SX'X'         SY'Y'        SX'Y'"
-#ifdef __TEST__
-					<< "              UX            UY           UZ            WEIGHTS"
-#endif
-					<< endl;
 				double TimoshenkoStresses[3];
 				double TimoshenkoForces[12];
-#ifdef __TEST__
-				double GaussDisplacements[12];
-				double weights[4];
-#endif
-
+				
+				*this << "  ELEMENT        FORCE_X1    FORCE_X2    FORCE_Y1    FORCE_Y2    FORCE_Z1    FORCE_Z2   MOMENT_X1   MOMENT_X2   MOMENT_Y1   MOMENT_Y2   MOMENT_Z1   MOMENT_Z2" << endl
+					<< "  NUMBER" << endl;
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
-#ifndef __TEST__
-					dynamic_cast<CQuadrilateral&>(
-						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoStresses, TimoshenkoForces, Positions);
-#else
-					dynamic_cast<CQuadrilateral&>(
-						EleGrp.GetElement(Ele)).ElementStress(
-							stresses, Displacement, Positions, GaussDisplacements, weights);
-#endif
-
-					for (unsigned i = 0; i<4; ++i) { // four gauss points
-						*this << setw(8) << Ele + 1;
-						*this << setw(10) << i + 1;
-						*this << setw(17) << Positions[i * 3] << setw(14) << Positions[i * 3 + 1] << setw(14) << Positions[i * 3 + 2];
-						*this << setw(17) << stresses[i * 3] << setw(14) << stresses[i * 3 + 1] << setw(14) << stresses[i * 3 + 2];
-						// *this << setw(32) << stresses[i] << std::endl;
+					dynamic_cast<CTimoshenkoSRINT&>(
+						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoStresses, TimoshenkoForces, Displacement);
+					*this << setw(5) << Ele + 1 << setw(18) << TimoshenkoForces[0] << setw(13) << TimoshenkoForces[1] 
+						<< setw(13) << TimoshenkoForces[2] << setw(13) << TimoshenkoForces[3] << setw(13) << TimoshenkoForces[4]
+						<< setw(13) << TimoshenkoForces[5] << setw(13) << TimoshenkoForces[6] << setw(13) << TimoshenkoForces[7]
+						<< setw(13) << TimoshenkoForces[8] << setw(13) << TimoshenkoForces[9] << setw(13) << TimoshenkoForces[10]
+						<< setw(13) << TimoshenkoForces[11] << endl;
+					*this << std::endl;
+				}
 #ifdef __TEST__
-						*this << setw(17) << GaussDisplacements[i * 3]
-							<< setw(14) << GaussDisplacements[i * 3 + 1]
-							<< setw(14) << GaussDisplacements[i * 3 + 2];
-						*this << setw(15) << weights[i];
-#endif
-						*this << std::endl;
-					}
+				*this << "  ELEMENT             STRESS_XX        STRESS_XY        STRESS_YY" << endl
+					<< "  NUMBER" << endl;
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					dynamic_cast<CTimoshenkoSRINT&>(
+						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoStresses, TimoshenkoForces, Positions);
+					*this << setw(5) << Ele + 1 << setw(18) << TimoshenkoStresses[0] << setw(10) << TimoshenkoStresses[1] 
+						<< setw(10) << TimoshenkoStresses[2] << std::endl;
 				}
 				*this << endl;
+#endif
 
 				break;
 

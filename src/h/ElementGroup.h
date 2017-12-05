@@ -27,7 +27,12 @@ enum ElementTypes
     Bar,
     Quadrilateral,
     Triangle,
-	TimoshenkoSRINT
+	H8,
+	Beam,
+	Plate,
+	Shell,
+	TimoshenkoSRINT,
+	TimoshenkoEBMOD
 };
 
 //! Element group class
