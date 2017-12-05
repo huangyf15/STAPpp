@@ -239,9 +239,13 @@ void CTimoshenkoSRINT::ElementStiffness(double* Matrix)
 */
 }
 
-//  Calculate element stress
-//  stress = [sigmaXX, sigmaXY, sigmaXZ];
-//  force = [Fx1, Fx2, Fy1, Fy2, Fz1, Fz2, Mx1, Mx2, My1, My2, Mz1, Mz2]
+// Calculate element stress
+// stress               double[3] = {sigmaXX, sigmaXY, sigmaXZ};
+// force                double[12] = {Fx1, Fx2, Fy1, Fy2, Fz1, Fz2, Mx1, Mx2, My1, My2, Mz1, Mz2}
+// Displacement:        double[NEQ], represent the nodal displacement.
+// Positions:           double[12], represent 3d position for 3 gauss points.
+// GaussDisplacements:  double[12], represent 3d displacements for 3 gauss points.
+// Weights:             double[2], represent integrate weights.
 void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double* Displacement)
 {
 	// Get the Material/Section property
@@ -249,10 +253,12 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 	CTimoshenkoMaterial* material = dynamic_cast<CTimoshenkoMaterial*>(ElementMaterial);
 
 	// Calculate beam length
-	// DX[3] = [x2-x1, y2-y1, z2-z1]
-	double DX[3];		
-	for (unsigned int i = 0; i < 3; i++)
+	// DX[3] = {x2-x1, y2-y1, z2-z1}
+	// X[12] = {x1,y1,z1,...,x2,y2,z2,...}
+	double DX[3];
+	for (unsigned int i = 0; i < 3; i++) {
 		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
+	}
 	double len = sqrt(DX[0] * DX[0] + DX[1] * DX[1] + DX[2] * DX[2]);
 
 	// Calculate the transform matrix
@@ -270,6 +276,7 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 	Q[8] = Q[0] * Q[4] - Q[1] * Q[3];
 
 	// Tranfer ele-background disp "displacement" to ele-local disp "Eledisp"
+	// Disp[12] = dispX1,dispY1,dispZ1,...,dispX2,dispY2,dispZ2,...}
 	double Disp[12];
 	for (unsigned index = 0; index < 12; ++index)
 	{
@@ -295,12 +302,6 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 	EleDisp[9] = Q[0] * Disp[9] + Q[1] * Disp[10] + Q[2] * Disp[11];
 	EleDisp[10] = Q[3] * Disp[9] + Q[4] * Disp[10] + Q[5] * Disp[11];
 	EleDisp[11] = Q[6] * Disp[9] + Q[7] * Disp[10] + Q[8] * Disp[11];
-/* ---------- JUST FOR DEBUG ---------- */
-/*
-	for (int i = 0; i < 12; i++) {
-		cout << "EleDisp[" << i << "] = " << EleDisp[i] << "  " << endl;
-	}
-*/
 
 	// Calculate the elements of element stiffness matrix in local coordinates
 	/*! by & bz are ONLY VALID FOR beams with rectangular section !*/
@@ -328,8 +329,7 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 	force[6] = Tors * (EleDisp[9] - EleDisp[3]);
 	force[7] = - force[6];
 	force[9] = - Stfy / len * (EleDisp[10] - EleDisp[4]);
-	force[8] = - force[9];
+	force[8] = - force[9] - force[6] * len;
 	force[11] = - Stfz / len * (EleDisp[11] - EleDisp[5]);
-	force[10] = - force[11];
+	force[10] = - force[11] + force[4] * len;
 }
-
