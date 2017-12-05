@@ -17,10 +17,10 @@
 using namespace std;
 
 //	Clear an array
-template <class type> void clear( type* a, unsigned int N )
+template <class type> void clear(type* a, unsigned int N)
 {
-	for (unsigned int i = 0; i < N; i++)
-		a[i] = 0;
+    for (unsigned int i = 0; i < N; i++)
+        a[i] = 0;
 }
 
 CDomain* CDomain::_instance = nullptr;
@@ -28,150 +28,164 @@ CDomain* CDomain::_instance = nullptr;
 //	Constructor
 CDomain::CDomain()
 {
-	Title[0] = '0';
-	MODEX = 0;
+    Title[0] = '0';
+    MODEX = 0;
 
-	NUMNP = 0;
-	NodeList = nullptr;
-	
-	NUMEG = 0;
-	EleGrpList = nullptr;
-	
-	NLCASE = 0;
-	NLOAD = nullptr;
-	LoadCases = nullptr;
-	
-	NEQ = 0;
-	NWK = 0;
-	MK = 0;
+    NUMNP = 0;
+    NodeList = nullptr;
 
-	Force = nullptr;
-	StiffnessMatrix = nullptr;
+    NUMEG = 0;
+    EleGrpList = nullptr;
+
+    NLCASE = 0;
+    NLOAD = nullptr;
+    LoadCases = nullptr;
+
+    NEQ = 0;
+    NWK = 0;
+    MK = 0;
+
+    Force = nullptr;
+    StiffnessMatrix = nullptr;
 }
 
 //	Desconstructor
 CDomain::~CDomain()
 {
-	delete [] NodeList;
+    delete[] NodeList;
 
-	delete [] EleGrpList;
+    delete[] EleGrpList;
 
-	delete [] NLOAD;
-	delete [] LoadCases;
+    delete[] NLOAD;
+    delete[] LoadCases;
 
-	delete [] Force;
-	delete StiffnessMatrix;
+    delete[] Force;
+    delete StiffnessMatrix;
 }
 
 //	Return pointer to the instance of the Domain class
 CDomain* CDomain::Instance()
 {
-	if (!_instance) 
-		_instance = new CDomain();
-	
-	return _instance;
+    if (!_instance)
+        _instance = new CDomain();
+
+    return _instance;
 }
 
 //	Read domain data from the input data file
 bool CDomain::ReadData(string FileName, string OutFile)
 {
-	Input.open(FileName);
+    Input.open(FileName);
 
-	if (!Input) 
-	{
-		cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
-		exit(3);
-	}
+    if (!Input)
+    {
+        cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
+        exit(3);
+    }
 
-	COutputter* Output = COutputter::Instance(OutFile);
+    COutputter* Output = COutputter::Instance(OutFile);
 
-//	Read the heading line
-	Input.getline(Title, 256);
-	Output->OutputHeading();
+    //	Read the heading line
+    Input.getline(Title, 256);
+    Output->OutputHeading();
 
-//	Read the control line
-	Input >> NUMNP >> NUMEG >> NLCASE >> MODEX;
+    //	Read the control line
+    Input >> NUMNP >> NUMEG >> NLCASE >> MODEX;
 
-//	Read nodal point data
-	if (ReadNodalPoints())
+    //	Read nodal point data
+    if (ReadNodalPoints())
         Output->OutputNodeInfo();
     else
         return false;
 
-//	Read load data
-	if (ReadLoadCases())
+    //	Read load data
+    if (ReadLoadCases())
         Output->OutputLoadInfo();
     else
         return false;
 
-//	Read element data
-	if (ReadElements())
+    //	Read element data
+    if (ReadElements())
         Output->OutputElementInfo();
     else
         return false;
 
-	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
-		if (EleGrpList[EleGrp].GetElementType() >=5)
-			for (unsigned int Nume = 0; Nume < EleGrpList[EleGrp].GetNUME(); Nume++){
-				*(EleGrpList[EleGrp].GetElement(Nume).GetNodes()).bcode[]
+    // adjust bcode for nodes of structure elements
+    for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+        if ((EleGrpList[EleGrp].GetElementType() >= 5) & (EleGrpList[EleGrp].GetElementType() <= 8))
+        {
+            unsigned int NumE = EleGrpList[EleGrp].GetNUME();
+            for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
+            {
 
-			}
+                unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
+                CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
+                for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
+                {
+                    unsigned int N = ElementNode[NumNode]->NodeNumber;
+                    if (N != 1)
+                    { // for test
+                        NodeList[N - 1].bcode[3] = 0;
+                        NodeList[N - 1].bcode[4] = 0;
+                        NodeList[N - 1].bcode[5] = 0;
+                    }
+                }
+            }
+        }
 
-		
+    //	Update equation number
+    CalculateEquationNumber();
+    Output->OutputEquationNumber();
 
-//	Update equation number
-	CalculateEquationNumber();
-	Output->OutputEquationNumber();
-
-	return true;
+    return true;
 }
 
 //	Read nodal point data
 bool CDomain::ReadNodalPoints()
 {
 
-//	Read nodal point data lines
-	NodeList = new CNode[NUMNP];
+    //	Read nodal point data lines
+    NodeList = new CNode[NUMNP];
 
-//	Loop over for all nodal points
-	for (unsigned int np = 0; np < NUMNP; np++)
-		if (!NodeList[np].Read(Input, np))
-			return false;
+    //	Loop over for all nodal points
+    for (unsigned int np = 0; np < NUMNP; np++)
+        if (!NodeList[np].Read(Input, np))
+            return false;
 
-	return true;
+    return true;
 }
 
 //	Calculate global equation numbers corresponding to every degree of freedom of each node
 void CDomain::CalculateEquationNumber()
 {
-	NEQ = 0;
-	for (unsigned int np = 0; np < NUMNP; np++)	// Loop over for all node
-	{
-		for (unsigned int dof = 0; dof < CNode::NDf; dof++)	// Loop over for DOFs of node np
-		{
-			if (NodeList[np].bcode[dof]) 
-				NodeList[np].bcode[dof] = 0;
-			else
-			{
-				NEQ++;
-				NodeList[np].bcode[dof] = NEQ;
-			}
-		}
-	}
+    NEQ = 0;
+    for (unsigned int np = 0; np < NUMNP; np++) // Loop over for all node
+    {
+        for (unsigned int dof = 0; dof < CNode::NDf; dof++) // Loop over for DOFs of node np
+        {
+            if (NodeList[np].bcode[dof])
+                NodeList[np].bcode[dof] = 0;
+            else
+            {
+                NEQ++;
+                NodeList[np].bcode[dof] = NEQ;
+            }
+        }
+    }
 }
 
 //	Read load case data
 bool CDomain::ReadLoadCases()
 {
-//	Read load data lines
-	LoadCases = new CLoadCaseData[NLCASE];	// List all load cases
+    //	Read load data lines
+    LoadCases = new CLoadCaseData[NLCASE]; // List all load cases
 
-//	Loop over for all load cases
-	for (unsigned int lcase = 0; lcase < NLCASE; lcase++)
-		if (!LoadCases[lcase].Read(Input, lcase))
-			return false;
+    //	Loop over for all load cases
+    for (unsigned int lcase = 0; lcase < NLCASE; lcase++)
+        if (!LoadCases[lcase].Read(Input, lcase))
+            return false;
 
-	return true;
+    return true;
 }
 
 // Read element data
@@ -179,11 +193,11 @@ bool CDomain::ReadElements()
 {
     EleGrpList = new CElementGroup[NUMEG];
 
-//	Loop over for all element group
-	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+    //	Loop over for all element group
+    for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
         if (!EleGrpList[EleGrp].Read(Input))
             return false;
-    
+
     return true;
 }
 
@@ -192,29 +206,29 @@ void CDomain::CalculateColumnHeights()
 {
     unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
 
-	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
+    for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++) //	Loop over for all element groups
     {
         CElementGroup& ElementGrp = EleGrpList[EleGrp];
         unsigned int NUME = ElementGrp.GetNUME();
-        
-		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
-			ElementGrp.GetElement(Ele).CalculateColumnHeight(ColumnHeights);
+
+        for (unsigned int Ele = 0; Ele < NUME; Ele++) //	Loop over for all elements in group
+                                                      //EleGrp
+            ElementGrp.GetElement(Ele).CalculateColumnHeight(ColumnHeights);
     }
 
-//	Maximum half bandwidth ( = max(ColumnHeights) + 1 )
-	MK = ColumnHeights[0];
+    //	Maximum half bandwidth ( = max(ColumnHeights) + 1 )
+    MK = ColumnHeights[0];
 
-	for (unsigned int i=1; i<NEQ; i++)
-		if (MK < ColumnHeights[i])
-			MK = ColumnHeights[i];
+    for (unsigned int i = 1; i < NEQ; i++)
+        if (MK < ColumnHeights[i])
+            MK = ColumnHeights[i];
 
-	MK = MK + 1;
+    MK = MK + 1;
 
 #ifdef _DEBUG_
-	COutputter* Output = COutputter::Instance();
-	Output->PrintColumnHeights();
+    COutputter* Output = COutputter::Instance();
+    Output->PrintColumnHeights();
 #endif
-
 }
 
 //	Calculate address of diagonal elements in banded matrix
@@ -224,90 +238,87 @@ void CDomain::CalculateDiagnoalAddress()
     unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
     unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
 
-//	Calculate the address of diagonal elements
-//	M(0) = 1;  M(i+1) = M(i) + H(i) + 1 (i = 0:NEQ)
-	DiagonalAddress[0] = 1;
-	for (unsigned int col = 1; col <= NEQ; col++)
-		DiagonalAddress[col] = DiagonalAddress[col - 1] + ColumnHeights[col-1] + 1;
+    //	Calculate the address of diagonal elements
+    //	M(0) = 1;  M(i+1) = M(i) + H(i) + 1 (i = 0:NEQ)
+    DiagonalAddress[0] = 1;
+    for (unsigned int col = 1; col <= NEQ; col++)
+        DiagonalAddress[col] = DiagonalAddress[col - 1] + ColumnHeights[col - 1] + 1;
 
-//	Number of elements in banded global stiffness matrix
-	NWK = DiagonalAddress[NEQ] - DiagonalAddress[0];
+    //	Number of elements in banded global stiffness matrix
+    NWK = DiagonalAddress[NEQ] - DiagonalAddress[0];
 
 #ifdef _DEBUG_
-	COutputter* Output = COutputter::Instance();
-	Output->PrintDiagonalAddress();
+    COutputter* Output = COutputter::Instance();
+    Output->PrintDiagonalAddress();
 #endif
-
 }
 
 //	Assemble the banded gloabl stiffness matrix
 void CDomain::AssembleStiffnessMatrix()
 {
-//	Loop over for all element groups
-	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
-	{
+    //	Loop over for all element groups
+    for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+    {
         CElementGroup& ElementGrp = EleGrpList[EleGrp];
         unsigned int NUME = ElementGrp.GetNUME();
 
-		unsigned int size = ElementGrp.GetElement(0).SizeOfStiffnessMatrix();
-		double* Matrix = new double[size];
+        unsigned int size = ElementGrp.GetElement(0).SizeOfStiffnessMatrix();
+        double* Matrix = new double[size];
 
-//		Loop over for all elements in group EleGrp
-		for (unsigned int Ele = 0; Ele < NUME; Ele++)
-			ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix);
+        //		Loop over for all elements in group EleGrp
+        for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix);
 
-		delete[] Matrix;
-		Matrix = nullptr;
-	}
+        delete[] Matrix;
+        Matrix = nullptr;
+    }
 
 #ifdef _DEBUG_
-	COutputter* Output = COutputter::Instance();
-	Output->PrintStiffnessMatrix();
+    COutputter* Output = COutputter::Instance();
+    Output->PrintStiffnessMatrix();
 #endif
-
 }
 
 //	Assemble the global nodal force vector for load case LoadCase
 bool CDomain::AssembleForce(unsigned int LoadCase)
 {
-	if (LoadCase > NLCASE) 
-		return false;
+    if (LoadCase > NLCASE)
+        return false;
 
-	const CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
+    const CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
 
-//	Loop over for all concentrated loads in load case LoadCase
-	for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)
-	{
-		unsigned int dof = NodeList[LoadData->node[lnum] - 1].bcode[LoadData->dof[lnum] - 1];
+    //	Loop over for all concentrated loads in load case LoadCase
+    for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)
+    {
+        unsigned int dof = NodeList[LoadData->node[lnum] - 1].bcode[LoadData->dof[lnum] - 1];
 
-        if(dof)// The DOF is activated
+        if (dof) // The DOF is activated
             Force[dof - 1] += LoadData->load[lnum];
-		
-	}
+    }
 
-	return true;
+    return true;
 }
 
 //	Allocate storage for matrices Force, ColumnHeights, DiagonalAddress and StiffnessMatrix
 //	and calculate the column heights and address of diagonal elements
 void CDomain::AllocateMatrices()
 {
-//	Allocate for global force/displacement vector
-	Force = new double[NEQ];
+    //	Allocate for global force/displacement vector
+    Force = new double[NEQ];
     clear(Force, NEQ);
 
-//  Create the banded stiffness matrix
+    //  Create the banded stiffness matrix
     StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
 
-//	Calculate column heights
-	CalculateColumnHeights();
+    //	Calculate column heights
+    CalculateColumnHeights();
 
-//	Calculate address of diagonal elements in banded matrix
-	CalculateDiagnoalAddress();
+    //	Calculate address of diagonal elements in banded matrix
+    CalculateDiagnoalAddress();
 
-//	Allocate for banded global stiffness matrix
+    //	Allocate for banded global stiffness matrix
     StiffnessMatrix->Allocate();
 
-	COutputter* Output = COutputter::Instance();
-	Output->OutputTotalSystemData();
+    COutputter* Output = COutputter::Instance();
+    Output->OutputTotalSystemData();
 }
