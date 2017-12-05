@@ -555,23 +555,33 @@ void CPlate::ElementStress(double* stress, double* Displacement,double* position
 	zdir[1]=xdir[2]*ydir[0]-xdir[0]*ydir[2];
 	zdir[2]=xdir[0]*ydir[1]-xdir[1]*ydir[0];
 
-	double xpsi(LX);
-	double yeta(LY);
+	double xpsi=LX/2;
+	double yeta=LY/2;
 
-	double dis[24];//displacement of nodes
-	for (unsigned i=0;i<=11;i++){
+	double truedisp[24];
+	double dis[12];//displacement of nodes
+	for (unsigned i=0;i<=23;i++){
 		if (LocationMatrix[i])
-		dis[i+1]=Displacement[LocationMatrix[i]-1];
+		truedisp[i]=Displacement[LocationMatrix[i]-1];
 		else
-			dis[i]=0.0;
+			truedisp[i]=0.0;
 
 	};
-	
+#ifdef _DEBUG_
+	for (unsigned int i=0;i<=23;i++){
+		cout<< "truedisp" <<i <<'@'<<truedisp[i]<<endl;
+	}
+#endif
+	for (unsigned int i=0;i<4;i++){
+		dis[3*i]=truedisp[6*i]*zdir[0]+truedisp[6*i+1]*zdir[1]+truedisp[6*i+2]*zdir[2];
+		dis[3*i+1]=truedisp[6*i+3]*xdir[0]+truedisp[6*i+4]*xdir[1]+truedisp[6*i+5]*xdir[2];
+		dis[3*i+2]=truedisp[6*i+3]*ydir[0]+truedisp[6*i+4]*ydir[1]+truedisp[6*i+5]*ydir[2];
+	}
 
 	double nu=material->nu;
 	double Jacobian=xpsi*yeta;
-	const double k= material->E*material->h*material->h*material->h*material->h*0.5*0.0833333333333333/(1-nu*nu);
-
+	const double k= material->E*material->h*0.5/(1-nu*nu);
+	/*the k is wrong!!!*/
 	double psix=yeta/Jacobian;
 	double etay=xpsi/Jacobian;
 

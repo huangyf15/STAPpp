@@ -641,8 +641,8 @@ void COutputter::OutputElementStress()
 					<< "              UX            UY           UZ            WEIGHTS"
 					#endif
 					<< endl;
-				double stresses4PE[12]; //4PE: for plate element
-				double Positions4PE[12];
+				double stresses[12]; //4PE: for plate element
+				double Positions[12];
 				#ifdef __TEST__
 				double GaussDisplacements[12];
 				double weights[4];
@@ -652,7 +652,7 @@ void COutputter::OutputElementStress()
 				{
 					#ifndef __TEST__
 					dynamic_cast<CQuadrilateral&>(
-						EleGrp.GetElement(Ele)).ElementStress(stresses4PE, Displacement, Positions4PE);
+						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
 					#else
 					dynamic_cast<CQuadrilateral&>(
 						EleGrp.GetElement(Ele)).ElementStress(
@@ -662,8 +662,8 @@ void COutputter::OutputElementStress()
 					for (unsigned i=0; i<4; ++i) { // four gauss points
 						*this << setw(8) << Ele + 1;
 						*this << setw(10) << i+1;
-						*this << setw(17) << Positions4PE[i*3] << setw(14) << Positions4PE[i*3+1] << setw(14) << Positions4PE[i*3+2];
-						*this << setw(17) << stresses4PE[i*3] << setw(14) << stresses4PE[i*3+1] << setw(14) << stresses4PE[i*3+2];
+						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
+						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
 						// *this << setw(32) << stresses[i] << std::endl;
 						#ifdef __TEST__
 						*this << setw(17) << GaussDisplacements[i*3] 
@@ -825,16 +825,18 @@ void COutputter::OutputElementStress()
 				*this << "     NUMBER    INDEX        X             Y             Z" 
 					<< "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX"
 					<< endl;
-				double stresses[12];
-				double Positions[12];
+				double stresses4PE[12];
+				double Positions4PE[12];
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
+					dynamic_cast<CPlate&>(
+						EleGrp.GetElement(Ele)).ElementStress(stresses4PE, Displacement, Positions4PE);
 					
 					for (unsigned i=0; i<4; ++i) { // four gauss points
 						*this << setw(8) << Ele + 1;
 						*this << setw(10) << i+1;
-						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
-						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
+						*this << setw(17) << Positions4PE[i*3] << setw(14) << Positions4PE[i*3+1] << setw(14) << Positions4PE[i*3+2];
+						*this << setw(17) << stresses4PE[i*3] << setw(14) << stresses4PE[i*3+1] << setw(14) << stresses4PE[i*3+2];
 						// *this << setw(32) << stresses[i] << std::endl;
 						
 						*this << std::endl;
