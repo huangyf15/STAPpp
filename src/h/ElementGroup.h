@@ -16,6 +16,7 @@
 #include "Elements/Bar.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/TimoshenkoSRINT.h"
+#include "Elements/TimoshenkoEBMOD.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -86,6 +87,9 @@ public:
 
 	//  Read TimoshenkoSRINT element data from the input data file
 	bool ReadTimoshenkoSRINTElementData(ifstream& Input);
+
+	//  Read TimoshenkoEBMOD element data from the input data file
+	bool ReadTimoshenkoEBMODElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

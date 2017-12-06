@@ -1,9 +1,0 @@
-Cables to test Timoshenko Beam elements (using SRINT)
-2	1	1	1
-1	1	1	1	1	1	1	0	0	0	0	0	0
-2	0	0	0	0	0	0	1	0	0	0	0	0
-1	1
-2	5	1
-8	1	1
-1	1000	0.25	1.8E-1	5.4E-3	1.35E-3	0	0	-1
-1	1	2	1

@@ -168,6 +168,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::TimoshenkoSRINT:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
+			case ElementTypes::TimoshenkoEBMOD:
+				PrintTimoshenkoSRINTElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -175,6 +178,7 @@ void COutputter::OutputElementInfo()
 		}
 	}
 }
+
 //	Output bar element data
 void COutputter::PrintBarElementData(unsigned int EleGrp)
 {
@@ -271,6 +275,32 @@ void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 	*this << "  SET      YOUNG'S      POISSON'S  CROSS-SECTIONAL MOMENT-INER  MOMENT-INER   1ST COORD     2ND COORD     3RD COORD" << endl
 		  << " NUMBER    MODULUS        RATIO         AREA      LOCAL Y-AXIS LOCAL Z-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS" << endl
 		  << "              E             nu          Area          Iyy          Izz         THETAY1       THETAY2       THETAY3" << endl << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(4);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+}
+
+//	Output TimoshenkoEBMOD Beam element data
+void COutputter::PrintTimoshenkoEBMODElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		<< endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		<< endl
+		<< endl;
+
+	*this << "  SET      YOUNG'S      POISSON'S  CROSS-SECTIONAL MOMENT-INER  MOMENT-INER   1ST COORD     2ND COORD     3RD COORD" << endl
+		<< " NUMBER    MODULUS        RATIO         AREA      LOCAL Y-AXIS LOCAL Z-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS" << endl
+		<< "              E             nu          Area          Iyy          Izz         THETAY1       THETAY2       THETAY3" << endl << endl;
 
 	*this << setiosflags(ios::scientific) << setprecision(4);
 
@@ -434,19 +464,25 @@ void COutputter::OutputElementStress()
 						<< setw(13) << TimoshenkoForces[11] << endl;
 					*this << std::endl;
 				}
-#ifdef __TEST__
-				*this << "  ELEMENT             STRESS_XX        STRESS_XY        STRESS_YY" << endl
+				break;
+
+			case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
+				double TimoshenkoEBStresses[3];
+				double TimoshenkoEBForces[12];
+
+				*this << "  ELEMENT        FORCE_X1    FORCE_X2    FORCE_Y1    FORCE_Y2    FORCE_Z1    FORCE_Z2   MOMENT_X1   MOMENT_X2   MOMENT_Y1   MOMENT_Y2   MOMENT_Z1   MOMENT_Z2" << endl
 					<< "  NUMBER" << endl;
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
-					dynamic_cast<CTimoshenkoSRINT&>(
-						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoStresses, TimoshenkoForces, Positions);
-					*this << setw(5) << Ele + 1 << setw(18) << TimoshenkoStresses[0] << setw(10) << TimoshenkoStresses[1] 
-						<< setw(10) << TimoshenkoStresses[2] << std::endl;
+					dynamic_cast<CTimoshenkoEBMOD&>(
+						EleGrp.GetElement(Ele)).ElementStress(TimoshenkoEBStresses, TimoshenkoEBForces, Displacement);
+					*this << setw(5) << Ele + 1 << setw(18) << TimoshenkoEBForces[0] << setw(13) << TimoshenkoEBForces[1]
+						<< setw(13) << TimoshenkoEBForces[2] << setw(13) << TimoshenkoEBForces[3] << setw(13) << TimoshenkoEBForces[4]
+						<< setw(13) << TimoshenkoEBForces[5] << setw(13) << TimoshenkoEBForces[6] << setw(13) << TimoshenkoEBForces[7]
+						<< setw(13) << TimoshenkoEBForces[8] << setw(13) << TimoshenkoEBForces[9] << setw(13) << TimoshenkoEBForces[10]
+						<< setw(13) << TimoshenkoEBForces[11] << endl;
+					*this << std::endl;
 				}
-				*this << endl;
-#endif
-
 				break;
 
 			default: // Invalid element type

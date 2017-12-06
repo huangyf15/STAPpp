@@ -20,6 +20,7 @@
 #include "Elements/Bar.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/TimoshenkoSRINT.h"
+#include "Elements/TimoshenkoEBMOD.h"
 #include "Outputter.h"
 #include "Solver.h"
 #include "LoadCaseData.h"

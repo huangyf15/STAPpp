@@ -64,6 +64,9 @@ public:
 //!	Output TimoshenkoSRINT Beam element data
 	void PrintTimoshenkoSRINTElementData(unsigned int EleGrp);
 
+// !Output TimoshenkoEBMOD Beam element data
+	void PrintTimoshenkoEBMODElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
