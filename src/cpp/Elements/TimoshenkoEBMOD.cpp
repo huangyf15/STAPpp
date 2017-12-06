@@ -309,24 +309,24 @@ void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double*
 
 	// Calculate the stress
 	stress[0] = material->E * (EleDisp[6] - EleDisp[0]) / len;
-	stress[1] = G / kMod / len * ((EleDisp[7] - EleDisp[1]) / (1 + bz) - 0.5*(EleDisp[5] + EleDisp[11]) * len * bz / (1 + bz));
-	stress[2] = G / kMod / len * ((EleDisp[8] - EleDisp[2]) / (1 + by) + 0.5*(EleDisp[4] + EleDisp[10]) * len * by / (1 + by));
+	stress[1] = G / kMod / len * ((EleDisp[7] - EleDisp[1]) - 0.5*(EleDisp[5] + EleDisp[11]) * len) * bz / (1 + bz);
+	stress[2] = G / kMod / len * ((EleDisp[8] - EleDisp[2]) + 0.5*(EleDisp[4] + EleDisp[10]) * len) * by / (1 + by);
 	// Calculate the internal forces on nodal points
 	/* ONLY use the shear force on the midpoint of the element*/
 	force[1] = Tens * (EleDisp[6] - EleDisp[0]);
 	force[0] = -force[1];
-	force[3] = Stfs / len * ((EleDisp[7] - EleDisp[1]) / (1 + bz) - 0.5*(EleDisp[5] + EleDisp[11]) * len * bz / (1 + bz));
+	force[3] = Stfs / len * ((EleDisp[7] - EleDisp[1]) - 0.5*(EleDisp[5] + EleDisp[11]) * len) * bz / (1 + bz);
 	force[2] = -force[3];
-	force[5] = Stfs / len * ((EleDisp[8] - EleDisp[2]) / (1 + by) + 0.5*(EleDisp[4] + EleDisp[10]) * len * by / (1 + by));
+	force[5] = Stfs / len * ((EleDisp[8] - EleDisp[2]) + 0.5*(EleDisp[4] + EleDisp[10]) * len) * by / (1 + by);
 	force[4] = -force[5];
 	force[6] = Tors * (EleDisp[9] - EleDisp[3]);
 	force[7] = -force[6];
-	force[8] = - Stfy / (1 + by) / len / len *
-		( 6 * (EleDisp[8] - EleDisp[2]) - 3 * (2 * by + 1)*(EleDisp[4] + EleDisp[10]) * len - (EleDisp[10] - EleDisp[4]) * len);
-	force[9] = - Stfy / (1 + by) / len / len *
-		(-6 * (EleDisp[8] - EleDisp[2]) + 3 * (2 * by + 1)*(EleDisp[4] + EleDisp[10]) * len - (EleDisp[10] - EleDisp[4]) * len);
-	force[10] = Stfz / (1 + bz) / len / len *
-		( 6 * (EleDisp[7] - EleDisp[1]) + 3 * (2 * by + 1)*(EleDisp[5] + EleDisp[11]) * len + (EleDisp[11] - EleDisp[5]) * len);
-	force[11] = Stfz / (1 + bz) / len / len * 
-		(-6 * (EleDisp[7] - EleDisp[1]) - 3 * (2 * by + 1)*(EleDisp[5] + EleDisp[11]) * len + (EleDisp[11] - EleDisp[5]) * len);
+	force[8] = - Stfy / len / len *
+		( 6 * (EleDisp[8] - EleDisp[2]) / (1 + by) - 3 * by / (1 + by) *(EleDisp[4] + EleDisp[10]) * len + (4 * EleDisp[4] + 2 * EleDisp[10]) * len);
+	force[9] = - Stfy / len / len *
+		( 6 * (EleDisp[8] - EleDisp[2]) / (1 + by) + 3 * by / (1 + by) *(EleDisp[4] + EleDisp[10]) * len - (4 * EleDisp[4] + 2 * EleDisp[10]) * len);
+	force[10] = Stfz / len / len *
+		( 6 * (EleDisp[7] - EleDisp[1]) / (1 + bz) + 3 * bz / (1 + bz) *(EleDisp[5] + EleDisp[11]) * len - (4 * EleDisp[5] + 2 * EleDisp[11]) * len);
+	force[11] = Stfz / len / len * 
+		(-6 * (EleDisp[7] - EleDisp[1]) / (1 + bz) - 3 * bz / (1 + bz) *(EleDisp[5] + EleDisp[11]) * len + (2 * EleDisp[5] + 4 * EleDisp[11]) * len);
 }

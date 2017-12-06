@@ -328,8 +328,8 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 	force[4] = - force[5];
 	force[6] = Tors * (EleDisp[9] - EleDisp[3]);
 	force[7] = - force[6];
-	force[9] = Stfy / len * (EleDisp[10] - EleDisp[4]);
-	force[8] = - force[9] - force[6] * len;
-	force[11] = Stfz / len * (EleDisp[11] - EleDisp[5]);
-	force[10] = - force[11] + force[4] * len;
+	force[9] = Stfy / len * (EleDisp[10] - EleDisp[4]) + 0.5 * force[5] * len;
+	force[8] = Stfy / len * (EleDisp[10] - EleDisp[4]) - 0.5 * force[5] * len;
+	force[11] = Stfz / len * (EleDisp[11] - EleDisp[5]) - 0.5 * force[3] * len;
+	force[10] = Stfz / len * (EleDisp[11] - EleDisp[5]) + 0.5 * force[3] * len;
 }
