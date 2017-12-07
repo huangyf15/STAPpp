@@ -22,6 +22,9 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[0] = 0;	// Boundary codes
     bcode[1] = 0;
     bcode[2] = 0;
+	bcode[3] = 1;
+	bcode[4] = 1;
+	bcode[5] = 1;
 };
 
 //	Read element data from stream Input
@@ -59,7 +62,7 @@ void CNode::WriteEquationNo(COutputter& output, unsigned int np)
 {
 	output << setw(9) << np+1 << "       ";
 
-	for (unsigned int dof = 0; dof < CNode::NDF; dof++)	// Loop over for DOFs of node np
+	for (unsigned int dof = 0; dof < CNode::NDf; dof++)	// Loop over for DOFs of node np
 	{
 		output << setw(5) << bcode[dof];
 	}
@@ -72,7 +75,7 @@ void CNode::WriteNodalDisplacement(COutputter& output, unsigned int np, double* 
 {
 	output << setw(5) << np + 1 << "        ";
 
-	for (unsigned int j = 0; j < NDF; j++)
+	for (unsigned int j = 0; j < NDf; j++)
 	{
 		if (bcode[j] == 0)
 		{

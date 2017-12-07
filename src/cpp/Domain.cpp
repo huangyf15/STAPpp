@@ -98,10 +98,6 @@ bool CDomain::ReadData(string FileName, string OutFile)
     else
         return false;
 
-//	Update equation number
-	CalculateEquationNumber();
-	Output->OutputEquationNumber();
-
 //	Read load data
 	if (ReadLoadCases())
         Output->OutputLoadInfo();
@@ -113,6 +109,19 @@ bool CDomain::ReadData(string FileName, string OutFile)
         Output->OutputElementInfo();
     else
         return false;
+
+	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+		if (EleGrpList[EleGrp].GetElementType() >=5)
+			for (unsigned int Nume = 0; Nume < EleGrpList[EleGrp].GetNUME(); Nume++){
+				*(EleGrpList[EleGrp].GetElement(Nume).GetNodes()).bcode[]
+
+			}
+
+		
+
+//	Update equation number
+	CalculateEquationNumber();
+	Output->OutputEquationNumber();
 
 	return true;
 }
@@ -138,7 +147,7 @@ void CDomain::CalculateEquationNumber()
 	NEQ = 0;
 	for (unsigned int np = 0; np < NUMNP; np++)	// Loop over for all node
 	{
-		for (unsigned int dof = 0; dof < CNode::NDF; dof++)	// Loop over for DOFs of node np
+		for (unsigned int dof = 0; dof < CNode::NDf; dof++)	// Loop over for DOFs of node np
 		{
 			if (NodeList[np].bcode[dof]) 
 				NodeList[np].bcode[dof] = 0;
@@ -270,9 +279,10 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 	for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)
 	{
 		unsigned int dof = NodeList[LoadData->node[lnum] - 1].bcode[LoadData->dof[lnum] - 1];
-        
-        if(dof) // The DOF is activated
+
+        if(dof)// The DOF is activated
             Force[dof - 1] += LoadData->load[lnum];
+		
 	}
 
 	return true;

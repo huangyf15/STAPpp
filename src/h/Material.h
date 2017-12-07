@@ -89,3 +89,28 @@ public:
 //!	Write material data to Stream
 	virtual void Write(COutputter& output, unsigned int mset);
 };
+
+//!	Material class for Beam element
+class CBeamMaterial : public CMaterial
+{
+public:
+
+	double nu; // 泊松比
+	double a; // 矩形的宽
+	double b; // 矩形的长
+	double t1;// 右侧厚度
+	double t2;// 上方厚度
+	double t3;// 左侧厚度
+	double t4;// 下方厚度 
+	double n1;// Y'轴的x分量
+	double n2;// Y'轴的y分量
+	double n3;// Y'轴的y分量
+
+public:
+	
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};

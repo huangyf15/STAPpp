@@ -70,6 +70,11 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CTriangle);
             MaterialSize_ = sizeof(CTriangleMaterial);
             break;
+        case ElementTypes::Beam:
+            ElementSize_ = sizeof(CBeam);
+            MaterialSize_ = sizeof(CBeamMaterial);
+            break;
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -90,6 +95,10 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Triangle:
             ElementList_ = new CTriangle[size];
             break;
+        case ElementTypes::Beam:
+            ElementList_ = new CBeam[size];
+            break;
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -109,6 +118,10 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::Quadrilateral:
             MaterialList_ = new CQuadrilateralMaterial[size];
             break;
+        case ElementTypes::Beam:
+            MaterialList_ = new CBeamMaterial[size];
+            break;
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
             exit(5);

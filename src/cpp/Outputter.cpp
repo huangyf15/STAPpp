@@ -167,6 +167,9 @@ void COutputter::OutputElementInfo()
 				break;
 			case ElementTypes::Triangle:
 				PrintTriangleElementData(EleGrp);
+                break;
+			case ElementTypes::Beam:
+				PrintBeamElementData(EleGrp);
 				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
@@ -253,6 +256,46 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
+// Output Beam element data
+void COutputter::PrintBeamElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+    *this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S         SHEAR          DIAMETER" << endl
+		  << " NUMBER     MODULUS        MODULUS                 " << endl
+		  << "               E              G                d" << endl;
+
+    *this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+    *this << " ELEMENT     NODE     NODE       MATERIAL" << endl
+		  << " NUMBER-N      I        J       SET NUMBER" << endl;
+
+	const unsigned int NUME = ElementGroup.GetNUME();
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < NUME; Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
 void COutputter::PrintTriangleElementData(unsigned int EleGrp)
 {
 	CDomain* FEMData = CDomain::Instance();
@@ -289,7 +332,6 @@ void COutputter::PrintTriangleElementData(unsigned int EleGrp)
 
 	*this << endl;
 }
-
 
 //	Print load data
 void COutputter::OutputLoadInfo()
@@ -331,7 +373,7 @@ void COutputter::OutputNodalDisplacement(unsigned int lcase)
 
 	*this << " D I S P L A C E M E N T S" << endl
 		  << endl;
-	*this << "  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT" << endl;
+	*this << "  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT        THETA-X            THETA-Y         THETA-Z" << endl;
 
 	for (unsigned int np = 0; np < FEMData->GetNUMNP(); np++)
 		NodeList[np].WriteNodalDisplacement(*this, np, Displacement);
@@ -441,6 +483,24 @@ void COutputter::OutputElementStress()
 					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
 					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
 				}
+				*this << endl;
+                break;
+			
+			case ElementTypes::Beam: // Bar element
+				*this << "  ELEMENT             FORCE            STRESS" << endl
+					<< "  NUMBER" << endl;
+
+				double beamstress;
+
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp.GetElement(Ele);
+					Element.ElementStress(&beamstress, Displacement);
+
+					CBeamMaterial& material = *dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
+					*this << setw(5) << Ele + 1 << setw(22) << beamstress << endl;
+				}
+
 				*this << endl;
 				break;
 
