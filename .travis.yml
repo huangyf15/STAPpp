@@ -12,3 +12,5 @@ script:
   - ./stap++ ../data/bar-6
   - cd ../data/4Q
   - python3 run-patch.py
+  - cd ../3T
+  - python3 run-patch.py
