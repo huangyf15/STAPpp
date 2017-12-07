@@ -2,6 +2,8 @@ language: cpp
 compiler:
   - clang
   - gcc
+before_script:
+  - pip3 install matplotlib
 script:
   - mkdir build
   - cd build
@@ -10,3 +12,5 @@ script:
   - ./stap++ ../data/test_truss_22.dat
   - ./stap++ ../data/truss
   - ./stap++ ../data/bar-6
+  - cd ../data/4Q
+  - python3 run-patch.py
