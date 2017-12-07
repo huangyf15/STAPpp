@@ -23,11 +23,11 @@ class Element():
 
 
 def main():
-    plot('patch.out')
+    return plot('patch.out')
 
 
 def plot(filename):
-    print(filename)
+    # print(filename)
     mark1 = False
     mark2 = False
     mark3 = False
@@ -95,8 +95,14 @@ def plot(filename):
         f(n[2], n[3])
         f(n[3], n[0])
 
-    plt.show()
-    # exit()
+    # plt.show()
+    plt.savefig('patch-test-4Q.png')
+    
+    # 判断是否通过分片试验
+    return all(
+        abs(node.dx - (b / E * node.x)) < 1e-5 and \
+        abs(node.dy - (-v * b / E * node.y)) < 1e-5
+        for _, node in nodes.items())
 
 
 if __name__ == '__main__':
