@@ -464,12 +464,12 @@ void COutputter::OutputElementStress()
 					for (unsigned GPIndex=0; GPIndex<3; GPIndex++)
 					{
 						*this << setw(6) << Ele+1 << setw(8) << GPIndex+1 
-							  << setw(18) << GPPosition[GPIndex] 
-							  << setw(14) << GPPosition[GPIndex+1] 
-							  << setw(14) << GPPosition[GPIndex+2]
-							  << setw(17) << GPDisplacement[GPIndex]
-							  << setw(14) << GPDisplacement[GPIndex+1]
-							  << setw(14) << GPDisplacement[GPIndex+2]
+							  << setw(18) << GPPosition[3*GPIndex] 
+							  << setw(14) << GPPosition[3*GPIndex + 1] 
+							  << setw(14) << GPPosition[3*GPIndex + 2]
+							  << setw(17) << GPDisplacement[3*GPIndex]
+							  << setw(14) << GPDisplacement[3*GPIndex + 1]
+							  << setw(14) << GPDisplacement[3*GPIndex + 2]
 							  << setw(17) << stress3T[0]
 							  << setw(14) << stress3T[1]
 							  << setw(14) << stress3T[2]
