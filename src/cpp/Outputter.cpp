@@ -165,12 +165,15 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
+			case ElementTypes::Triangle:
+				PrintTriangleElementData(EleGrp);
+				break;
 			case ElementTypes::TimoshenkoSRINT:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
 			case ElementTypes::TimoshenkoEBMOD:
 				PrintTimoshenkoSRINTElementData(EleGrp);
-				break;
+			
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -257,6 +260,43 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
+void COutputter::PrintTriangleElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		<< endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		<< endl
+		<< endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		<< " NUMBER     MODULUS          RATIO" << endl
+		<< "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		<< endl
+		<< " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE        MATERIAL" << endl
+		<< " NUMBER-N      I        J        K        SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
 //	Output TimoshenkoSRINT Beam element data
 void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 {
@@ -273,14 +313,26 @@ void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 		<< endl;
 
 	*this << "  SET      YOUNG'S      POISSON'S  CROSS-SECTIONAL MOMENT-INER  MOMENT-INER   1ST COORD     2ND COORD     3RD COORD" << endl
-		  << " NUMBER    MODULUS        RATIO         AREA      LOCAL Y-AXIS LOCAL Z-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS" << endl
-		  << "              E             nu          Area          Iyy          Izz         THETAY1       THETAY2       THETAY3" << endl << endl;
+		<< " NUMBER    MODULUS        RATIO         AREA      LOCAL Y-AXIS LOCAL Z-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS  LOCAL Y-AXIS" << endl
+		<< "              E             nu          Area          Iyy          Izz         THETAY1       THETAY2       THETAY3" << endl << endl;
 
 	*this << setiosflags(ios::scientific) << setprecision(4);
 
 	//	Loop over for all property sets
 	for (unsigned int mset = 0; mset < NUMMAT; mset++)
 		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		<< endl
+		<< " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     MATERIAL" << endl
+		<< " NUMBER-N      I        J        SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
 }
 
 //	Output TimoshenkoEBMOD Beam element data
@@ -307,6 +359,18 @@ void COutputter::PrintTimoshenkoEBMODElementData(unsigned int EleGrp)
 	//	Loop over for all property sets
 	for (unsigned int mset = 0; mset < NUMMAT; mset++)
 		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		<< endl
+		<< " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     MATERIAL" << endl
+		<< " NUMBER-N      I        J        SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
 }
 
 //	Print load data
@@ -444,7 +508,22 @@ void COutputter::OutputElementStress()
 					}
 				}
 				*this << endl;
+				break;
 
+			case ElementTypes::Triangle:
+				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
+					  << "  NUMBER         SXX            SYY            SYY" << endl;
+				double stress3T[3];
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp.GetElement(Ele);
+					Element.ElementStress(stress3T, Displacement);
+					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
+
+					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
+					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+				}
+				*this << endl;
 				break;
 
 			case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element

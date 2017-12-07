@@ -87,14 +87,6 @@ void CQuadrilateral::GenerateLocationMatrix()
 //  which is 77 BTW
 unsigned int CQuadrilateral::SizeOfStiffnessMatrix() { return 12 * (12 + 1) / 2; }
 
-void normalize(double vec[3])
-{
-    double length = std::sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
-    vec[0] /= length;
-    vec[1] /= length;
-    vec[2] /= length;
-}
-
 // returns |Je|
 // generate B
 double GenerateB(double B[8], const double eta, const double psi, const double xe[4],

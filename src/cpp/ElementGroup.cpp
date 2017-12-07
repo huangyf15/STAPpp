@@ -62,22 +62,23 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBar);
             MaterialSize_ = sizeof(CBarMaterial);
             break;
-
         case ElementTypes::Quadrilateral:
             ElementSize_ = sizeof(CQuadrilateral);
             MaterialSize_ = sizeof(CQuadrilateralMaterial);
             break;
-
+		case ElementTypes::Triangle:
+			ElementSize_ = sizeof(CTriangle);
+			MaterialSize_ = sizeof(CTriangleMaterial);
+			break;
 		case ElementTypes::TimoshenkoSRINT:
 			ElementSize_ = sizeof(CTimoshenkoSRINT);
 			MaterialSize_ = sizeof(CTimoshenkoMaterial);
 			break;
-
 		case ElementTypes::TimoshenkoEBMOD:
 			ElementSize_ = sizeof(CTimoshenkoEBMOD);
 			MaterialSize_ = sizeof(CTimoshenkoMaterial);
 			break;
-
+        
 
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
@@ -95,16 +96,18 @@ void CElementGroup::AllocateElement(std::size_t size)
             break;
         case ElementTypes::Quadrilateral:
             ElementList_ = new CQuadrilateral[size];
-            break;
+            break; 
+		case ElementTypes::Triangle:
+			ElementList_ = new CTriangle[size];
+			break;
 		case ElementTypes::TimoshenkoSRINT:
 			ElementList_ = new CTimoshenkoSRINT[size];
 			break;
 		case ElementTypes::TimoshenkoEBMOD:
 			ElementList_ = new CTimoshenkoEBMOD[size];
 			break;
-
-
-		default:
+       
+        default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
     }
@@ -118,8 +121,11 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             MaterialList_ = new CBarMaterial[size];
             break;
         case ElementTypes::Quadrilateral:
-            MaterialList_ =new CQuadrilateralMaterial[size];
+            MaterialList_ = new CQuadrilateralMaterial[size];
             break;
+		case ElementTypes::Triangle:
+			MaterialList_ = new CTriangleMaterial[size];
+			break;
 		case ElementTypes::TimoshenkoSRINT:
 			MaterialList_ = new CTimoshenkoMaterial[size];
 			break;
