@@ -10,84 +10,82 @@
 
 #include "Elements/Beam.h"
 
-#include <iostream>
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
 
 using namespace std;
 
 //	Constructor
 CBeam::CBeam()
 {
-	NEN = 2;	// Each element has 2 nodes
-	nodes = new CNode*[NEN];
-	
-	ND = 12;
+    NEN = 2; // Each element has 2 nodes
+    nodes = new CNode*[NEN];
+
+    ND = 12;
     LocationMatrix = new unsigned int[ND];
 
-	ElementMaterial = nullptr;
+    ElementMaterial = nullptr;
 }
 
 //	Desconstructor
-CBeam::~CBeam()
-{
-}
+CBeam::~CBeam() {}
 
 //	Read element data from stream Input
 bool CBeam::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNode* NodeList)
 {
-	unsigned int N;
+    unsigned int N;
 
-	Input >> N;	// element number
+    Input >> N; // element number
 
-	if (N != Ele + 1)
-	{
-		cerr << "*** Error *** Elements must be inputted in order !" << endl 
-			 << "    Expected element : " << Ele + 1 << endl
-			 << "    Provided element : " << N << endl;
+    if (N != Ele + 1)
+    {
+        cerr << "*** Error *** Elements must be inputted in order !" << endl
+             << "    Expected element : " << Ele + 1 << endl
+             << "    Provided element : " << N << endl;
 
-		return false;
-	}
+        return false;
+    }
 
-	unsigned int MSet;	// Material property set number
-	unsigned int N1, N2;	// Left node number and right node number
+    unsigned int MSet;   // Material property set number
+    unsigned int N1, N2; // Left node number and right node number
+    Input >> N1 >> N2 >> MSet;
+    ElementMaterial = dynamic_cast<CBeamMaterial*>(MaterialSets) + MSet - 1;
+    nodes[0] = &NodeList[N1 - 1];
+    nodes[1] = &NodeList[N2 - 1];
 
-	Input >> N1 >> N2 >> MSet;
-	ElementMaterial = dynamic_cast<CBeamMaterial*>(MaterialSets) + MSet - 1;
-	nodes[0] = &NodeList[N1 - 1];
-	nodes[1] = &NodeList[N2 - 1];
-
-	return true;
+    return true;
 }
 
 //	Write element data to stream
 void CBeam::Write(COutputter& output, unsigned int Ele)
 {
-	output << setw(5) << Ele+1 << setw(11) << nodes[0]->NodeNumber 
-		   << setw(9) << nodes[1]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
+    output << setw(5) << Ele + 1 << setw(11) << nodes[0]->NodeNumber << setw(9)
+           << nodes[1]->NodeNumber << setw(12) << ElementMaterial->nset << endl;
 }
 
-//  Generate location matrix: the global equation number that corresponding to each DOF of the element
+//  Generate location matrix: the global equation number that corresponding to each DOF of the
+//  element
 //	Caution:  Equation number is numbered from 1 !
 void CBeam::GenerateLocationMatrix()
 {
     unsigned int i = 0;
     for (unsigned int N = 0; N < NEN; N++)
-        for (unsigned int D = 0; D < 6; D++){
-			double ccc;
-			ccc=nodes[N]->bcode[D];
+        for (unsigned int D = 0; D < 6; D++)
+        {
+            double Boundary;
+            Boundary = nodes[N]->bcode[D];
 
             LocationMatrix[i++] = nodes[N]->bcode[D];
-		}
+        }
 }
-
 
 //	Return the size of the element stiffness matrix (stored as an array column by column)
 //	For 2 node beam element, element stiffness is a 12x12 matrix, whose upper triangular part
 //	has 21 elements
 unsigned int CBeam::SizeOfStiffnessMatrix() { return 78; }
 
-//	Calculate element stiffness matrix 
+//	Calculate element stiffness matrix
 //	Upper triangular matrix, stored as an array column by colum starting from the diagonal element
 void CBeam::ElementStiffness(double* Matrix)
 {
@@ -200,8 +198,8 @@ void CBeam::ElementStiffness(double* Matrix)
 	Matrix[43] = - k1*N13 - k2*N14 - k3*N15;
 	Matrix[44] = - k1*N16 - k2*N17 - k3*N18;
 	Matrix[45] = k4*N1 + k5*N4 + k6*N7;
-	Matrix[46] = k7*N19 - k8*N20;
-	Matrix[47] = k7*N21 - k8*N22;
+	Matrix[46] = k7*N20 - k8*N19;
+	Matrix[47] = k7*N22 - k8*N21;
 	Matrix[48] = k7*N25 - k8*N25;
 	Matrix[49] = (k5*N17)/2 - k4*N16 + (k6*N18)/2;
 	Matrix[50] = (k5*N11)/2 - k4*N10 + (k6*N12)/2;
@@ -211,9 +209,9 @@ void CBeam::ElementStiffness(double* Matrix)
 	Matrix[54] = k8*N25 - k7*N25;
 	Matrix[55] = k4*N2 + k5*N5 + k6*N8;
 	Matrix[56] = k4*N10 + k5*N11 + k6*N12;
-	Matrix[57] = k7*N23 - k8*N24;
+	Matrix[57] = k7*N24 - k8*N23;
 	Matrix[58] = k7*N26 - k8*N26;
-	Matrix[59] = k7*N22 - k8*N21;
+	Matrix[59] = k7*N21 - k8*N22;
 	Matrix[60] = (k5*N14)/2 - k4*N13 + (k6*N15)/2;
 	Matrix[61] = - k4*N2 + (k5*N5)/2 + (k6*N8)/2;
 	Matrix[62] = (k5*N11)/2 - k4*N10 + (k6*N12)/2;
@@ -224,8 +222,8 @@ void CBeam::ElementStiffness(double* Matrix)
 	Matrix[67] = k4*N13 + k5*N14 + k6*N15;
 	Matrix[68] = k4*N16 + k5*N17 + k6*N18;
 	Matrix[69] = k7*N27 - k8*N27;
-	Matrix[70] = k7*N24 - k8*N23;
-	Matrix[71] = k7*N20 - k8*N19;
+	Matrix[70] = k7*N23 - k8*N24;
+	Matrix[71] = k7*N19 - k8*N20;
 	Matrix[72] = - k4*N3 + (k5*N6)/2 + (k6*N9)/2;
 	Matrix[73] = (k5*N14)/2 - k4*N13 + (k6*N15)/2;
 	Matrix[74] = (k5*N17)/2 - k4*N16 + (k6*N18)/2;
@@ -233,38 +231,38 @@ void CBeam::ElementStiffness(double* Matrix)
 	Matrix[76] = k8*N24 - k7*N23;
 	Matrix[77] = k8*N20 - k7*N19;
 }
-//	Calculate element stress 
+//	Calculate element stress
 void CBeam::ElementStress(double* stress, double* Displacement)
 {
-	CBeamMaterial* material = dynamic_cast<CBeamMaterial*>(ElementMaterial);	// Pointer to material of the element
+    CBeamMaterial* material =
+        dynamic_cast<CBeamMaterial*>(ElementMaterial); // Pointer to material of the element
+    clear(stress, 3);
+    double DX[3]; //	dx = x2-x1, dy = y2-y1, dz = z2-z1
+    double L = 0; //	 beam length
 
-	double DX[3];	//	dx = x2-x1, dy = y2-y1, dz = z2-z1
-	double L2 = 0;	//	Square of beam length (L^2)
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
+    }
 
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-		L2 = L2 + DX[i]*DX[i];
-	}
+    L = sqrt(DX[0] * DX[0] + DX[1] * DX[1] + DX[2] * DX[2]);
 
-	double S[6];
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		S[i] = -DX[i] * material->E / L2;
-		S[i+3] = -S[i];
-	}
-	double s=0;
-	double LM[12];
-	for (unsigned int i = 0; i < 12; i++)
-		LM[i]=LocationMatrix[i];
-	*stress = 0.0;
-	for (unsigned int i = 0; i < 2; i++){
-		for (unsigned int j = 0; j < 3; j++){
-			if (LocationMatrix[i*6+j]){
-			*stress += S[i*3+j] * Displacement[LocationMatrix[i*6+j]-1];
-			s += S[i*3+j] * Displacement[LocationMatrix[i*6+j]-1];
-			}
-		}
-		
-	}
+    double S[6];
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        S[i] = -DX[i] * DX[i] * material->E / (L * L * L);
+        S[i + 3] = -S[i];
+    }
+
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            if (LocationMatrix[i * 6 + j])
+            {
+                double a = S[i * 3 + j] * Displacement[LocationMatrix[i * 6 + j] - 1];
+                stress[j] += S[i * 3 + j] * Displacement[LocationMatrix[i * 6 + j] - 1];
+            }
+        }
+    }
 }
