@@ -91,8 +91,8 @@ def verify(filename, plot):
             f(n[2], n[3])
             f(n[3], n[0])
         plt.scatter(rx, ry, color='r')
-        # plt.show()
-        # plt.savefig('patch-test-4Q.png')
+        plt.show()
+        plt.savefig('patch-test-4Q.png')
 
     # 判断是否通过分片试验
     return all(
