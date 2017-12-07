@@ -2,8 +2,6 @@ language: cpp
 compiler:
   - clang
   - gcc
-before_script:
-  - pip3 install matplotlib
 script:
   - mkdir build
   - cd build
