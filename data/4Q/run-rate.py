@@ -4,7 +4,8 @@ import shutil
 
 PATH = 'convergence rate data'
 
-shutil.rmtree(PATH)
+if os.path.exists(PATH):
+    shutil.rmtree(PATH)
 
 import genDat
 genDat.main()
