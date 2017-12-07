@@ -96,9 +96,15 @@ def verify(filename, plot):
 
     # 判断是否通过分片试验
     return all(
-        abs(node.dx - (b / E * node.x)) < 1e-5 and
-        abs(node.dy - (-v * b / E * node.y)) < 1e-5
+        equal(node.dx, b / E * node.x) and equal(node.dy, -v * b / E * node.y)
         for _, node in nodes.items())
+
+
+def equal(a, b):
+    res = abs(a - b) <= max(abs(a) * 1e-6, abs(b) * 1e-6, 1e-15)
+    if not res:
+        print('failed (a, b) = %s' % str((a, b)))
+    return res
 
 
 def main(plotFlag=False):
