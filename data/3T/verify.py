@@ -1,6 +1,5 @@
 import os
 import re
-import matplotlib.pyplot as plt
 
 TIMES = 10000
 
@@ -22,12 +21,8 @@ class Element():
         self.nodes = nodes
 
 
-def main():
-    plot('patch.out')
-
-
-def plot(filename):
-    print(filename)
+def verify(filename, plot):
+    # print(filename)
     mark1 = False
     mark2 = False
     mark3 = False
@@ -66,36 +61,53 @@ def plot(filename):
                 elif ' NUMBER-N      I        J        K        SET NUMBER' in line:
                     mark3 = True
 
-    x = []
-    y = []
-    rx = []
-    ry = []
     b = 10
     E = 1.0e6
     v = 0.3
 
-    for _, node in nodes.items():
-        x.append(node.x + TIMES * node.dx)
-        y.append(node.y + TIMES * node.dy)
-        rx.append(node.x + TIMES * (b / E * node.x))
-        ry.append(node.y + TIMES * (-v * b / E * node.y))
-    # plt.scatter(x, y)
-    plt.scatter(rx, ry, color='r')
+    if plot:
+        x = []
+        y = []
+        rx = []
+        ry = []
+        for _, node in nodes.items():
+            x.append(node.x + TIMES * node.dx)
+            y.append(node.y + TIMES * node.dy)
+            rx.append(node.x + TIMES * (b / E * node.x))
+            ry.append(node.y + TIMES * (-v * b / E * node.y))
+        # plt.scatter(x, y)
+        import matplotlib.pyplot as plt
 
-    def f(n1, n2):
-        x = [n1.x + TIMES * n1.dx, n2.x + TIMES * n2.dx]
-        y = [n1.y + TIMES * n1.dy, n2.y + TIMES * n2.dy]
-        plt.plot(x, y)
+        def f(n1, n2):
+            x = [n1.x + TIMES * n1.dx, n2.x + TIMES * n2.dx]
+            y = [n1.y + TIMES * n1.dy, n2.y + TIMES * n2.dy]
+            plt.plot(x, y)
 
-    lines = []
-    for _, element in elements.items():
-        n = element.nodes
-        f(n[0], n[1])
-        f(n[1], n[2])
-        f(n[2], n[0])
+        lines = []
+        for _, element in elements.items():
+            n = element.nodes
+            f(n[0], n[1])
+            f(n[1], n[2])
+            f(n[2], n[0])
+        plt.scatter(rx, ry, color='r')
+        plt.show()
+        plt.savefig('patch-test-3T.png')
 
-    plt.show()
-    # exit()
+    # 判断是否通过分片试验
+    return all(
+        equal(node.dx, b / E * node.x) and equal(node.dy, -v * b / E * node.y)
+        for _, node in nodes.items())
+
+
+def equal(a, b):
+    res = abs(a - b) <= max(abs(a) * 1e-6, abs(b) * 1e-6, 1e-15)
+    if not res:
+        print('failed (a, b) = %s' % str((a, b)))
+    return res
+
+
+def main(plotFlag=False):
+    return verify('patch.out', plotFlag)
 
 
 if __name__ == '__main__':

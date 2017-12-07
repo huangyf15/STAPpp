@@ -10,3 +10,7 @@ script:
   - ./stap++ ../data/test_truss_22.dat
   - ./stap++ ../data/truss
   - ./stap++ ../data/bar-6
+  - cd ../data/4Q
+  - python3 run-patch.py
+  - cd ../3T
+  - python3 run-patch.py
