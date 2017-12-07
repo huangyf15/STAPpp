@@ -432,10 +432,20 @@ void COutputter::OutputElementStress()
 				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
 					  << "  NUMBER         SXX            SYY            SYY" << endl;
 				double stress3T[3];
+				#ifdef __TEST__
+				double GPPosition[9];
+				double GPDisplacement[9];
+				double weights3T[3];
+				#endif
+
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp.GetElement(Ele);
-					Element.ElementStress(stress3T, Displacement);
+					#ifndef __TEST__
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement);
+					#else
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement, GPPosition, GPDisplacement, weights3T);
+					#endif
 					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
 
 					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
