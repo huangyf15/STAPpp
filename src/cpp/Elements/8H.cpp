@@ -9,7 +9,7 @@
 /*****************************************************************************/
 
 #include "Elements/8H.h"
-#include "Eigen/dense"
+#include "../../eigen-3/Eigen/Dense"
 
 #include <iostream>
 #include <iomanip>
