@@ -18,6 +18,7 @@
 #include "Node.h"
 #include "ElementGroup.h"
 #include "Elements/Bar.h"
+#include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/TimoshenkoEBMOD.h"
