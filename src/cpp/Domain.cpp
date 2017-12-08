@@ -17,10 +17,10 @@
 using namespace std;
 
 //	Clear an array
-template <class type> void clear(type* a, unsigned int N)
+template <class type> void clear( type* a, unsigned int N )
 {
-    for (unsigned int i = 0; i < N; i++)
-        a[i] = 0;
+	for (unsigned int i = 0; i < N; i++)
+		a[i] = 0;
 }
 
 CDomain* CDomain::_instance = nullptr;
@@ -28,72 +28,72 @@ CDomain* CDomain::_instance = nullptr;
 //	Constructor
 CDomain::CDomain()
 {
-    Title[0] = '0';
-    MODEX = 0;
+	Title[0] = '0';
+	MODEX = 0;
 
-    NUMNP = 0;
-    NodeList = nullptr;
+	NUMNP = 0;
+	NodeList = nullptr;
+	
+	NUMEG = 0;
+	EleGrpList = nullptr;
+	
+	NLCASE = 0;
+	NLOAD = nullptr;
+	LoadCases = nullptr;
+	
+	NEQ = 0;
+	NWK = 0;
+	MK = 0;
 
-    NUMEG = 0;
-    EleGrpList = nullptr;
-
-    NLCASE = 0;
-    NLOAD = nullptr;
-    LoadCases = nullptr;
-
-    NEQ = 0;
-    NWK = 0;
-    MK = 0;
-
-    Force = nullptr;
-    StiffnessMatrix = nullptr;
+	Force = nullptr;
+	StiffnessMatrix = nullptr;
 }
 
 //	Desconstructor
 CDomain::~CDomain()
 {
-    delete[] NodeList;
+	delete [] NodeList;
 
-    delete[] EleGrpList;
+	delete [] EleGrpList;
 
-    delete[] NLOAD;
-    delete[] LoadCases;
+	delete [] NLOAD;
+	delete [] LoadCases;
 
-    delete[] Force;
-    delete StiffnessMatrix;
+	delete [] Force;
+	delete StiffnessMatrix;
 }
 
 //	Return pointer to the instance of the Domain class
 CDomain* CDomain::Instance()
 {
-    if (!_instance)
-        _instance = new CDomain();
-
-    return _instance;
+	if (!_instance) 
+		_instance = new CDomain();
+	
+	return _instance;
 }
 
 //	Read domain data from the input data file
 bool CDomain::ReadData(string FileName, string OutFile)
 {
-    Input.open(FileName);
+	Input.open(FileName);
 
-    if (!Input)
-    {
-        cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
-        exit(3);
-    }
+	if (!Input) 
+	{
+		cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
+		exit(3);
+	}
 
-    COutputter* Output = COutputter::Instance(OutFile);
+	COutputter* Output = COutputter::Instance(OutFile);
 
-    //	Read the heading line
-    Input.getline(Title, 256);
-    Output->OutputHeading();
+//	Read the heading line
+	Input.getline(Title, 256);
+	Output->OutputHeading();
 
-    //	Read the control line
-    Input >> NUMNP >> NUMEG >> NLCASE >> MODEX;
+//	Read the control line
+	Input >> NUMNP >> NUMEG >> NLCASE >> MODEX;
 
-    //	Read nodal point data
-    if (ReadNodalPoints())
+//	Read nodal point data
+	if (ReadNodalPoints())
         Output->OutputNodeInfo();
     else
         return false;
