@@ -171,6 +171,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Hexahedron:
 				PrintHexElementData(EleGrp);
 				break;
+			case ElementTypes::Beam:
+				PrintBeamElementData(EleGrp);
+				break;
 			case ElementTypes::TimoshenkoSRINT:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
