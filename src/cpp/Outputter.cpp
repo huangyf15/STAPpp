@@ -285,8 +285,8 @@ void COutputter::PrintTriangleElementData(unsigned int EleGrp)
 	*this << endl
 		  << endl
 		  << " E L E M E N T   I N F O R M A T I O N" << endl;
-	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
-		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE        MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        SET NUMBER" << endl;
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
