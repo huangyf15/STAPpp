@@ -33,21 +33,21 @@ def verify(filename, plot):
         for line in fp:
             if mark1:
                 try:
-                    index, _, __, ___, x, y, z = line.split()
+                    index, _, __, ___, x, y, z = line.split()[:7]
                     nodes[int(index)] = Node(float(x), float(y), float(z))
                 except:
                     mark1 = False
                     continue
             elif mark2:
                 try:
-                    index, dx, dy, dz = line.split()
+                    index, dx, dy, dz = line.split()[:4]
                     nodes[int(index)].dis(float(dx), float(dy), float(dz))
                 except:
                     mark2 = False
                     continue
             elif mark3:
                 try:
-                    ele, n1, n2, n3, n4, _ = line.split()
+                    ele, n1, n2, n3, n4, _ = line.split()[:6]
                     elements[int(ele)] = Element([nodes[int(item)]
                                                   for item in (n1, n2, n3, n4)])
                 except:

@@ -17,6 +17,7 @@
 #include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/8H.h"
+#include "Elements/Beam.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -27,8 +28,11 @@ enum ElementTypes
     UNDEFINED = 0,
     Bar,
     Quadrilateral,
-	Triangle,
-    Hexahedron
+    Triangle,
+    Hexahedron,
+    Beam,
+    Plate,
+    Shell
 };
 
 //! Element group class

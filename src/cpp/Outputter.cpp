@@ -256,6 +256,44 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
+// Output Beam element data
+void COutputter::PrintBeamElementData(unsigned int EleGrp)
+{
+    CDomain* FEMData = CDomain::Instance();
+
+    CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+    unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+    *this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
+    *this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+    *this << " AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+          << endl
+          << endl;
+
+    *this << "  SET       YOUNG'S         SHEAR          DIAMETER" << endl
+          << " NUMBER     MODULUS        MODULUS                 " << endl
+          << "               E              G                d" << endl;
+
+    *this << setiosflags(ios::scientific) << setprecision(5);
+
+    //	Loop over for all property sets
+    for (unsigned int mset = 0; mset < NUMMAT; mset++)
+        ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
+    *this << " ELEMENT     NODE     NODE       MATERIAL" << endl
+          << " NUMBER-N      I        J       SET NUMBER" << endl;
+
+    const unsigned int NUME = ElementGroup.GetNUME();
+
+    //	Loop over for all elements in group EleGrp
+    for (unsigned int Ele = 0; Ele < NUME; Ele++)
+        ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+    *this << endl;
+}
+
+// Output Triangle element data
 void COutputter::PrintTriangleElementData(unsigned int EleGrp)
 
 {
@@ -475,18 +513,75 @@ void COutputter::OutputElementStress()
 
 				break;
 
-			case ElementTypes::Triangle:
-				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
-					<< "  NUMBER         SXX            SYY            SYY" << endl;
-				double stress3T[3];
+			case ElementTypes::Beam: // Bar element
+				*this << "  ELEMENT          SXX                 SYY                   SZZ" << endl
+					<< "  NUMBER" << endl;
+
+				double beamstress[3];
+
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp.GetElement(Ele);
-					Element.ElementStress(stress3T, Displacement);
+					Element.ElementStress(beamstress, Displacement);
 
+					CBeamMaterial& material =
+						*dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
+					*this << setw(5) << Ele + 1 << setw(22) << beamstress[0] << setw(22)
+						<< beamstress[1] << setw(22) << beamstress[2] << endl;
+				}
+
+				*this << endl;
+				break;	
+
+			case ElementTypes::Triangle:
+				double stress3T[3];
+				#ifndef __TEST__
+				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
+					  << "  NUMBER         SXX            SYY            SXY" << endl;
+				#else
+				double GPPosition[9];
+				double GPDisplacement[9];
+				double weights3T[3];
+				*this << "  ELEMENT    GP               GAUSS POINTS POSITION    "
+					  << "                GAUSS POINTS DISPLACEMENTS       " 
+					  << "               GAUSS POINTS STRESSES              INTEGRATE"
+					  << std::endl
+					  << "   INDEX   INDEX          X            Y              Z"
+					  << "                DX           DY           DZ     "
+					  << "          SXX           SYY           SXY          WEIGHTS"
+					  << std::endl;
+				#endif
+
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp.GetElement(Ele);
+					#ifndef __TEST__
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement);
+					#else
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement, GPPosition, GPDisplacement, weights3T);
+					#endif
 					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
+					
+					#ifndef __TEST__
 					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
-					 << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+					#else
+					for (unsigned GPIndex=0; GPIndex<3; GPIndex++)
+					{
+						*this << setw(6) << Ele+1 << setw(8) << GPIndex+1 
+							  << setw(18) << GPPosition[3*GPIndex] 
+							  << setw(14) << GPPosition[3*GPIndex + 1] 
+							  << setw(14) << GPPosition[3*GPIndex + 2]
+							  << setw(17) << GPDisplacement[3*GPIndex]
+							  << setw(14) << GPDisplacement[3*GPIndex + 1]
+							  << setw(14) << GPDisplacement[3*GPIndex + 2]
+							  << setw(17) << stress3T[0]
+							  << setw(14) << stress3T[1]
+							  << setw(14) << stress3T[2]
+							  << setw(14) << weights3T[GPIndex]
+							  << std::endl;
+					}
+					#endif
 				}
 
 				*this << endl;

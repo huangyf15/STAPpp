@@ -3,8 +3,8 @@ import re
 import verify
 import sys
 
-os.system('..' + os.sep + '..' + os.sep + 'build' + os.sep + 'stap++ patch.dat > nul')
-res = verify.main()
+res = 0 == os.system('..' + os.sep + '..' + os.sep + 'build' + os.sep + 'stap++ patch.dat > nul')
+res = res and verify.main()
 if res:
     print('patch test passed.')
     sys.exit(0)

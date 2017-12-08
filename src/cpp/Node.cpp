@@ -22,6 +22,9 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[0] = 0;	// Boundary codes
     bcode[1] = 0;
     bcode[2] = 0;
+	bcode[3] = 1;
+	bcode[4] = 1;
+	bcode[5] = 1;
 };
 
 //	Read element data from stream Input

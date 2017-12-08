@@ -90,6 +90,8 @@ public:
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }
 
+    //! Return NEN
+    inline int GetNEN() { return NEN; }
 //!	Return material of the element
 	inline CMaterial* GetElementMaterial() { return ElementMaterial; }
 

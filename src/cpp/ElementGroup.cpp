@@ -74,7 +74,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CHex);
             MaterialSize_ = sizeof(CHexMaterial);
             break;
-
+        case ElementTypes::Beam:
+            ElementSize_ = sizeof(CBeam);
+            MaterialSize_ = sizeof(CBeamMaterial);
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -98,6 +101,9 @@ void CElementGroup::AllocateElement(std::size_t size)
 		case ElementTypes::Hexahedron:
             ElementList_ = new CHex[size];
             break;
+        case ElementTypes::Beam:
+            ElementList_ = new CBeam[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -118,7 +124,10 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             MaterialList_ = new CQuadrilateralMaterial[size];
             break;
 		case ElementTypes::Hexahedron:
-            MaterialList_ =new CHexMaterial[size];
+            MaterialList_ = new CHexMaterial[size];
+            break;
+        case ElementTypes::Beam:
+            MaterialList_ = new CBeamMaterial[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;

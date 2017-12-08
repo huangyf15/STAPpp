@@ -67,6 +67,9 @@ public:
 //!	Output Quadrilateral element data
 	void PrintHexElementData(unsigned int EleGrp);
 
+//!	Output bar element data
+	void PrintBeamElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
