@@ -67,7 +67,9 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CQuadrilateral);
             MaterialSize_ = sizeof(CQuadrilateralMaterial);
             break;
-
+        case ElementTypes::Triangle:
+			ElementSize_ = sizeof(CTriangle);
+			MaterialSize_ = sizeof(CTriangleMaterial);
 		case ElementTypes::Hexahedron:
             ElementSize_ = sizeof(CHex);
             MaterialSize_ = sizeof(CHexMaterial);
@@ -90,6 +92,9 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Quadrilateral:
             ElementList_ = new CQuadrilateral[size];
             break;
+		case ElementTypes::Triangle:
+            ElementList_ = new CTriangle[size];
+			break;
 		case ElementTypes::Hexahedron:
             ElementList_ = new CHex[size];
             break;
@@ -106,8 +111,11 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::Bar:
             MaterialList_ = new CBarMaterial[size];
             break;
+		case ElementTypes::Triangle:
+            MaterialList_ = new CTriangleMaterial[size];
+			break;
         case ElementTypes::Quadrilateral:
-            MaterialList_ =new CQuadrilateralMaterial[size];
+            MaterialList_ = new CQuadrilateralMaterial[size];
             break;
 		case ElementTypes::Hexahedron:
             MaterialList_ =new CHexMaterial[size];
