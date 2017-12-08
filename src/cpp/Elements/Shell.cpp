@@ -75,7 +75,7 @@ unsigned int CShell::SizeOfStiffnessMatrix() { return 300; }
 
 //	Calculate element stiffness matrix
 //	Upper triangular matrix, stored as an array column by colum starting from the diagonal element
-void CPlate::ElementStiffness(double* Matrix)
+void CShell::ElementStiffness(double* Matrix)
 {
     clear(Matrix, SizeOfStiffnessMatrix());
 
