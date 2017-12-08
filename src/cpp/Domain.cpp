@@ -123,12 +123,9 @@ bool CDomain::ReadData(string FileName, string OutFile)
                 for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
                 {
                     unsigned int N = ElementNode[NumNode]->NodeNumber;
-                    if (N != 1)
-                    { // for test
-                        NodeList[N - 1].bcode[3] = 0;
-                        NodeList[N - 1].bcode[4] = 0;
-                        NodeList[N - 1].bcode[5] = 0;
-                    }
+					NodeList[N - 1].bcode[3] = 0;
+					NodeList[N - 1].bcode[4] = 0;
+					NodeList[N - 1].bcode[5] = 0;
                 }
             }
         }
