@@ -14,8 +14,10 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
-#include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
+#include "Elements/Triangle.h"
+#include "Elements/8H.h"
+#include "Elements/Beam.h"
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/TimoshenkoEBMOD.h"
 #include "Material.h"
@@ -29,10 +31,10 @@ enum ElementTypes
     Bar,
     Quadrilateral,
     Triangle,
-	H8,
-	Beam,
-	Plate,
-	Shell,
+    Hexahedron,
+    Beam,
+    Plate,
+    Shell,
 	TimoshenkoSRINT,
 	TimoshenkoEBMOD
 };
@@ -85,6 +87,9 @@ public:
 
     //! Read quadrilateral element data from the input data file
     bool ReadQuadrilateralElementData(ifstream& Input);
+
+	//! Read quadrilateral element data from the input data file
+	bool ReadHexElementData(ifstream& Input);
 
 	//  Read TimoshenkoSRINT element data from the input data file
 	bool ReadTimoshenkoSRINTElementData(ifstream& Input);

@@ -2,6 +2,13 @@ language: cpp
 compiler:
   - clang
   - gcc
+install:
+  - mkdir temp
+  - cd temp
+  - wget http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
+  - tar -zxvf 3.3.4.tar.gz
+  - mv eigen-eigen-5a0156e40feb ../src/eigen-3
+  - cd ..
 script:
   - mkdir build
   - cd build
@@ -10,3 +17,7 @@ script:
   - ./stap++ ../data/test_truss_22.dat
   - ./stap++ ../data/truss
   - ./stap++ ../data/bar-6
+  - cd ../data/4Q
+  - python3 run-patch.py
+  - cd ../3T
+  - python3 run-patch.py

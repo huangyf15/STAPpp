@@ -1,5 +1,5 @@
 # stappp
-![](https://travis-ci.com/gwy15/STAPpp.svg?token=xVpBdFRd1VWbmgq6LXmh&branch=master)
+[![build_status](https://travis-ci.com/gwy15/STAPpp.svg?token=xVpBdFRd1VWbmgq6LXmh&branch=master)](https://travis-ci.com/gwy15/STAPpp/)
 
 STAP++ is a C++ finite element method (FEM) code whose input/output data files are the same as STAP90. STAP90 is a FEM code in Fortran 90 provided by our textbook (Xiong Zhang, Tianshu Wang. Computational Dynamics, Tsinghau University Press, 2007; Xiong Zhang, Tianshu Wang, Yan Liu. Computational Dynamics (2nd edition), Tsinghau University Press, 2015)
 
@@ -8,3 +8,7 @@ STAP++ is developed for the course "Finite Element Method" delivered by Professo
 STAP++ is developed and maintained by the Computational Dynamics Laboratory (http://www.comdyn.cn/), School of Aerospace Engineering, Tsinghua University, China. Your feedbacks are welcome.
 
 The documentation of STAP++ can be found at https://xzhang66.github.io/stappp/index.html.
+
+## before cmake
+
+Please download http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz, unzip and move the directory to `src/eigen-3`

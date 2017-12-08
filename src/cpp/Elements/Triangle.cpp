@@ -218,7 +218,8 @@ void CTriangle::ElementStiffness(double* Matrix)
 }
 
 //  Calculate element stress
-void CTriangle::ElementStress(double stress[3], double* Displacement)
+void CTriangle::ElementStress(double stress[3], double* Displacement, double GaussPosition[9],
+                              double GaussDisplacements[9], double weights[3])
 {
     const CNode& n1 = *nodes[0];
     const CNode& n2 = *nodes[1];
@@ -281,4 +282,23 @@ void CTriangle::ElementStress(double stress[3], double* Displacement)
         2 * cof * (y23 * de[0] + y31 * de[2] + v * (x32 * de[1] + x13 * de[3] + x21 * de[5]));
     stress[1] = 2 * (v * y23 * de[0] + x32 * de[1] + v * y31 * de[2] + x13 * de[3] + x21 * de[5]);
     stress[2] = (1 - v) * (x32 * de[0] + y23 * de[1] + x13 * de[2] + y31 * de[3] + x21 * de[4]);
+
+#ifdef __TEST__
+    for (unsigned index = 0; index < 3; index++)
+    {
+        weights[index] = Area / 3;
+    }
+    for (unsigned GPindex = 0; GPindex < 3; ++GPindex)
+    {
+        for (unsigned dof = 0; dof < 3; dof++)
+        {
+            unsigned index = GPindex * 3 + dof;
+            GaussPosition[index] = nodes[GPindex]->XYZ[dof] * 2. / 3. +
+                                   nodes[(GPindex + 1) % 3]->XYZ[dof] / 6. +
+                                   nodes[(GPindex + 2) % 3]->XYZ[dof] / 6.;
+            GaussDisplacements[index] =
+                d[index] * 2. / 3. + d[(index + 3) % 9] / 6. + d[(index + 6) % 9] / 6.;
+        }
+    }
+#endif
 }

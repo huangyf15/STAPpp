@@ -62,7 +62,13 @@ public:
 	void PrintQuadrilateralElementData(unsigned int EleGrp);
 
 //!	Output Triangle element data
-	void PrintTriangleElementData(unsigned int EleGrp);
+    void PrintTriangleElementData(unsigned int EleGrp);	
+
+//!	Output Quadrilateral element data
+	void PrintHexElementData(unsigned int EleGrp);
+
+//!	Output bar element data
+	void PrintBeamElementData(unsigned int EleGrp);
 
 //!	Output TimoshenkoSRINT Beam element data
 	void PrintTimoshenkoSRINTElementData(unsigned int EleGrp);

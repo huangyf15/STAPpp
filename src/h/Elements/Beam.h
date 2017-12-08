@@ -14,15 +14,15 @@
 
 using namespace std;
 
-//! Bar element class
-class CTriangle : public CElement
+//! Beam element class
+class CBeam : public CElement
 {
 public:
     //!	Constructor
-    CTriangle();
+    CBeam();
 
     //!	Desconstructor
-    ~CTriangle();
+    ~CBeam();
 
     //!	Read element data from stream Input
     virtual bool Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNode* NodeList);
@@ -39,9 +39,7 @@ public:
     virtual void ElementStiffness(double* Matrix);
 
     //!	Calculate element stress
-    virtual void ElementStress(double* stress, double* Displacement,
-                               double* GaussPosition = nullptr,
-                               double* GaussDisplacements = nullptr, double* weights = nullptr);
+    virtual void ElementStress(double* stress, double* Displacement);
 
     //!	Return the size of the element stiffness matrix (stored as an array column by column)
     virtual unsigned int SizeOfStiffnessMatrix();
