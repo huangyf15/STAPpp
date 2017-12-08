@@ -30,10 +30,10 @@ template <class type> void clear( type* a, unsigned int N );	// Clear an array
 
 inline void normalize(double ptr[3])
 {
-	double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] * ptr[2]));
-	ptr[0] /= sum;
-	ptr[1] /= sum;
-	ptr[2] /= sum;
+    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] * ptr[2]));
+    ptr[0] /= sum;
+    ptr[1] /= sum;
+    ptr[2] /= sum;
 }
 
 //!	Element base class
