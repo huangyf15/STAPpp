@@ -16,6 +16,7 @@
 #include "Elements/Bar.h"
 #include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
+#include "Elements/8H.h"
 #include "Elements/Beam.h"
 #include "Material.h"
 #include "Node.h"
@@ -28,7 +29,7 @@ enum ElementTypes
     Bar,
     Quadrilateral,
     Triangle,
-    H8,
+    Hexahedron,
     Beam,
     Plate,
     Shell
@@ -82,6 +83,9 @@ public:
 
     //! Read quadrilateral element data from the input data file
     bool ReadQuadrilateralElementData(ifstream& Input);
+
+	 //! Read quadrilateral element data from the input data file
+    bool ReadHexElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

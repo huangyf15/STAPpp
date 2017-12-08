@@ -62,7 +62,7 @@ class CTriangleMaterial : public CMaterial
 {
 public:
 
-	double nu;	// poisson's ratio
+	double nu; // Poisson's ratio
 
 public:
 	
@@ -73,13 +73,27 @@ public:
 	virtual void Write(COutputter& output, unsigned int mset);
 };
 
-
 //!	Material class for Quadrilateral element
 class CQuadrilateralMaterial : public CMaterial
 {
 public:
 
 	double nu; // Poisson's ratio
+
+public:
+	
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};
+
+class CHexMaterial : public CMaterial
+{
+public:
+
+	double nu;	//!< Sectional area of a bar element
 
 public:
 	

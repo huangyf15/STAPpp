@@ -62,6 +62,7 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBar);
             MaterialSize_ = sizeof(CBarMaterial);
             break;
+
         case ElementTypes::Quadrilateral:
             ElementSize_ = sizeof(CQuadrilateral);
             MaterialSize_ = sizeof(CQuadrilateralMaterial);
@@ -69,6 +70,9 @@ void CElementGroup::CalculateMemberSize()
         case ElementTypes::Triangle:
             ElementSize_ = sizeof(CTriangle);
             MaterialSize_ = sizeof(CTriangleMaterial);
+        case ElementTypes::Hexahedron:
+            ElementSize_ = sizeof(CHex);
+            MaterialSize_ = sizeof(CHexMaterial);
             break;
         case ElementTypes::Beam:
             ElementSize_ = sizeof(CBeam);
@@ -94,6 +98,9 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Triangle:
             ElementList_ = new CTriangle[size];
             break;
+        case ElementTypes::Hexahedron:
+            ElementList_ = new CHex[size];
+            break;
         case ElementTypes::Beam:
             ElementList_ = new CBeam[size];
             break;
@@ -115,6 +122,9 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             break;
         case ElementTypes::Quadrilateral:
             MaterialList_ = new CQuadrilateralMaterial[size];
+            break;
+        case ElementTypes::Hexahedron:
+            MaterialList_ = new CHexMaterial[size];
             break;
         case ElementTypes::Beam:
             MaterialList_ = new CBeamMaterial[size];
@@ -175,6 +185,30 @@ bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
 //  Read element data lines
     ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
     CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+//  Read Hexahedron element data from the input data file
+bool CElementGroup::ReadHexElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CHexMaterial[NUMMAT_];    // Materials for group EleGrp
+    CHexMaterial* mlist = dynamic_cast<CHexMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CHex[NUME_];    // Elements of group EleGrp
+    CHex* elist = dynamic_cast<CHex*>(ElementList_);
     
 //  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
