@@ -112,7 +112,7 @@ bool CDomain::ReadData(string FileName, string OutFile)
 
     // adjust bcode for nodes of structure elements
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
-        if ((EleGrpList[EleGrp].GetElementType() >= 5) & (EleGrpList[EleGrp].GetElementType() <= 8))
+        if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 8))
         {
             unsigned int NumE = EleGrpList[EleGrp].GetNUME();
             for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
