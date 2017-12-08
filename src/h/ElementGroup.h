@@ -14,6 +14,7 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
+#include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/8H.h"
 #include "Material.h"
@@ -26,6 +27,7 @@ enum ElementTypes
     UNDEFINED = 0,
     Bar,
     Quadrilateral,
+	Triangle,
     Hexahedron
 };
 

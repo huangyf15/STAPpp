@@ -165,6 +165,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
+			case ElementTypes::Triangle:
+				PrintTriangleElementData(EleGrp);
+				break;
 			case ElementTypes::Hexahedron:
 				PrintHexElementData(EleGrp);
 				break;
@@ -252,6 +255,48 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 
 	*this << endl;
 }
+
+void COutputter::PrintTriangleElementData(unsigned int EleGrp)
+
+{
+	
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+}	  
+
+
 
 //	Output hexahedron element data
 void COutputter::PrintHexElementData(unsigned int EleGrp)
@@ -428,6 +473,23 @@ void COutputter::OutputElementStress()
 				}
 				*this << endl;
 
+				break;
+
+			case ElementTypes::Triangle:
+				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
+					<< "  NUMBER         SXX            SYY            SYY" << endl;
+				double stress3T[3];
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp.GetElement(Ele);
+					Element.ElementStress(stress3T, Displacement);
+
+					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
+					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
+					 << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+				}
+
+				*this << endl;
 				break;
 
 

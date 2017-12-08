@@ -42,6 +42,14 @@ void CBarMaterial::Write(COutputter& output, unsigned int mset)
 }
 
 //	Read material data from stream Input
+bool CTriangleMaterial::Read(ifstream& Input, unsigned int mset)
+{
+	Input >> nset;	// Number of property set
+
+	return true;
+}
+
+
 bool CQuadrilateralMaterial::Read(ifstream& Input, unsigned int mset)
 {
 	Input >> nset;	// Number of property set
@@ -60,11 +68,6 @@ bool CQuadrilateralMaterial::Read(ifstream& Input, unsigned int mset)
 	return true;
 }
 
-//	Write material data to Stream
-void CQuadrilateralMaterial::Write(COutputter& output, unsigned int mset)
-{
-	output << setw(5) << mset+1 << setw(16) << E << setw(16) << nu << endl;
-}
 
 //	Read material data from stream Input
 bool CHexMaterial::Read(ifstream& Input, unsigned int mset)
@@ -83,6 +86,17 @@ bool CHexMaterial::Read(ifstream& Input, unsigned int mset)
 	Input >> E >> nu;	// Young's modulus and Poisson's ratio
 
 	return true;
+}
+
+void CTriangleMaterial::Write(COutputter& output, unsigned int mset)
+{
+	output << setw(5) << mset+1 << setw(16) << E << setw(16) << nu << endl;
+}
+
+//	Write material data to Stream
+void CQuadrilateralMaterial::Write(COutputter& output, unsigned int mset)
+{
+	output << setw(5) << mset+1 << setw(16) << E << setw(16) << nu << endl;
 }
 
 //	Write material data to Stream
