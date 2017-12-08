@@ -64,6 +64,9 @@ public:
 //!	Output Triangle element data
 	void PrintTriangleElementData(unsigned int EleGrp);
 
+//!	Output bar element data
+	void PrintBeamElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 

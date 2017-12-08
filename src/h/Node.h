@@ -24,13 +24,13 @@ public:
 
 //!	Maximum number of degrees of freedom per node
 /*!	For 3D bar and solid elements, NDF = 3. For 3D beam or shell elements, NDF = 5 or 6 */
-	const static unsigned int NDF = 3;
-
+//! the nodes of structure elements need 6 degrees of freedom, and for nodes of solid elements, value of the last 3 bcodes are 1
+	const static unsigned int NDF= 6;
 //!	Node numer
 	unsigned int NodeNumber;
 
 //!	x, y and z coordinates of the node
-	double XYZ[NDF];
+	double XYZ[3];
 
 //!	Boundary code of each degree of freedom of the node
 /*!		0: The corresponding degree of freedom is active (defined in the global system) */
