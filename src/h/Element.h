@@ -10,23 +10,23 @@
 
 #pragma once
 
-#include <climits>
-#include <fstream>
-#include <iostream>
 #include <stddef.h>
-#include <string>
-#include <cmath>
 #include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <climits>
+#include <cmath>
 
-#include "Material.h"
 #include "Node.h"
+#include "Material.h"
 #include "SkylineMatrix.h"
 
 using namespace std;
 
 class CDomain;
 
-template <class type> void clear(type* a, unsigned int N); // Clear an array
+template <class type> void clear( type* a, unsigned int N );	// Clear an array
 
 inline void normalize(double ptr[3])
 {
@@ -41,63 +41,62 @@ inline void normalize(double ptr[3])
 class CElement
 {
 protected:
-    //!	Number of nodes per element
-    unsigned int NEN;
 
-    //!	Nodes of the element
-    CNode** nodes;
+//!	Number of nodes per element
+	unsigned int NEN;
 
-    //!	Material of the element
-    CMaterial* ElementMaterial; //!< Pointer to an element of MaterialSetList[][]
+//!	Nodes of the element
+	CNode** nodes;
 
-    //! Location Matrix of the element
+//!	Material of the element
+	CMaterial* ElementMaterial;	//!< Pointer to an element of MaterialSetList[][]
+    
+//! Location Matrix of the element
     unsigned int* LocationMatrix;
 
-    //! Dimension of the location matrix
+//! Dimension of the location matrix
     unsigned int ND;
 
 public:
-    //!	Constructor
-    CElement() : NEN(0), nodes(nullptr), ElementMaterial(nullptr), LocationMatrix(nullptr), ND(0){};
 
-    //! Virtual deconstructor
+//!	Constructor
+	CElement() : NEN(0), nodes(nullptr), ElementMaterial(nullptr), LocationMatrix(nullptr), ND(0) {};
+
+//! Virtual deconstructor
     virtual ~CElement();
 
-    //!	Read element data from stream Input
-    virtual bool Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets,
-                      CNode* NodeList) = 0;
+//!	Read element data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNode* NodeList) = 0;
 
-    //!	Write element data to stream
-    virtual void Write(COutputter& output, unsigned int Ele) = 0;
+//!	Write element data to stream
+	virtual void Write(COutputter& output, unsigned int Ele) = 0;
 
-    //! Generate location matrix: the global equation number that corresponding to each DOF of the
-    //! element
-    //	Caution:  Equation number is numbered from 1 !
+//! Generate location matrix: the global equation number that corresponding to each DOF of the element
+//	Caution:  Equation number is numbered from 1 !
     virtual void GenerateLocationMatrix() = 0;
+    
+//! Calculate the column height, used with the skyline storage scheme
+	void CalculateColumnHeight(unsigned int* ColumnHeight); 
 
-    //! Calculate the column height, used with the skyline storage scheme
-    void CalculateColumnHeight(unsigned int* ColumnHeight);
+//!	Assemble the element stiffness matrix to the global stiffness matrix
+	void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix);
 
-    //!	Assemble the element stiffness matrix to the global stiffness matrix
-    void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix);
+//!	Calculate element stiffness matrix (Upper triangular matrix, stored as an array column by colum)
+	virtual void ElementStiffness(double* stiffness) = 0; 
 
-    //!	Calculate element stiffness matrix (Upper triangular matrix, stored as an array column by
-    //!colum)
-    virtual void ElementStiffness(double* stiffness) = 0;
+//!	Calculate element stress 
+	virtual void ElementStress(double* stress, double* Displacement){};
 
-    //!	Calculate element stress
-    virtual void ElementStress(double* stress, double* Displacement){};
-
-    //!	Return nodes of the element
-    inline CNode** GetNodes() { return nodes; }
+//!	Return nodes of the element
+	inline CNode** GetNodes() { return nodes; }
 
     //! Return NEN
     inline int GetNEN() { return NEN; }
-    //!	Return material of the element
-    inline CMaterial* GetElementMaterial() { return ElementMaterial; }
+//!	Return material of the element
+	inline CMaterial* GetElementMaterial() { return ElementMaterial; }
 
 //!	Return the size of the element stiffness matrix (stored as an array column by column)
-	virtual unsigned int SizeOfStiffnessMatrix() = 0;   
-	
+	virtual unsigned int SizeOfStiffnessMatrix() = 0;     
+
 	friend class CDomain;	// Allow class Domain to access its protected member
 };
