@@ -487,17 +487,54 @@ void COutputter::OutputElementStress()
 				break;	
 
 			case ElementTypes::Triangle:
-				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
-					  << "  NUMBER         SXX            SYY            SYY" << endl;
 				double stress3T[3];
+				#ifndef __TEST__
+				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
+					  << "  NUMBER         SXX            SYY            SXY" << endl;
+				#else
+				double GPPosition[9];
+				double GPDisplacement[9];
+				double weights3T[3];
+				*this << "  ELEMENT    GP               GAUSS POINTS POSITION    "
+					  << "                GAUSS POINTS DISPLACEMENTS       " 
+					  << "               GAUSS POINTS STRESSES              INTEGRATE"
+					  << std::endl
+					  << "   INDEX   INDEX          X            Y              Z"
+					  << "                DX           DY           DZ     "
+					  << "          SXX           SYY           SXY          WEIGHTS"
+					  << std::endl;
+				#endif
+
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp.GetElement(Ele);
-					Element.ElementStress(stress3T, Displacement);
+					#ifndef __TEST__
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement);
+					#else
+					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement, GPPosition, GPDisplacement, weights3T);
+					#endif
 					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
-
+					
+					#ifndef __TEST__
 					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
 					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+					#else
+					for (unsigned GPIndex=0; GPIndex<3; GPIndex++)
+					{
+						*this << setw(6) << Ele+1 << setw(8) << GPIndex+1 
+							  << setw(18) << GPPosition[3*GPIndex] 
+							  << setw(14) << GPPosition[3*GPIndex + 1] 
+							  << setw(14) << GPPosition[3*GPIndex + 2]
+							  << setw(17) << GPDisplacement[3*GPIndex]
+							  << setw(14) << GPDisplacement[3*GPIndex + 1]
+							  << setw(14) << GPDisplacement[3*GPIndex + 2]
+							  << setw(17) << stress3T[0]
+							  << setw(14) << stress3T[1]
+							  << setw(14) << stress3T[2]
+							  << setw(14) << weights3T[GPIndex]
+							  << std::endl;
+					}
+					#endif
 				}
 				*this << endl;
 				break;
