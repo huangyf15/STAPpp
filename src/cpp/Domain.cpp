@@ -112,23 +112,24 @@ bool CDomain::ReadData(string FileName, string OutFile)
 
     // adjust bcode for nodes of structure elements
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+    {
         if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 8))
         {
-            unsigned int NumE = EleGrpList[EleGrp].GetNUME();
+            const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
             for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
             {
-
-                unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
+                const unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
                 CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
                 for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
                 {
-                    unsigned int N = ElementNode[NumNode]->NodeNumber;
-					NodeList[N - 1].bcode[3] = 0;
-					NodeList[N - 1].bcode[4] = 0;
-					NodeList[N - 1].bcode[5] = 0;
+                    const unsigned int N = ElementNode[NumNode]->NodeNumber;
+                    NodeList[N - 1].bcode[3] = 0;
+                    NodeList[N - 1].bcode[4] = 0;
+                    NodeList[N - 1].bcode[5] = 0;
                 }
             }
         }
+    }
 
     //	Update equation number
     CalculateEquationNumber();
