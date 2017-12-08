@@ -14,9 +14,9 @@ script:
   - cd build
   - cmake ../src
   - make
-  - ./stap++ ../data/test_truss_22.dat
-  - ./stap++ ../data/truss
-  - ./stap++ ../data/bar-6
+  - ./stap++ ../data/test_truss_22.dat > nul
+  - ./stap++ ../data/truss > nul
+  - ./stap++ ../data/bar-6 > nul
   - cd ../data/4Q
   - python3 run-patch.py
   - cd ../3T
