@@ -57,12 +57,12 @@ public:
 	virtual void Write(COutputter& output, unsigned int mset);
 };
 
-//!	Material class for bar element
-class CTriangleMaterial : public CMaterial
+//!	Material class for Quadrilateral element
+class CQuadrilateralMaterial : public CMaterial
 {
 public:
 
-	double nu;	// poisson's ratio
+	double nu; // Poisson's ratio
 
 public:
 	
@@ -73,13 +73,11 @@ public:
 	virtual void Write(COutputter& output, unsigned int mset);
 };
 
-
-//!	Material class for Quadrilateral element
-class CQuadrilateralMaterial : public CMaterial
+class CHexMaterial : public CMaterial
 {
 public:
 
-	double nu; // Poisson's ratio
+	double nu;	//!< Sectional area of a bar element
 
 public:
 	

@@ -16,7 +16,6 @@
 #include <iostream>
 #include <fstream>
 #include <climits>
-#include <cmath>
 
 #include "Node.h"
 #include "Material.h"
@@ -27,14 +26,6 @@ using namespace std;
 class CDomain;
 
 template <class type> void clear( type* a, unsigned int N );	// Clear an array
-
-inline void normalize(double ptr[3])
-{
-    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] * ptr[2]));
-    ptr[0] /= sum;
-    ptr[1] /= sum;
-    ptr[2] /= sum;
-}
 
 //!	Element base class
 /*!	All type of element classes should be derived from this base class */

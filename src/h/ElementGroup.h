@@ -14,8 +14,8 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
-#include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
+#include "Elements/8H.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -26,7 +26,7 @@ enum ElementTypes
     UNDEFINED = 0,
     Bar,
     Quadrilateral,
-    Triangle
+    Hexahedron
 };
 
 //! Element group class
@@ -77,6 +77,9 @@ public:
 
     //! Read quadrilateral element data from the input data file
     bool ReadQuadrilateralElementData(ifstream& Input);
+
+	 //! Read quadrilateral element data from the input data file
+    bool ReadHexElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

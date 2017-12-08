@@ -62,14 +62,17 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBar);
             MaterialSize_ = sizeof(CBarMaterial);
             break;
+
         case ElementTypes::Quadrilateral:
             ElementSize_ = sizeof(CQuadrilateral);
             MaterialSize_ = sizeof(CQuadrilateralMaterial);
             break;
-        case ElementTypes::Triangle:
-            ElementSize_ = sizeof(CTriangle);
-            MaterialSize_ = sizeof(CTriangleMaterial);
+
+		case ElementTypes::Hexahedron:
+            ElementSize_ = sizeof(CHex);
+            MaterialSize_ = sizeof(CHexMaterial);
             break;
+
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -87,8 +90,8 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Quadrilateral:
             ElementList_ = new CQuadrilateral[size];
             break;
-        case ElementTypes::Triangle:
-            ElementList_ = new CTriangle[size];
+		case ElementTypes::Hexahedron:
+            ElementList_ = new CHex[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
@@ -103,11 +106,11 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::Bar:
             MaterialList_ = new CBarMaterial[size];
             break;
-        case ElementTypes::Triangle:
-            MaterialList_ = new CTriangleMaterial[size];
-            break;
         case ElementTypes::Quadrilateral:
-            MaterialList_ = new CQuadrilateralMaterial[size];
+            MaterialList_ =new CQuadrilateralMaterial[size];
+            break;
+		case ElementTypes::Hexahedron:
+            MaterialList_ =new CHexMaterial[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
@@ -165,6 +168,30 @@ bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
 //  Read element data lines
     ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
     CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
+    
+//  Loop over for all elements in this element group
+    for (unsigned int Ele = 0; Ele < NUME_; Ele++)
+        if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
+            return false;
+    
+    return true;
+}
+
+//  Read Hexahedron element data from the input data file
+bool CElementGroup::ReadHexElementData(ifstream& Input)
+{
+//  Read material/section property lines
+    MaterialList_ = new CHexMaterial[NUMMAT_];    // Materials for group EleGrp
+    CHexMaterial* mlist = dynamic_cast<CHexMaterial*>(MaterialList_);
+    
+//  Loop over for all material property sets in this element group
+    for (unsigned int mset = 0; mset < NUMMAT_; mset++)
+        if (!mlist[mset].Read(Input, mset))
+            return false;
+    
+//  Read element data lines
+    ElementList_ = new CHex[NUME_];    // Elements of group EleGrp
+    CHex* elist = dynamic_cast<CHex*>(ElementList_);
     
 //  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)

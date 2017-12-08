@@ -165,8 +165,8 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
-			case ElementTypes::Triangle:
-				PrintTriangleElementData(EleGrp);
+			case ElementTypes::Hexahedron:
+				PrintHexElementData(EleGrp);
 				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
@@ -253,7 +253,8 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 	*this << endl;
 }
 
-void COutputter::PrintTriangleElementData(unsigned int EleGrp)
+//	Output hexahedron element data
+void COutputter::PrintHexElementData(unsigned int EleGrp)
 {
 	CDomain* FEMData = CDomain::Instance();
 
@@ -280,8 +281,8 @@ void COutputter::PrintTriangleElementData(unsigned int EleGrp)
 	*this << endl
 		  << endl
 		  << " E L E M E N T   I N F O R M A T I O N" << endl;
-	*this << " ELEMENT     NODE     NODE     NODE        MATERIAL" << endl
-		  << " NUMBER-N      I        J        K        SET NUMBER" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
@@ -426,23 +427,36 @@ void COutputter::OutputElementStress()
 					}
 				}
 				*this << endl;
+
 				break;
 
-			case ElementTypes::Triangle:
-				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
-					  << "  NUMBER         SXX            SYY            SYY" << endl;
-				double stress3T[3];
+
+			case ElementTypes::Hexahedron: // 8H element
+				*this << "node    X		Y		Z	  XY	 YZ		XZ" << endl
+					<< "  NUMBER" << endl;
+
+				double stressHex[48];
+
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp.GetElement(Ele);
-					Element.ElementStress(stress3T, Displacement);
-					CTriangleMaterial material = *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
+					Element.ElementStress(stressHex, Displacement);
 
-					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
-					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
+					CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
+					*this << setw(14) << stressHex[0]<< setw(16) << stressHex[1] << setw(16)<< stressHex[2]<< setw(16)<< stressHex[3]<< setw(16)<< stressHex[4]<< setw(16)<< stressHex[5]<< endl
+						<< setw(14) << stressHex[6]<< setw(16) << stressHex[7] << setw(16)<< stressHex[8]<< setw(16)<< stressHex[9]<< setw(16)<< stressHex[10]<< setw(16)<< stressHex[11]<< endl
+						<< setw(14) << stressHex[12]<< setw(16) << stressHex[13] << setw(16)<< stressHex[14]<< setw(16)<< stressHex[15]<< setw(16)<< stressHex[16]<< setw(16)<< stressHex[17]<< endl
+						<< setw(14) << stressHex[18]<< setw(16) << stressHex[19] << setw(16)<< stressHex[20]<< setw(16)<< stressHex[21]<< setw(16)<< stressHex[22]<< setw(16)<< stressHex[23]<< endl
+						<< setw(14) << stressHex[24]<< setw(16) << stressHex[25] << setw(16)<< stressHex[26]<< setw(16)<< stressHex[27]<< setw(16)<< stressHex[28]<< setw(16)<< stressHex[29]<< endl
+						<< setw(14) << stressHex[30]<< setw(16) << stressHex[31] << setw(16)<< stressHex[32]<< setw(16)<< stressHex[33]<< setw(16)<< stressHex[34]<< setw(16)<< stressHex[35]<< endl
+						<< setw(14) << stressHex[36]<< setw(16) << stressHex[37] << setw(16)<< stressHex[38]<< setw(16)<< stressHex[39]<< setw(16)<< stressHex[40]<< setw(16)<< stressHex[41]<< endl
+						<< setw(14) << stressHex[42]<< setw(16) << stressHex[43] << setw(16)<< stressHex[44]<< setw(16)<< stressHex[45]<< setw(16)<< stressHex[46]<< setw(16)<< stressHex[47]<< endl;
 				}
+
 				*this << endl;
 				break;
+			
+				
 
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
