@@ -161,7 +161,7 @@ void CDomain::CalculateEquationNumber()
     NEQ = 0;
     for (unsigned int np = 0; np < NUMNP; np++) // Loop over for all node
     {
-        for (unsigned int dof = 0; dof < CNode::NumDF; dof++) // Loop over for DOFs of node np
+        for (unsigned int dof = 0; dof < CNode::NDF; dof++) // Loop over for DOFs of node np
         {
             if (NodeList[np].bcode[dof])
                 NodeList[np].bcode[dof] = 0;

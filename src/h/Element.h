@@ -36,14 +36,6 @@ inline void normalize(double ptr[3])
     ptr[2] /= sum;
 }
 
-inline void normalize(double ptr[3])
-{
-    double sum = std::sqrt((ptr[0] * ptr[0]) + (ptr[1] * ptr[1]) + (ptr[2] * ptr[2]));
-    ptr[0] /= sum;
-    ptr[1] /= sum;
-    ptr[2] /= sum;
-}
-
 //!	Element base class
 /*!	All type of element classes should be derived from this base class */
 class CElement

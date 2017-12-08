@@ -62,7 +62,7 @@ void CNode::WriteEquationNo(COutputter& output, unsigned int np)
 {
 	output << setw(9) << np+1 << "       ";
 
-	for (unsigned int dof = 0; dof < CNode::NumDF; dof++)	// Loop over for DOFs of node np
+	for (unsigned int dof = 0; dof < CNode::NDF; dof++)	// Loop over for DOFs of node np
 	{
 		output << setw(5) << bcode[dof];
 	}
@@ -75,7 +75,7 @@ void CNode::WriteNodalDisplacement(COutputter& output, unsigned int np, double* 
 {
 	output << setw(5) << np + 1 << "        ";
 
-	for (unsigned int j = 0; j < NumDF; j++)
+	for (unsigned int j = 0; j < NDF; j++)
 	{
 		if (bcode[j] == 0)
 		{

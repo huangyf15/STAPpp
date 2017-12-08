@@ -55,13 +55,6 @@ void CElement::assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix)
 {
 //	Calculate element stiffness matrix
 	ElementStiffness(Matrix);
-	double a[78],b[12];
-	for (unsigned int j=0; j<78; j++){
-		a[j]=Matrix[j];
-	}
-	for (unsigned int j=0; j<12; j++){
-		b[j]=LocationMatrix[j];
-	}
 	
 //	Assemble global stiffness matrix
 	for (unsigned int j = 0; j < ND; j++)

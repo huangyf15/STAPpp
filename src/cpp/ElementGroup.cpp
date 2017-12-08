@@ -21,12 +21,12 @@ CElementGroup::CElementGroup()
         CDomain* FEMData = CDomain::Instance();
         NodeList_ = FEMData->GetNodeList();
     }
-
+    
     ElementType_ = ElementTypes::UNDEFINED;
-
+    
     NUME_ = 0;
     ElementList_ = nullptr;
-
+    
     NUMMAT_ = 0;
     MaterialList_ = nullptr;
 }
@@ -35,20 +35,20 @@ CElementGroup::CElementGroup()
 CElementGroup::~CElementGroup()
 {
     if (ElementList_)
-        delete[] ElementList_;
-
+        delete [] ElementList_;
+    
     if (MaterialList_)
-        delete[] MaterialList_;
+        delete [] MaterialList_;
 }
 
 CElement& CElementGroup::GetElement(unsigned int index)
 {
-    return *(CElement*)((std::size_t)(ElementList_) + index * ElementSize_);
+    return *(CElement*)((std::size_t)(ElementList_) + index*ElementSize_);
 }
 
 CMaterial& CElementGroup::GetMaterial(unsigned int index)
 {
-    return *(CMaterial*)((std::size_t)(MaterialList_) + index * MaterialSize_);
+    return *(CMaterial*)((std::size_t)(MaterialList_) + index*MaterialSize_);
 }
 
 void CElementGroup::CalculateMemberSize()
@@ -74,11 +74,6 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBeam);
             MaterialSize_ = sizeof(CBeamMaterial);
             break;
-
-        case ElementTypes::Triangle:
-            ElementSize_ = sizeof(CTriangle);
-            MaterialSize_ = sizeof(CTriangleMaterial);
-            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -88,7 +83,7 @@ void CElementGroup::CalculateMemberSize()
 
 void CElementGroup::AllocateElement(std::size_t size)
 {
-    switch (ElementType_)
+    switch(ElementType_)
     {
         case ElementTypes::Bar:
             ElementList_ = new CBar[size];
@@ -102,9 +97,6 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::Beam:
             ElementList_ = new CBeam[size];
             break;
-        case ElementTypes::Triangle:
-            ElementList_ = new CTriangle[size];
-            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -113,7 +105,7 @@ void CElementGroup::AllocateElement(std::size_t size)
 
 void CElementGroup::AllocateMaterial(std::size_t size)
 {
-    switch (ElementType_)
+    switch(ElementType_)
     {
         case ElementTypes::Bar:
             MaterialList_ = new CBarMaterial[size];
@@ -127,7 +119,6 @@ void CElementGroup::AllocateMaterial(std::size_t size)
         case ElementTypes::Beam:
             MaterialList_ = new CBeamMaterial[size];
             break;
-
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
             exit(5);
@@ -138,7 +129,7 @@ void CElementGroup::AllocateMaterial(std::size_t size)
 bool CElementGroup::Read(ifstream& Input)
 {
     Input >> (int&)ElementType_ >> NUME_ >> NUMMAT_;
-
+    
     CalculateMemberSize();
 
     if (!ReadElementData(Input))
@@ -147,48 +138,48 @@ bool CElementGroup::Read(ifstream& Input)
     return true;
 }
 
-//  Read bar/beam element data from the input data file
+//  Read bar element data from the input data file
 bool CElementGroup::ReadElementData(ifstream& Input)
 {
-    //  Read material/section property lines
+//  Read material/section property lines
     AllocateMaterial(NUMMAT_);
-
-    //  Loop over for all material property sets in this element group
+    
+//  Loop over for all material property sets in this element group
     for (unsigned int mset = 0; mset < NUMMAT_; mset++)
         if (!GetMaterial(mset).Read(Input, mset))
             return false;
-
-    //  Read element data lines
+    
+//  Read element data lines
     AllocateElement(NUME_);
-
-    //  Loop over for all elements in this element group
+    
+//  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
         if (!GetElement(Ele).Read(Input, Ele, MaterialList_, NodeList_))
             return false;
-
+    
     return true;
 }
 
 //  Read quadrilateral element data from the input data file
 bool CElementGroup::ReadQuadrilateralElementData(ifstream& Input)
 {
-    //  Read material/section property lines
-    MaterialList_ = new CQuadrilateralMaterial[NUMMAT_]; // Materials for group EleGrp
+//  Read material/section property lines
+    MaterialList_ = new CQuadrilateralMaterial[NUMMAT_];    // Materials for group EleGrp
     CQuadrilateralMaterial* mlist = dynamic_cast<CQuadrilateralMaterial*>(MaterialList_);
-
-    //  Loop over for all material property sets in this element group
+    
+//  Loop over for all material property sets in this element group
     for (unsigned int mset = 0; mset < NUMMAT_; mset++)
         if (!mlist[mset].Read(Input, mset))
             return false;
-
-    //  Read element data lines
-    ElementList_ = new CQuadrilateral[NUME_]; // Elements of group EleGrp
+    
+//  Read element data lines
+    ElementList_ = new CQuadrilateral[NUME_];    // Elements of group EleGrp
     CQuadrilateral* elist = dynamic_cast<CQuadrilateral*>(ElementList_);
-
-    //  Loop over for all elements in this element group
+    
+//  Loop over for all elements in this element group
     for (unsigned int Ele = 0; Ele < NUME_; Ele++)
         if (!elist[Ele].Read(Input, Ele, MaterialList_, NodeList_))
             return false;
-
+    
     return true;
 }

@@ -94,18 +94,18 @@ bool CBeamMaterial::Read(ifstream& Input, unsigned int mset)
 {
 	Input >> nset;	// Number of property set
 
-	if (nset != mset + 1)
-	{
-		cerr << "*** Error *** Material sets must be inputted in order !" << endl 
-			 << "    Expected set : " << mset + 1 << endl
-			 << "    Provided set : " << nset << endl;
+    if (nset != mset + 1)
+    {
+        cerr << "*** Error *** Material sets must be inputted in order !" << endl
+             << "    Expected set : " << mset + 1 << endl
+             << "    Provided set : " << nset << endl;
 
-		return false;
-	}
+        return false;
+    }
 
 	Input >> E >> nu >> a >> b >> t1 >> t2 >> t3 >> t4 >> n1 >> n2 >> n3;	// 杨氏模量，泊松比，几何参数和Y’轴指向
 
-	return true;
+    return true;
 }
 
 //	Write material data to Stream
