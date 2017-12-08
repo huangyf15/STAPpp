@@ -165,6 +165,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
+			case ElementTypes::Beam:
+				PrintBeamElementData(EleGrp);
+				break;
 			case ElementTypes::Triangle:
 				PrintTriangleElementData(EleGrp);
 				break;
