@@ -21,3 +21,5 @@ script:
   - python3 run-patch.py
   - cd ../3T
   - python3 run-patch.py
+  - cd ../Beam
+  - python3 run-patch.py

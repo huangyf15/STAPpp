@@ -25,3 +25,6 @@
 @cd ../3T
 @python run-patch.py
 @if not %errorlevel%==0 (echo test failed. & exit)
+@cd ../Beam
+@python run-patch.py
+@if not %errorlevel%==0 (echo test failed. & exit)
