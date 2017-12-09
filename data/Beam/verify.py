@@ -31,7 +31,7 @@ class Element():
         self.nodes = nodes
 
 
-def verify(filename, plot):
+def verify(filename):
     # print(filename)
     mark1 = False
     mark2 = False
@@ -72,35 +72,6 @@ def verify(filename, plot):
                 elif ' NUMBER-N      I        J       SET NUMBER' in line:
                     mark3 = True
 
-    if plot:
-        x = []
-        y = []
-        rx = []
-        ry = []
-        for _, node in nodes.items():
-            x.append(node.x + TIMES * node.dx)
-            y.append(node.y + TIMES * node.dy)
-            rx.append(node.x + TIMES * (b / E * node.x))
-            ry.append(node.y + TIMES * (-v * b / E * node.y))
-        # plt.scatter(x, y)
-        import matplotlib.pyplot as plt
-
-        def f(n1, n2):
-            x = [n1.x + TIMES * n1.dx, n2.x + TIMES * n2.dx]
-            y = [n1.y + TIMES * n1.dy, n2.y + TIMES * n2.dy]
-            plt.plot(x, y)
-
-        lines = []
-        for _, element in elements.items():
-            n = element.nodes
-            f(n[0], n[1])
-            f(n[1], n[2])
-            f(n[2], n[3])
-            f(n[3], n[0])
-        plt.scatter(rx, ry, color='r')
-        plt.show()
-        plt.savefig('patch-test-4Q.png')
-
     # 判断是否通过分片试验
     return all(testPass(node) for _, node in nodes.items())
 
@@ -130,8 +101,8 @@ def equal(a, b):
     return res
 
 
-def main(plotFlag=False):
-    return verify('patch.out', plotFlag)
+def main():
+    return verify('patch.out')
 
 
 if __name__ == '__main__':
