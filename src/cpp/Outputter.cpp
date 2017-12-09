@@ -281,9 +281,9 @@ void COutputter::PrintBeamElementData(unsigned int EleGrp)
           << endl
           << endl;
 
-    *this << "  SET       YOUNG'S         SHEAR                               CROSS-SECTIONAL CONSTANTS [ONLY NALID FOR BOX]" << endl
-          << " NUMBER     MODULUS        MODULUS                 " << endl
-          << "               E              G              a              b              t1              t2              t3              t4" << endl;
+    *this << "  SET       YOUNG'S       POISSON'S                               CROSS-SECTIONAL CONSTANTS [ONLY VALID FOR BOX]" << endl
+          << " NUMBER     MODULUS         RATIO                 " << endl
+          << "               E             nu               a               b               t1               t2               t3               t4" << endl;
 
     *this << setiosflags(ios::scientific) << setprecision(5);
 

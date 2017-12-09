@@ -35,8 +35,8 @@ enum ElementTypes
     Beam,
     Plate,
     Shell,
-	TimoshenkoSRINT,
-	TimoshenkoEBMOD
+    TimoshenkoSRINT,
+    TimoshenkoEBMOD
 };
 
 //! Element group class
