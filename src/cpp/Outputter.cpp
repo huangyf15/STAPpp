@@ -501,7 +501,7 @@ void COutputter::OutputNodalDisplacement(unsigned int lcase)
 
 	*this << " D I S P L A C E M E N T S" << endl
 		  << endl;
-	*this << "  NODE             X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT      X-ROTATION        Y-ROTATION        Z-ROTATION" << endl;
+	*this << "  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT      X-ROTATION        Y-ROTATION        Z-ROTATION" << endl;
 
 	for (unsigned int np = 0; np < FEMData->GetNUMNP(); np++)
 		NodeList[np].WriteNodalDisplacement(*this, np, Displacement);
