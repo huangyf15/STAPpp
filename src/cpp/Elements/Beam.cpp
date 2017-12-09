@@ -71,13 +71,12 @@ void CBeam::GenerateLocationMatrix()
 {
     unsigned int i = 0;
     for (unsigned int N = 0; N < NEN; N++)
+    {
         for (unsigned int D = 0; D < 6; D++)
         {
-            double Boundary;
-            Boundary = nodes[N]->bcode[D];
-
             LocationMatrix[i++] = nodes[N]->bcode[D];
         }
+    }
 }
 
 //	Return the size of the element stiffness matrix (stored as an array column by column)
@@ -99,32 +98,32 @@ void CBeam::ElementStiffness(double* Matrix)
     double L = sqrt(DX[0] * DX[0] + DX[1] * DX[1] + DX[2] * DX[2]);
 
     //计算局部坐标系的矩阵需要的元素
-    CBeamMaterial* material =
-        dynamic_cast<CBeamMaterial*>(ElementMaterial); // Pointer to material of the element
-    double Iz = (material->a * material->a * material->a) * material->b / 12 -
-                pow(-material->a + material->t1 + material->t3, 3.0) *
-                    (-material->b + material->t2 + material->t4) / 12;
-    double Iy = (material->b * material->b * material->b) * material->a / 12 -
-                pow(-material->b + material->t2 + material->t4, 3.0) *
-                    (-material->a + material->t1 + material->t3) / 12;
+    const CBeamMaterial& material =
+        dynamic_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
+    double Iz = (material.a * material.a * material.a) * material.b / 12 -
+                pow(material.a - material.t1 - material.t3, 3.0) *
+                    (material.b - material.t2 - material.t4) / 12;
+    double Iy = (material.b * material.b * material.b) * material.a / 12 -
+                pow(material.b - material.t2 - material.t4, 3.0) *
+                    (material.a - material.t1 - material.t3) / 12;
     double Ip = Iz + Iy;
-    double k1 = material->E * material->a * material->b / L;
-    double k2 = 12 * material->E * Iz / (L * L * L);
-    double k3 = 12 * material->E * Iy / (L * L * L);
-    double k4 = material->E * Ip / ((2 + 2 * material->nu) * L);
-    double k5 = 4 * material->E * Iy / L;
-    double k6 = 4 * material->E * Iz / L;
-    double k7 = 6 * material->E * Iy / (L * L);
-    double k8 = 6 * material->E * Iz / (L * L);
+    double k1 = material.E * material.a * material.b / L;
+    double k2 = 12 * material.E * Iz / (L * L * L);
+    double k3 = 12 * material.E * Iy / (L * L * L);
+    double k4 = material.E * Ip / ((2 + 2 * material.nu) * L);
+    double k5 = 4 * material.E * Iy / L;
+    double k6 = 4 * material.E * Iz / L;
+    double k7 = 6 * material.E * Iy / (L * L);
+    double k8 = 6 * material.E * Iz / (L * L);
 
     double n[3][3];
 
     for (unsigned int i = 0; i < 3; i++)
         n[0][i] = DX[i] / L; //计算X'轴指向
 
-    n[1][0] = material->n1;
-    n[1][1] = material->n2;
-    n[1][2] = material->n3; // Y'轴指向从材料/截面行中读入
+    n[1][0] = material.n1;
+    n[1][1] = material.n2;
+    n[1][2] = material.n3; // Y'轴指向从材料/截面行中读入
     n[2][0] = n[0][1] * n[1][2] - n[0][2] * n[1][1];
     n[2][1] = n[0][2] * n[1][0] - n[0][0] * n[1][2];
     n[2][2] = n[0][0] * n[1][1] - n[0][1] * n[1][0]; //叉乘得到Z'轴指向
@@ -239,8 +238,8 @@ void CBeam::ElementStiffness(double* Matrix)
 //	Calculate element stress
 void CBeam::ElementStress(double* stress, double* Displacement)
 {
-    CBeamMaterial* material =
-        dynamic_cast<CBeamMaterial*>(ElementMaterial); // Pointer to material of the element
+    const CBeamMaterial& material =
+        dynamic_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
     clear(stress, 3);
     double DX[3]; //	dx = x2-x1, dy = y2-y1, dz = z2-z1
     double L = 0; //	 beam length
@@ -255,7 +254,7 @@ void CBeam::ElementStress(double* stress, double* Displacement)
     double S[6];
     for (unsigned int i = 0; i < 3; i++)
     {
-        S[i] = -DX[i] * DX[i] * material->E / (L * L * L);
+        S[i] = -DX[i] * DX[i] * material.E / (L * L * L);
         S[i + 3] = -S[i];
     }
 
