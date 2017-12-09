@@ -11,4 +11,4 @@ The documentation of STAP++ can be found at https://xzhang66.github.io/stappp/in
 
 ## before cmake
 
-Please download http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz, unzip and remove the directory to `src/eigen-3`
+Please download http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz, unzip and move the directory to `src/eigen-3`

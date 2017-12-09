@@ -25,7 +25,7 @@ CBar::CBar()
 	ND = 6;
     LocationMatrix = new unsigned int[ND];
 
-	ElementMaterial = nullptr;
+	ElementMaterial = NULL;
 }
 
 //	Desconstructor

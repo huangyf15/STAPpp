@@ -22,9 +22,9 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[0] = 0;	// Boundary codes
     bcode[1] = 0;
     bcode[2] = 0;
-	bcode[3] = 1;
-	bcode[4] = 1;
-	bcode[5] = 1;
+    bcode[3] = 1;
+    bcode[4] = 1;
+    bcode[5] = 1;
 };
 
 //	Read element data from stream Input
@@ -44,8 +44,7 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 
 	NodeNumber = N;
 
-	Input >> bcode[0] >> bcode[1] >> bcode[2]
-		  >> XYZ[0] >> XYZ[1] >> XYZ[2];
+	Input >> bcode[0] >> bcode[1] >> bcode[2] >> XYZ[0] >> XYZ[1] >> XYZ[2];
 
 	return true;
 }
@@ -53,8 +52,9 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 //	Output nodal point data to stream
 void CNode::Write(COutputter& output, unsigned int np)
 {
-	output << setw(9) << np + 1 << setw(5) << bcode[0] << setw(5) << bcode[1] << setw(5) << bcode[2]
-		   << setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] << endl;
+	output << setw(9) << np + 1 
+		<< setw(5) << bcode[0] << setw(5) << bcode[1] << setw(5) << bcode[2]
+		<< setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] << endl;
 }
 
 //	Output equation numbers of nodal point to stream

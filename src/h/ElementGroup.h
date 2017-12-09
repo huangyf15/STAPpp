@@ -14,10 +14,12 @@
 
 #include "Element.h"
 #include "Elements/Bar.h"
-#include "Elements/Triangle.h"
 #include "Elements/Quadrilateral.h"
+#include "Elements/Triangle.h"
 #include "Elements/8H.h"
 #include "Elements/Beam.h"
+#include "Elements/TimoshenkoSRINT.h"
+#include "Elements/TimoshenkoEBMOD.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -32,7 +34,9 @@ enum ElementTypes
     Hexahedron,
     Beam,
     Plate,
-    Shell
+    Shell,
+    TimoshenkoSRINT,
+    TimoshenkoEBMOD
 };
 
 //! Element group class
@@ -80,12 +84,6 @@ public:
 
     //! Read element data from the input data file
     bool ReadElementData(ifstream& Input);
-
-    //! Read quadrilateral element data from the input data file
-    bool ReadQuadrilateralElementData(ifstream& Input);
-
-	 //! Read quadrilateral element data from the input data file
-    bool ReadHexElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

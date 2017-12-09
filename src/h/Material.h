@@ -96,11 +96,11 @@ public:
 	double nu;	//!< Sectional area of a bar element
 
 public:
-	
-//!	Read material data from stream Input
+
+	//!	Read material data from stream Input
 	virtual bool Read(ifstream& Input, unsigned int mset);
 
-//!	Write material data to Stream
+	//!	Write material data to Stream
 	virtual void Write(COutputter& output, unsigned int mset);
 };
 
@@ -126,5 +126,34 @@ public:
 	virtual bool Read(ifstream& Input, unsigned int mset);
 
 //!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};
+
+
+//!	Material class for Timoshenko beam element
+class CTimoshenkoMaterial : public CMaterial
+{
+public:
+
+	double nu;      // Poisson's ratio
+
+	double Area;    // Sectional area of a beam element
+
+	double Iyy;     // Moment of inertia for bending about local y-axis
+
+	double Izz;     // Moment of inertia for bending about local z-axis
+
+	double Thetay1; // 1st direction cosine of local y-axis
+
+	double Thetay2; // 2nd direction cosine of local y-axis
+
+	double Thetay3; // 3rd direction cosine of local y-axis
+
+public:
+
+	//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+	//!	Write material data to Stream
 	virtual void Write(COutputter& output, unsigned int mset);
 };
