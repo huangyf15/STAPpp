@@ -234,9 +234,6 @@ void CTimoshenkoEBMOD::ElementStiffness(double* Matrix)
 // stress               double[3] = {sigmaXX, sigmaXY, sigmaXZ};
 // force                double[12] = {Fx1, Fx2, Fy1, Fy2, Fz1, Fz2, Mx1, Mx2, My1, My2, Mz1, Mz2}
 // Displacement:        double[NEQ], represent the nodal displacement.
-// Positions:           double[12], represent 3d position for 3 gauss points.
-// GaussDisplacements:  double[12], represent 3d displacements for 3 gauss points.
-// Weights:             double[2], represent integrate weights.
 void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double* Displacement)
 {
 	// Get the Material/Section property

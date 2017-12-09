@@ -165,6 +165,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Quadrilateral:
 				PrintQuadrilateralElementData(EleGrp);
 				break;
+			case ElementTypes::Beam:
+				PrintBeamElementData(EleGrp);
+				break;
 			case ElementTypes::Triangle:
 				PrintTriangleElementData(EleGrp);
 				break;
@@ -702,7 +705,7 @@ void COutputter::OutputElementStress()
 			case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
 				double TimoshenkoStresses[3];
 				double TimoshenkoForces[12];
-				
+
 				*this << "  ELEMENT        FORCE_X1    FORCE_X2    FORCE_Y1    FORCE_Y2    FORCE_Z1    FORCE_Z2   MOMENT_X1   MOMENT_X2   MOMENT_Y1   MOMENT_Y2   MOMENT_Z1   MOMENT_Z2  STRESS_XX  STRESS_YY  STRESS_XZ" << endl
 					<< "  NUMBER" << endl;
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
