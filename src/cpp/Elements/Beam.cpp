@@ -71,13 +71,12 @@ void CBeam::GenerateLocationMatrix()
 {
     unsigned int i = 0;
     for (unsigned int N = 0; N < NEN; N++)
+    {
         for (unsigned int D = 0; D < 6; D++)
         {
-            double Boundary;
-            Boundary = nodes[N]->bcode[D];
-
             LocationMatrix[i++] = nodes[N]->bcode[D];
         }
+    }
 }
 
 //	Return the size of the element stiffness matrix (stored as an array column by column)
