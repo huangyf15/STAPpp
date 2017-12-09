@@ -90,7 +90,7 @@ def testPass(node):
         equal(node.dz, 0) and equal(node.tx, 0) and equal(node.ty, 0) and \
         equal(node.tz, tz())
     if not res:
-        print(f'failed at node {node}')
+        print('failed at node %s'%node)
     return res
 
 
