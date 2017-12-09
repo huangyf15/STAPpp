@@ -124,7 +124,7 @@ def testPass(node):
 
 
 def equal(a, b):
-    res = abs(a - b) <= max(abs(a) * 1e-6, abs(b) * 1e-6, 1e-15)
+    res = abs(a - b) <= max(abs(a) * 1e-5, abs(b) * 1e-5, 1e-15)
     if not res:
         print('failed equal: (a, b) = %s' % str((a, b)))
     return res
