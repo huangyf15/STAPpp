@@ -90,7 +90,7 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CPlate);
             MaterialSize_ = sizeof(CPlateMaterial);
             break;
-        case ElementTypes::Shell;
+        case ElementTypes::Shell:
             ElementSize_ = sizeof(CShell);
             MaterialSize_ = sizeof(CShellMaterial);
             break;
