@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 #include "Node.h"
 
@@ -25,6 +26,8 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[3] = 1;
     bcode[4] = 1;
     bcode[5] = 1;
+
+	BcodeFlag = 0;	// Boundary code flag
 };
 
 //	Read element data from stream Input
@@ -45,7 +48,29 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	NodeNumber = N;
 
 	Input >> bcode[0] >> bcode[1] >> bcode[2] >> XYZ[0] >> XYZ[1] >> XYZ[2];
-
+	
+	// Flags determing whether the istream is at the end of the line
+	string EndFlag;
+	getline(Input, EndFlag,'\n');
+	if (!EndFlag.empty()) {
+		// the last 3 bcodes are given
+		BcodeFlag = 1;
+		bcode[3] = static_cast<int>(XYZ[0]);
+		bcode[4] = static_cast<int>(XYZ[1]);
+		bcode[5] = static_cast<int>(XYZ[2]);
+		int posTab = 0;
+		string XYZtempstr;
+		for (unsigned int i = 0; i < 2; i++) {
+			int posNextTab = EndFlag.find('\t',posTab+1);
+			posTab += posNextTab - posTab;
+			XYZtempstr.assign(EndFlag, posTab, posNextTab - posTab);
+			XYZ[i] = atof(XYZtempstr.c_str());
+		}
+		int LastStrLength = EndFlag.at(EndFlag.size() - 1) - posTab;
+		XYZtempstr.assign(EndFlag, posTab, LastStrLength);
+		XYZ[2] = atof(XYZtempstr.c_str());
+	}
+	
 	return true;
 }
 
