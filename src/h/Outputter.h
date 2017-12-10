@@ -76,6 +76,9 @@ public:
     //!	Output Plate element data
     void PrintPlateElementData(unsigned int EleGrp);
 
+    //!	Output Shell element data
+    void PrintShellElementData(unsigned int EleGrp);
+
     //!	Output load data
     void OutputLoadInfo();
 

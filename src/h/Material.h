@@ -137,7 +137,6 @@ public:
     virtual void Write(COutputter& output, unsigned int mset);
 };
 
-
 //!	Material class for Timoshenko beam element
 class CTimoshenkoMaterial : public CMaterial
 {
@@ -164,4 +163,19 @@ public:
 
 	//!	Write material data to Stream
 	virtual void Write(COutputter& output, unsigned int mset);
+};
+
+class CShellMaterial : public CMaterial
+{
+public:
+    double h; // thickness or height
+
+    double nu; // Poisson's ratio
+
+public:
+    //!	Read material data from stream Input
+    virtual bool Read(ifstream& Input, unsigned int mset);
+
+    //!	Write material data to Stream
+    virtual void Write(COutputter& output, unsigned int mset);
 };

@@ -515,7 +515,7 @@ void COutputter::OutputLoadInfo()
         *this << endl;
     }
 }
-/*
+
 void COutputter::PrintPlateElementData(unsigned int EleGrp)
 {
     CDomain* FEMData = CDomain::Instance();
@@ -523,16 +523,15 @@ void COutputter::PrintPlateElementData(unsigned int EleGrp)
     CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
     unsigned int NUMMAT = ElementGroup.GetNUMMAT();
 
-    *this << " M A T E R I A L   D E F I N I T I O N" << endl
-          << endl;
+    *this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
     *this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
-    *this << " AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+    *this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
           << endl
           << endl;
 
-    *this << "  SET       YOUNG'S  THICKNESS   CROSS-SECTIONAL" << endl
-          << " NUMBER     MODULUS                   AREA" << endl
-          << "               E        H              A" << endl;
+    *this << "  SET       YOUNG'S        THICKNESS        POISSON'S" << endl
+          << " NUMBER     MODULUS         (HEIGHT)          RATIO" << endl
+          << "               E               h                nu" << endl;
 
     *this << setiosflags(ios::scientific) << setprecision(5);
 
@@ -540,21 +539,40 @@ void COutputter::PrintPlateElementData(unsigned int EleGrp)
     for (unsigned int mset = 0; mset < NUMMAT; mset++)
         ElementGroup.GetMaterial(mset).Write(*this, mset);
 
-    *this << endl
-          << endl
-          << " E L E M E N T   I N F O R M A T I O N" << endl;
-    *this << " ELEMENT     NODE     NODE     NODE     NODE        MATERIAL" << endl
-          << " NUMBER-N      1        2       3        4         SET NUMBER" << endl;
-
-    const unsigned int NUME = ElementGroup.GetNUME();
+    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
+    *this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+          << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
 
     //	Loop over for all elements in group EleGrp
-    for (unsigned int Ele = 0; Ele < NUME; Ele++)
+    for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
         ElementGroup.GetElement(Ele).Write(*this, Ele);
 
     *this << endl;
 }
-*/
+
+//	Print load data
+void COutputter::OutputLoadInfo()
+{
+    CDomain* FEMData = CDomain::Instance();
+
+    for (unsigned int lcase = 1; lcase <= FEMData->GetNLCASE(); lcase++)
+    {
+        CLoadCaseData* LoadData = &FEMData->GetLoadCases()[lcase - 1];
+
+        *this << setiosflags(ios::scientific);
+        *this << " L O A D   C A S E   D A T A" << endl << endl;
+
+        *this << "     LOAD CASE NUMBER . . . . . . . =" << setw(6) << lcase << endl;
+        *this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl
+              << endl;
+        *this << "    NODE       DIRECTION      LOAD" << endl
+              << "   NUMBER                   MAGNITUDE" << endl;
+
+        LoadData->Write(*this, lcase);
+
+        *this << endl;
+    }
+}
 
 //	Print nodal displacement
 void COutputter::OutputNodalDisplacement(unsigned int lcase)

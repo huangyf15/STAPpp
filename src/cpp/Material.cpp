@@ -198,3 +198,28 @@ void CPlateMaterial::Write(COutputter& output, unsigned int mset)
 {
     output << setw(5) << mset + 1 << setw(16) << E << setw(16) << h << setw(16) << nu << endl;
 }
+
+
+bool CShellMaterial::Read(ifstream& Input, unsigned int mset)
+{
+    Input >> nset; // Number of property set
+
+    if (nset != mset + 1)
+    {
+        cerr << "*** Error *** Material sets must be inputted in order !" << endl
+             << "    Expected set : " << mset + 1 << endl
+             << "    Provided set : " << nset << endl;
+
+        return false;
+    }
+
+    Input >> E >> h >> nu; // Young's modulus and height and Poisson's ratio
+
+    return true;
+}
+
+void CShellMaterial::Write(COutputter& output, unsigned int mset)
+{
+    output << setw(5) << mset + 1 << setw(16) << E << setw(16) << h << setw(16) << nu << endl;
+}
+
