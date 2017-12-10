@@ -670,11 +670,12 @@ void CShell::ElementStiffness(double* Matrix)
 
     for (unsigned i = 0; i < 36; ++i)
     {
-        Matrix4Q[i] *= (k2*0.25);
+        Matrix4Q[i] *= (k2 * 0.25);
     }
 
 #ifdef _DEBUG_
-    for (unsigned i=0;i<36;++i){
+    for (unsigned i = 0; i < 36; ++i)
+    {
         cout << "Matrix4Q[" << i << "] = " << Matrix4Q[i] << endl;
     }
 #endif
