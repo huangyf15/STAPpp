@@ -8,29 +8,29 @@
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
-#include "Outputter.h"
 #include "Domain.h"
+#include "Outputter.h"
 #include "SkylineMatrix.h"
 
-#include <ctime>
-#include <iomanip>
 #include <iostream>
+#include <iomanip>
+#include <ctime>
 
 using namespace std;
 
 //	Output current time and date
-void COutputter::PrintTime(const struct tm* ptm, COutputter& output)
+void COutputter::PrintTime(const struct tm* ptm, COutputter &output)
 {
-    const char* weekday[] = {"Sunday",   "Monday", "Tuesday", "Wednesday",
-                             "Thursday", "Friday", "Saturday"};
-    const char* month[] = {"January", "February", "March",     "April",   "May",      "June",
-                           "July",    "August",   "September", "October", "November", "December"};
+	const char* weekday[] = {"Sunday", "Monday", "Tuesday", "Wednesday",
+							 "Thursday", "Friday", "Saturday"};
+	const char* month[] = {"January", "February", "March", "April", "May", "June",
+						   "July", "August", "September", "October", "November", "December"};
 
-    output << "        (";
-    output << ptm->tm_hour << ":" << ptm->tm_min << ":" << ptm->tm_sec << " on ";
-    output << month[ptm->tm_mon] << " " << ptm->tm_mday << ", " << ptm->tm_year + 1900 << ", "
-           << weekday[ptm->tm_wday] << ")" << endl
-           << endl;
+	output << "        (";
+	output << ptm->tm_hour << ":" << ptm->tm_min << ":" << ptm->tm_sec << " on ";
+	output << month[ptm->tm_mon] << " " << ptm->tm_mday << ", " << ptm->tm_year + 1900 << ", "
+		   << weekday[ptm->tm_wday] << ")" << endl
+		   << endl;
 }
 
 COutputter* COutputter::_instance = nullptr;
@@ -38,91 +38,91 @@ COutputter* COutputter::_instance = nullptr;
 //	Constructor
 COutputter::COutputter(string FileName)
 {
-    OutputFile.open(FileName);
+	OutputFile.open(FileName);
 
-    if (!OutputFile)
-    {
-        cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
-        exit(3);
-    }
+	if (!OutputFile)
+	{
+		cerr << "*** Error *** File " << FileName << " does not exist !" << endl;
+		exit(3);
+	}
 }
 
 //	Return the single instance of the class
 COutputter* COutputter::Instance(string FileName)
 {
-    if (!_instance)
-        _instance = new COutputter(FileName);
-    return _instance;
+	if (!_instance)
+		_instance = new COutputter(FileName);
+	return _instance;
 }
 
 //	Print program logo
 void COutputter::OutputHeading()
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    *this << "TITLE : " << FEMData->GetTitle() << endl;
+	*this << "TITLE : " << FEMData->GetTitle() << endl;
 
-    time_t rawtime;
-    struct tm* timeinfo;
+	time_t rawtime;
+	struct tm* timeinfo;
 
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
 
-    PrintTime(timeinfo, *this);
+	PrintTime(timeinfo, *this);
 }
 
 //	Print nodal data
 void COutputter::OutputNodeInfo()
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    CNode* NodeList = FEMData->GetNodeList();
+	CNode* NodeList = FEMData->GetNodeList();
 
-    *this << "C O N T R O L   I N F O R M A T I O N" << endl << endl;
+	*this << "C O N T R O L   I N F O R M A T I O N" << endl
+		  << endl;
 
-    *this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(5);
 
-    unsigned int NUMNP = FEMData->GetNUMNP();
-    unsigned int NUMEG = FEMData->GetNUMEG();
-    unsigned int NLCASE = FEMData->GetNLCASE();
-    unsigned int MODEX = FEMData->GetMODEX();
+	unsigned int NUMNP = FEMData->GetNUMNP();
+	unsigned int NUMEG = FEMData->GetNUMEG();
+	unsigned int NLCASE = FEMData->GetNLCASE();
+	unsigned int MODEX = FEMData->GetMODEX();
 
-    *this << "      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =" << setw(6) << NUMNP
-          << endl;
-    *this << "      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =" << setw(6) << NUMEG
-          << endl;
-    *this << "      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =" << setw(6) << NLCASE
-          << endl;
-    *this << "      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =" << setw(6) << MODEX
-          << endl;
-    *this << "         EQ.0, DATA CHECK" << endl << "         EQ.1, EXECUTION" << endl << endl;
+	*this << "      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =" << setw(6) << NUMNP << endl;
+	*this << "      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =" << setw(6) << NUMEG << endl;
+	*this << "      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =" << setw(6) << NLCASE << endl;
+	*this << "      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =" << setw(6) << MODEX << endl;
+	*this << "         EQ.0, DATA CHECK" << endl
+		  << "         EQ.1, EXECUTION" << endl
+		  << endl;
 
-    *this << " N O D A L   P O I N T   D A T A" << endl << endl;
-    *this << "    NODE       BOUNDARY                         NODAL POINT" << endl
-          << "   NUMBER  CONDITION  CODES                     COORDINATES" << endl;
+	*this << " N O D A L   P O I N T   D A T A" << endl << endl;
+	*this << "    NODE       BOUNDARY                         NODAL POINT" << endl
+		  << "   NUMBER  CONDITION  CODES                     COORDINATES" << endl;
 
-    for (unsigned int np = 0; np < NUMNP; np++)
-        NodeList[np].Write(*this, np);
+	for (unsigned int np = 0; np < NUMNP; np++)
+		NodeList[np].Write(*this, np);
 
-    *this << endl;
+	*this << endl;
 }
 
 //	Output equation numbers
 void COutputter::OutputEquationNumber()
 {
-    CDomain* FEMData = CDomain::Instance();
-    unsigned int NUMNP = FEMData->GetNUMNP();
+	CDomain* FEMData = CDomain::Instance();
+	unsigned int NUMNP = FEMData->GetNUMNP();
 
-    CNode* NodeList = FEMData->GetNodeList();
+	CNode* NodeList = FEMData->GetNodeList();
 
-    *this << " EQUATION NUMBERS" << endl << endl;
-    *this << "   NODE NUMBER   DEGREES OF FREEDOM" << endl;
-    *this << "        N           X    Y    Z" << endl;
+	*this << " EQUATION NUMBERS" << endl
+		  << endl;
+	*this << "   NODE NUMBER   DEGREES OF FREEDOM" << endl;
+	*this << "        N           X    Y    Z" << endl;
 
-    for (unsigned int np = 0; np < NUMNP; np++) // Loop over for all node
-        NodeList[np].WriteEquationNo(*this, np);
+	for (unsigned int np = 0; np < NUMNP; np++) // Loop over for all node
+		NodeList[np].WriteEquationNo(*this, np);
 
-    *this << endl;
+	*this << endl;
 }
 
 //	Output element data
@@ -180,9 +180,7 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::TimoshenkoEBMOD:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
-			case ElementTypes::Plate:
-				PrintPlateElementData(EleGrp);
-				break;
+
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -194,47 +192,50 @@ void COutputter::OutputElementInfo()
 //	Output bar element data
 void COutputter::PrintBarElementData(unsigned int EleGrp)
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
-    unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
 
-    *this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
-    *this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
-    *this << " AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
-          << endl
-          << endl;
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
 
-    *this << "  SET       YOUNG'S     CROSS-SECTIONAL" << endl
-          << " NUMBER     MODULUS          AREA" << endl
-          << "               E              A" << endl;
+	*this << "  SET       YOUNG'S     CROSS-SECTIONAL" << endl
+		  << " NUMBER     MODULUS          AREA" << endl
+		  << "               E              A" << endl;
 
-    *this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(5);
 
-    //	Loop over for all property sets
-    for (unsigned int mset = 0; mset < NUMMAT; mset++)
-        ElementGroup.GetMaterial(mset).Write(*this, mset);
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
 
-    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
-    *this << " ELEMENT     NODE     NODE       MATERIAL" << endl
-          << " NUMBER-N      I        J       SET NUMBER" << endl;
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE       MATERIAL" << endl
+		  << " NUMBER-N      I        J       SET NUMBER" << endl;
 
-    const unsigned int NUME = ElementGroup.GetNUME();
+	const unsigned int NUME = ElementGroup.GetNUME();
 
-    //	Loop over for all elements in group EleGrp
-    for (unsigned int Ele = 0; Ele < NUME; Ele++)
-        ElementGroup.GetElement(Ele).Write(*this, Ele);
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < NUME; Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
 
-    *this << endl;
+	*this << endl;
 }
 
 //	Output quadrilateral element data
 void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
-    unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
 
 	*this << " M A T E R I A L   D E F I N I T I O N" << endl
 		  << endl;
@@ -243,25 +244,27 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 		  << endl
 		  << endl;
 
-    *this << "  SET       YOUNG'S        POISSON'S" << endl
-          << " NUMBER     MODULUS          RATIO" << endl
-          << "               E              nu" << endl;
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
 
-    *this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(5);
 
-    //	Loop over for all property sets
-    for (unsigned int mset = 0; mset < NUMMAT; mset++)
-        ElementGroup.GetMaterial(mset).Write(*this, mset);
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
 
-    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
-    *this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
-          << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
 
-    //	Loop over for all elements in group EleGrp
-    for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
-        ElementGroup.GetElement(Ele).Write(*this, Ele);
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
 
-    *this << endl;
+	*this << endl;
 }
 
 // Output Beam element data
@@ -461,25 +464,26 @@ void COutputter::PrintTimoshenkoEBMODElementData(unsigned int EleGrp)
 //	Print load data
 void COutputter::OutputLoadInfo()
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    for (unsigned int lcase = 1; lcase <= FEMData->GetNLCASE(); lcase++)
-    {
-        CLoadCaseData* LoadData = &FEMData->GetLoadCases()[lcase - 1];
+	for (unsigned int lcase = 1; lcase <= FEMData->GetNLCASE(); lcase++)
+	{
+		CLoadCaseData* LoadData = &FEMData->GetLoadCases()[lcase - 1];
 
-        *this << setiosflags(ios::scientific);
-        *this << " L O A D   C A S E   D A T A" << endl << endl;
+		*this << setiosflags(ios::scientific);
+		*this << " L O A D   C A S E   D A T A" << endl
+			  << endl;
 
-        *this << "     LOAD CASE NUMBER . . . . . . . =" << setw(6) << lcase << endl;
-        *this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl
-              << endl;
-        *this << "    NODE       DIRECTION      LOAD" << endl
-              << "   NUMBER                   MAGNITUDE" << endl;
+		*this << "     LOAD CASE NUMBER . . . . . . . =" << setw(6) << lcase << endl;
+		*this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl
+			  << endl;
+		*this << "    NODE       DIRECTION      LOAD" << endl
+			  << "   NUMBER                   MAGNITUDE" << endl;
 
-        LoadData->Write(*this, lcase);
+		LoadData->Write(*this, lcase);
 
-        *this << endl;
-    }
+		*this << endl;
+	}
 }
 
 void COutputter::PrintPlateElementData(unsigned int EleGrp)
@@ -519,22 +523,24 @@ void COutputter::PrintPlateElementData(unsigned int EleGrp)
 //	Print nodal displacement
 void COutputter::OutputNodalDisplacement(unsigned int lcase)
 {
-    CDomain* FEMData = CDomain::Instance();
-    CNode* NodeList = FEMData->GetNodeList();
-    double* Displacement = FEMData->GetDisplacement();
+	CDomain* FEMData = CDomain::Instance();
+	CNode* NodeList = FEMData->GetNodeList();
+	double* Displacement = FEMData->GetDisplacement();
 
-    *this << " LOAD CASE" << setw(5) << lcase + 1 << endl << endl << endl;
+	*this << " LOAD CASE" << setw(5) << lcase + 1 << endl
+		  << endl
+		  << endl;
 
-    *this << setiosflags(ios::scientific);
+	*this << setiosflags(ios::scientific);
 
 	*this << " D I S P L A C E M E N T S" << endl
 		  << endl;
 	*this << "  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT      X-ROTATION        Y-ROTATION        Z-ROTATION" << endl;
 
-    for (unsigned int np = 0; np < FEMData->GetNUMNP(); np++)
-        NodeList[np].WriteNodalDisplacement(*this, np, Displacement);
+	for (unsigned int np = 0; np < FEMData->GetNUMNP(); np++)
+		NodeList[np].WriteNodalDisplacement(*this, np, Displacement);
 
-    *this << endl;
+	*this << endl;
 }
 
 //	Calculate stresses
@@ -590,7 +596,7 @@ void COutputter::OutputElementStress()
 					<< "              UX            UY           UZ            WEIGHTS"
 					#endif
 					<< endl;
-				double stresses[12]; //4PE: for plate element
+				double stresses[12];
 				double Positions[12];
 				#ifdef __TEST__
 				double GaussDisplacements[12];
@@ -766,7 +772,6 @@ void COutputter::OutputElementStress()
 					*this << std::endl;
 				}
 				break;
-
 			case ElementTypes::Plate:
 				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
 					<< "                       GUASS POINTS STRESSES"
@@ -794,6 +799,7 @@ void COutputter::OutputElementStress()
 				*this << endl;
 
 				break;
+
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
 					<< " has not been implemented.\n\n";
@@ -804,20 +810,21 @@ void COutputter::OutputElementStress()
 //	Print total system data
 void COutputter::OutputTotalSystemData()
 {
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    *this << "	TOTAL SYSTEM DATA" << endl << endl;
+	*this << "	TOTAL SYSTEM DATA" << endl
+		  << endl;
 
-    *this << "     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) = " << FEMData->GetNEQ()
-          << endl
-          << "     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) = " << FEMData->GetNWK()
-          << endl
-          << "     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) = " << FEMData->GetMK()
-          << endl
-          << "     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) = "
-          << FEMData->GetNWK() / FEMData->GetNEQ() << endl
-          << endl
-          << endl;
+	*this << "     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) = " << FEMData->GetNEQ()
+		  << endl
+		  << "     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) = " << FEMData->GetNWK()
+		  << endl
+		  << "     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) = " << FEMData->GetMK()
+		  << endl
+		  << "     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) = "
+		  << FEMData->GetNWK() / FEMData->GetNEQ() << endl
+		  << endl
+		  << endl;
 }
 
 #ifdef _DEBUG_
@@ -825,124 +832,128 @@ void COutputter::OutputTotalSystemData()
 //	Print column heights for debuging
 void COutputter::PrintColumnHeights()
 {
-    *this << "*** _Debug_ *** Column Heights" << endl;
+	*this << "*** _Debug_ *** Column Heights" << endl;
 
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    unsigned int NEQ = FEMData->GetNEQ();
-    CSkylineMatrix<double>* StiffnessMatrix = FEMData->GetStiffnessMatrix();
-    unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
+	unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
 
-    for (unsigned int col = 0; col < NEQ; col++)
-    {
-        if (col + 1 % 10 == 0)
-        {
-            *this << endl;
-        }
+	for (unsigned int col = 0; col < NEQ; col++)
+	{
+		if (col + 1 % 10 == 0)
+		{
+			*this << endl;
+		}
 
-        *this << setw(8) << ColumnHeights[col];
-    }
+		*this << setw(8) << ColumnHeights[col];
+	}
 
-    *this << endl << endl;
+	*this << endl
+		  << endl;
 }
 
 //	Print address of diagonal elements for debuging
 void COutputter::PrintDiagonalAddress()
 {
-    *this << "*** _Debug_ *** Address of Diagonal Element" << endl;
+	*this << "*** _Debug_ *** Address of Diagonal Element" << endl;
 
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    unsigned int NEQ = FEMData->GetNEQ();
-    CSkylineMatrix<double>* StiffnessMatrix = FEMData->GetStiffnessMatrix();
-    unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
+	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
 
-    for (unsigned int col = 0; col <= NEQ; col++)
-    {
-        if (col + 1 % 10 == 0)
-        {
-            *this << endl;
-        }
+	for (unsigned int col = 0; col <= NEQ; col++)
+	{
+		if (col + 1 % 10 == 0)
+		{
+			*this << endl;
+		}
 
-        *this << setw(8) << DiagonalAddress[col];
-    }
+		*this << setw(8) << DiagonalAddress[col];
+	}
 
-    *this << endl << endl;
+	*this << endl
+		  << endl;
 }
 
 //	Print banded and full stiffness matrix for debuging
 void COutputter::PrintStiffnessMatrix()
 {
-    *this << "*** _Debug_ *** Banded stiffness matrix" << endl;
+	*this << "*** _Debug_ *** Banded stiffness matrix" << endl;
 
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    unsigned int NEQ = FEMData->GetNEQ();
-    CSkylineMatrix<double>* StiffnessMatrix = FEMData->GetStiffnessMatrix();
-    unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
+	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
 
-    *this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(5);
 
-    for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
-    {
-        *this << setw(14) << (*StiffnessMatrix)(i);
+	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
+	{
+		*this << setw(14) << (*StiffnessMatrix)(i);
 
-        if ((i + 1) % 6 == 0)
-        {
-            *this << endl;
-        }
-    }
+		if ((i + 1) % 6 == 0)
+		{
+			*this << endl;
+		}
+	}
 
-    *this << endl << endl;
+	*this << endl
+		  << endl;
 
-    *this << "*** _Debug_ *** Full stiffness matrix" << endl;
+	*this << "*** _Debug_ *** Full stiffness matrix" << endl;
 
-    for (int I = 1; I <= NEQ; I++)
-    {
-        for (int J = 1; J <= NEQ; J++)
-        {
-            int H = DiagonalAddress[J] - DiagonalAddress[J - 1];
-            if (J - I - H >= 0)
-            {
-                *this << setw(14) << 0.0;
-            }
-            else
-            {
-                *this << setw(14) << (*StiffnessMatrix)(I, J);
-            }
-        }
+	for (int I = 1; I <= NEQ; I++)
+	{
+		for (int J = 1; J <= NEQ; J++)
+		{
+			int H = DiagonalAddress[J] - DiagonalAddress[J - 1];
+			if (J - I - H >= 0)
+			{
+				*this << setw(14) << 0.0;
+			}
+			else
+			{
+				*this << setw(14) << (*StiffnessMatrix)(I, J);
+			}
+		}
 
-        *this << endl;
-    }
+		*this << endl;
+	}
 
-    *this << endl;
+	*this << endl;
 }
 
 //	Print displacement vector for debuging
 void COutputter::PrintDisplacement(unsigned int loadcase)
 {
-    *this << "*** _Debug_ *** Displacement vector" << endl;
+	*this << "*** _Debug_ *** Displacement vector" << endl;
 
-    CDomain* FEMData = CDomain::Instance();
+	CDomain* FEMData = CDomain::Instance();
 
-    unsigned int NEQ = FEMData->GetNEQ();
-    double* Force = FEMData->GetForce();
+	unsigned int NEQ = FEMData->GetNEQ();
+	double* Force = FEMData->GetForce();
 
-    *this << "  Load case = " << loadcase << endl;
+	*this << "  Load case = " << loadcase << endl;
 
-    *this << setiosflags(ios::scientific) << setprecision(5);
+	*this << setiosflags(ios::scientific) << setprecision(5);
 
-    for (unsigned int i = 0; i < NEQ; i++)
-    {
-        if ((i + 1) % 6 == 0)
-        {
-            *this << endl;
-        }
+	for (unsigned int i = 0; i < NEQ; i++)
+	{
+		if ((i + 1) % 6 == 0)
+		{
+			*this << endl;
+		}
 
-        *this << setw(14) << Force[i];
-    }
+		*this << setw(14) << Force[i];
+	}
 
-    *this << endl << endl;
+	*this << endl
+		  << endl;
 }
 
 #endif
