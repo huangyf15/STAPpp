@@ -107,7 +107,7 @@ void CShell::ElementStiffness(double* Matrix)
     double nu = material->nu;
     const double k = material->E * material->h * material->h * material->h * 0.0833333333333333 /
                      (1 - nu * nu) * LX * LY / 4;
-    const double k2 = material->E / (1-nu*nu) *0.25 *LX*LY;
+    const double k2 = material->E / (1 - nu * nu) * material->h;
     double xpsi = LX / 2;
     double yeta = LY / 2;
 
@@ -631,47 +631,53 @@ void CShell::ElementStiffness(double* Matrix)
         };
     #endif*/
     double Matrix4Q[36];
-    Matrix4Q[0] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) - 4 / (3 * (LX * LX)));
-    Matrix4Q[1] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) - 4 / (3 * (LY * LY)));
-    Matrix4Q[2] = nu / 2 + 1 / 2;
-    Matrix4Q[3] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) - 4 / (3 * (LX * LX)));
-    Matrix4Q[4] = 1 / 2 - (3 * nu) / 2;
-    Matrix4Q[5] = -LX * LY * ((nu / 3 - 1 / 3) / (LY * LY) + 4 / (3 * (LX * LX)));
-    Matrix4Q[6] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) - 4 / (3 * (LY * LY)));
-    Matrix4Q[7] = -nu / 2 - 1 / 2;
-    Matrix4Q[8] = LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) + 2 / (3 * (LY * LY)));
-    Matrix4Q[9] = (3 * nu) / 2 - 1 / 2;
-    Matrix4Q[10] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) - 4 / (3 * (LX * LX)));
-    Matrix4Q[11] = 1 / 2 - (3 * nu) / 2;
-    Matrix4Q[12] = LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) + 2 / (3 * (LX * LX)));
-    Matrix4Q[13] = -nu / 2 - 1 / 2;
-    Matrix4Q[14] = LX * LY * ((nu / 3 - 1 / 3) / (LY * LY) - 2 / (3 * (LX * LX)));
-    Matrix4Q[15] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) - 4 / (3 * (LY * LY)));
-    Matrix4Q[16] = nu / 2 + 1 / 2;
-    Matrix4Q[17] = -LX * LY * ((nu / 3 - 1 / 3) / (LX * LX) + 4 / (3 * (LY * LY)));
-    Matrix4Q[18] = (3 * nu) / 2 - 1 / 2;
-    Matrix4Q[19] = LX * LY * ((nu / 3 - 1 / 3) / (LX * LX) - 2 / (3 * (LY * LY)));
-    Matrix4Q[20] = -nu / 2 - 1 / 2;
-    Matrix4Q[21] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) - 4 / (3 * (LX * LX)));
-    Matrix4Q[22] = 1 / 2 - (3 * nu) / 2;
-    Matrix4Q[23] = -LX * LY * ((nu / 3 - 1 / 3) / (LY * LY) + 4 / (3 * (LX * LX)));
-    Matrix4Q[24] = nu / 2 + 1 / 2;
-    Matrix4Q[25] = LX * LY * ((nu / 3 - 1 / 3) / (LY * LY) - 2 / (3 * (LX * LX)));
-    Matrix4Q[26] = (3 * nu) / 2 - 1 / 2;
-    Matrix4Q[27] = LX * LY * (((2 * nu) / 3 - 2 / 3) / (LY * LY) + 2 / (3 * (LX * LX)));
-    Matrix4Q[28] = -LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) - 4 / (3 * (LY * LY)));
-    Matrix4Q[29] = -nu / 2 - 1 / 2;
-    Matrix4Q[30] = LX * LY * (((2 * nu) / 3 - 2 / 3) / (LX * LX) + 2 / (3 * (LY * LY)));
-    Matrix4Q[31] = (3 * nu) / 2 - 1 / 2;
-    Matrix4Q[32] = LX * LY * ((nu / 3 - 1 / 3) / (LX * LX) - 2 / (3 * (LY * LY)));
-    Matrix4Q[33] = nu / 2 + 1 / 2;
-    Matrix4Q[34] = -LX * LY * ((nu / 3 - 1 / 3) / (LX * LX) + 4 / (3 * (LY * LY)));
-    Matrix4Q[35] = 1 / 2 - (3 * nu) / 2;
+    Matrix4Q[0] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) - 4.0 / (3 * (LX * LX)));
+    Matrix4Q[1] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) - 4.0 / (3 * (LY * LY)));
+    Matrix4Q[2] = nu / 2 + 1.0 / 2;
+    Matrix4Q[3] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) - 4.0 / (3 * (LX * LX)));
+    Matrix4Q[4] = 1.0 / 2 - (3 * nu) / 2;
+    Matrix4Q[5] = -LX * LY * ((nu / 3 - 1.0 / 3) / (LY * LY) + 4.0 / (3 * (LX * LX)));
+    Matrix4Q[6] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) - 4.0 / (3 * (LY * LY)));
+    Matrix4Q[7] = -nu / 2 - 1.0 / 2;
+    Matrix4Q[8] = LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) + 2.0 / (3 * (LY * LY)));
+    Matrix4Q[9] = (3 * nu) / 2 - 1.0 / 2;
+    Matrix4Q[10] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) - 4.0 / (3 * (LX * LX)));
+    Matrix4Q[11] = 1.0 / 2 - (3 * nu) / 2;
+    Matrix4Q[12] = LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) + 2.0 / (3 * (LX * LX)));
+    Matrix4Q[13] = -nu / 2 - 1.0 / 2;
+    Matrix4Q[14] = LX * LY * ((nu / 3 - 1.0 / 3) / (LY * LY) - 2.0 / (3 * (LX * LX)));
+    Matrix4Q[15] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) - 4.0 / (3 * (LY * LY)));
+    Matrix4Q[16] = nu / 2 + 1.0 / 2;
+    Matrix4Q[17] = -LX * LY * ((nu / 3 - 1.0 / 3) / (LX * LX) + 4.0 / (3 * (LY * LY)));
+    Matrix4Q[18] = (3 * nu) / 2 - 1.0 / 2;
+    Matrix4Q[19] = LX * LY * ((nu / 3 - 1.0 / 3) / (LX * LX) - 2.0 / (3 * (LY * LY)));
+    Matrix4Q[20] = -nu / 2 - 1.0 / 2;
+    Matrix4Q[21] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) - 4.0 / (3 * (LX * LX)));
+    Matrix4Q[22] = 1.0 / 2 - (3 * nu) / 2;
+    Matrix4Q[23] = -LX * LY * ((nu / 3 - 1.0 / 3) / (LY * LY) + 4.0 / (3 * (LX * LX)));
+    Matrix4Q[24] = nu / 2 + 1.0 / 2;
+    Matrix4Q[25] = LX * LY * ((nu / 3 - 1.0 / 3) / (LY * LY) - 2.0 / (3 * (LX * LX)));
+    Matrix4Q[26] = (3 * nu) / 2 - 1.0 / 2;
+    Matrix4Q[27] = LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LY * LY) + 2.0 / (3 * (LX * LX)));
+    Matrix4Q[28] = -LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) - 4.0 / (3 * (LY * LY)));
+    Matrix4Q[29] = -nu / 2 - 1.0 / 2;
+    Matrix4Q[30] = LX * LY * (((2 * nu) / 3 - 2.0 / 3) / (LX * LX) + 2.0 / (3 * (LY * LY)));
+    Matrix4Q[31] = (3 * nu) / 2 - 1.0 / 2;
+    Matrix4Q[32] = LX * LY * ((nu / 3 - 1.0 / 3) / (LX * LX) - 2.0 / (3 * (LY * LY)));
+    Matrix4Q[33] = nu / 2 + 1.0 / 2;
+    Matrix4Q[34] = -LX * LY * ((nu / 3 - 1.0 / 3) / (LX * LX) + 4.0 / (3 * (LY * LY)));
+    Matrix4Q[35] = 1.0 / 2 - (3 * nu) / 2;
 
-    for (unsigned i=1;i<36;++i){
-        Matrix4Q[i] *= k2;
+    for (unsigned i = 0; i < 36; ++i)
+    {
+        Matrix4Q[i] *= (k2*0.25);
     }
 
+#ifdef _DEBUG_
+    for (unsigned i=0;i<36;++i){
+        cout << "Matrix4Q[" << i << "] = " << Matrix4Q[i] << endl;
+    }
+#endif
     Matrix[0] += Matrix4Q[0] * xdir[0] * xdir[0] + Matrix4Q[2] * xdir[0] * ydir[0] +
                  Matrix4Q[2] * ydir[0] * xdir[0] + Matrix4Q[1] * ydir[0] * ydir[0];
     Matrix[1] += Matrix4Q[0] * xdir[1] * xdir[1] + Matrix4Q[2] * xdir[1] * ydir[1] +
@@ -864,8 +870,8 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     double yeta = LY / 2;
 
     double truedisp[24];
-    double dis[12]; // displacement of nodes
-    double dis_inner[8]; //displacement in the plane
+    double dis[12];      // displacement of nodes
+    double dis_inner[8]; // displacement in the plane
     for (unsigned i = 0; i <= 23; i++)
     {
         if (LocationMatrix[i])
@@ -887,17 +893,16 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
                          truedisp[6 * i + 5] * xdir[2];
         dis[3 * i + 2] = truedisp[6 * i + 3] * ydir[0] + truedisp[6 * i + 4] * ydir[1] +
                          truedisp[6 * i + 5] * ydir[2];
-        dis_inner[2*i] =  truedisp[6 * i] * xdir[0] + truedisp[6 * i + 1] * xdir[1] +
-                     truedisp[6 * i + 2] * xdir[2];
-        dis_inner[2*i] =  truedisp[6 * i] * ydir[0] + truedisp[6 * i + 1] * ydir[1] +
-                     truedisp[6 * i + 2] * ydir[2];
-
+        dis_inner[2 * i] = truedisp[6 * i] * xdir[0] + truedisp[6 * i + 1] * xdir[1] +
+                           truedisp[6 * i + 2] * xdir[2];
+        dis_inner[2 * i] = truedisp[6 * i] * ydir[0] + truedisp[6 * i + 1] * ydir[1] +
+                           truedisp[6 * i + 2] * ydir[2];
     }
 
     double nu = material->nu;
     double Jacobian = xpsi * yeta;
     const double k = material->E * material->h * 0.5 / (1 - nu * nu);
-    double k2 =material->E / (1-nu*nu);
+    double k2 = material->E / (1 - nu * nu);
     double psix = yeta / Jacobian;
     double etay = xpsi / Jacobian;
 
@@ -1078,11 +1083,16 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     position[9] = xmid + sqrt(1.0 / 3) * (-xpsi);
     position[10] = ymid + sqrt(1.0 / 3) * (yeta);
     position[11] = zmid;
-    stress[12] = (0.5/LX*(-dis_inner[0]+dis_inner[2]+dis_inner[4]-dis_inner[6])+nu*0.5/LY*(-dis_inner[1]-dis_inner[3]+dis_inner[5]+dis_inner[7]))*k2;
-    stress[13] =( nu*0.5/LX*(-dis_inner[0]+dis_inner[2]+dis_inner[4]-dis_inner[6])+0.5/LY*(-dis_inner[1]-dis_inner[3]+dis_inner[5]+dis_inner[7]))*k2;
-    stress[14]= k2*(1-nu)*0.5*(0.5/LX*(-dis_inner[1]+dis_inner[3]+dis_inner[5]-dis_inner[7])+0.5/LY*(-dis_inner[0]-dis_inner[2]+dis_inner[4]+dis_inner[6]));
+    stress[12] = (0.5 / LX * (-dis_inner[0] + dis_inner[2] + dis_inner[4] - dis_inner[6]) +
+                  nu * 0.5 / LY * (-dis_inner[1] - dis_inner[3] + dis_inner[5] + dis_inner[7])) *
+                 k2;
+    stress[13] = (nu * 0.5 / LX * (-dis_inner[0] + dis_inner[2] + dis_inner[4] - dis_inner[6]) +
+                  0.5 / LY * (-dis_inner[1] - dis_inner[3] + dis_inner[5] + dis_inner[7])) *
+                 k2;
+    stress[14] = k2 * (1 - nu) * 0.5 *
+                 (0.5 / LX * (-dis_inner[1] + dis_inner[3] + dis_inner[5] - dis_inner[7]) +
+                  0.5 / LY * (-dis_inner[0] - dis_inner[2] + dis_inner[4] + dis_inner[6]));
     position[12] = xmid;
     position[13] = ymid;
-    position[14]= zmid;
+    position[14] = zmid;
 }
-
