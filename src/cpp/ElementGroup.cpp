@@ -94,7 +94,7 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CShell);
             MaterialSize_ = sizeof(CShellMaterial);
             break;
-
+ 
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
