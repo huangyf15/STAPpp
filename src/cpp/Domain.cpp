@@ -135,7 +135,10 @@ bool CDomain::ReadNodalPoints()
 //	Calculate global equation numbers corresponding to every degree of freedom of each node
 void CDomain::CalculateEquationNumber()
 {
-	// adjust bcode for nodes of structure elements
+	// Adjust bcode for nodes of structure elements
+	// Default values of the last 3 bcodes (related to the rotation):
+	//     Structure elements: active,     value = 0;
+	//     Solid elements:     not active, value = 1.
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
     {
         if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 9))
