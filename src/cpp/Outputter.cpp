@@ -413,8 +413,8 @@ void COutputter::PrintHexElementData(unsigned int EleGrp)
 	*this << endl
 		  << endl
 		  << " E L E M E N T   I N F O R M A T I O N" << endl;
-	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
-		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE      NODE     NODE     NODE     NODE     NODE        MATERIAL" << endl
+		  << " NUMBER-N      1        2        3        4        5        6        7        8          SET NUMBER" << endl;
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
@@ -675,8 +675,8 @@ void COutputter::OutputElementStress()
 
 
 			case ElementTypes::Hexahedron: // 8H element
-				*this << "node    X		Y		Z	  XY	 YZ		XZ" << endl
-					<< "  NUMBER" << endl;
+				*this << "node      X              Y              Z              XY              YZ              XZ" << endl
+					<< "NUMBER" << endl;
 
 				double stressHex[48];
 
@@ -686,14 +686,14 @@ void COutputter::OutputElementStress()
 					Element.ElementStress(stressHex, Displacement);
 
 					CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
-					*this << setw(14) << stressHex[0]<< setw(16) << stressHex[1] << setw(16)<< stressHex[2]<< setw(16)<< stressHex[3]<< setw(16)<< stressHex[4]<< setw(16)<< stressHex[5]<< endl
-						<< setw(14) << stressHex[6]<< setw(16) << stressHex[7] << setw(16)<< stressHex[8]<< setw(16)<< stressHex[9]<< setw(16)<< stressHex[10]<< setw(16)<< stressHex[11]<< endl
-						<< setw(14) << stressHex[12]<< setw(16) << stressHex[13] << setw(16)<< stressHex[14]<< setw(16)<< stressHex[15]<< setw(16)<< stressHex[16]<< setw(16)<< stressHex[17]<< endl
-						<< setw(14) << stressHex[18]<< setw(16) << stressHex[19] << setw(16)<< stressHex[20]<< setw(16)<< stressHex[21]<< setw(16)<< stressHex[22]<< setw(16)<< stressHex[23]<< endl
-						<< setw(14) << stressHex[24]<< setw(16) << stressHex[25] << setw(16)<< stressHex[26]<< setw(16)<< stressHex[27]<< setw(16)<< stressHex[28]<< setw(16)<< stressHex[29]<< endl
-						<< setw(14) << stressHex[30]<< setw(16) << stressHex[31] << setw(16)<< stressHex[32]<< setw(16)<< stressHex[33]<< setw(16)<< stressHex[34]<< setw(16)<< stressHex[35]<< endl
-						<< setw(14) << stressHex[36]<< setw(16) << stressHex[37] << setw(16)<< stressHex[38]<< setw(16)<< stressHex[39]<< setw(16)<< stressHex[40]<< setw(16)<< stressHex[41]<< endl
-						<< setw(14) << stressHex[42]<< setw(16) << stressHex[43] << setw(16)<< stressHex[44]<< setw(16)<< stressHex[45]<< setw(16)<< stressHex[46]<< setw(16)<< stressHex[47]<< endl;
+					*this  << Ele + 1 << setw(15) << stressHex[0]<< setw(16) << stressHex[1] << setw(16)<< stressHex[2]<< setw(16)<< stressHex[3]<< setw(16)<< stressHex[4]<< setw(16)<< stressHex[5]<< endl
+						<< setw(16) << stressHex[6]<< setw(16) << stressHex[7] << setw(16)<< stressHex[8]<< setw(16)<< stressHex[9]<< setw(16)<< stressHex[10]<< setw(16)<< stressHex[11]<< endl
+						<< setw(16) << stressHex[12]<< setw(16) << stressHex[13] << setw(16)<< stressHex[14]<< setw(16)<< stressHex[15]<< setw(16)<< stressHex[16]<< setw(16)<< stressHex[17]<< endl
+						<< setw(16) << stressHex[18]<< setw(16) << stressHex[19] << setw(16)<< stressHex[20]<< setw(16)<< stressHex[21]<< setw(16)<< stressHex[22]<< setw(16)<< stressHex[23]<< endl
+						<< setw(16) << stressHex[24]<< setw(16) << stressHex[25] << setw(16)<< stressHex[26]<< setw(16)<< stressHex[27]<< setw(16)<< stressHex[28]<< setw(16)<< stressHex[29]<< endl
+						<< setw(16) << stressHex[30]<< setw(16) << stressHex[31] << setw(16)<< stressHex[32]<< setw(16)<< stressHex[33]<< setw(16)<< stressHex[34]<< setw(16)<< stressHex[35]<< endl
+						<< setw(16) << stressHex[36]<< setw(16) << stressHex[37] << setw(16)<< stressHex[38]<< setw(16)<< stressHex[39]<< setw(16)<< stressHex[40]<< setw(16)<< stressHex[41]<< endl
+						<< setw(16) << stressHex[42]<< setw(16) << stressHex[43] << setw(16)<< stressHex[44]<< setw(16)<< stressHex[45]<< setw(16)<< stressHex[46]<< setw(16)<< stressHex[47]<< endl;
 				}
 
 				*this << endl;
