@@ -186,6 +186,7 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Shell:
 				PrintShellElementData(EleGrp);
 				break;
+
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
