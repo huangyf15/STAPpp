@@ -8,18 +8,18 @@
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
-#include <iomanip>
 #include <iostream>
+#include <iomanip>
 
 #include "Node.h"
 
-CNode::CNode(double X, double Y, double Z) : NodeNumber(0)
+CNode::CNode(double X, double Y, double Z):NodeNumber(0)
 {
-    XYZ[0] = X; // Coordinates of the node
+    XYZ[0] = X;		// Coordinates of the node
     XYZ[1] = Y;
     XYZ[2] = Z;
-
-    bcode[0] = 0; // Boundary codes
+    
+    bcode[0] = 0;	// Boundary codes
     bcode[1] = 0;
     bcode[2] = 0;
     bcode[3] = 1;
@@ -30,23 +30,23 @@ CNode::CNode(double X, double Y, double Z) : NodeNumber(0)
 //	Read element data from stream Input
 bool CNode::Read(ifstream& Input, unsigned int np)
 {
-    unsigned int N;
+	unsigned int N;
 
-    Input >> N; // node number
-    if (N != np + 1)
-    {
-        cerr << "*** Error *** Nodes must be inputted in order !" << endl
-             << "   Expected node number : " << np + 1 << endl
-             << "   Provided node number : " << N << endl;
+	Input >> N;	// node number
+	if (N != np + 1) 
+	{
+		cerr << "*** Error *** Nodes must be inputted in order !" << endl 
+			 << "   Expected node number : " << np + 1 << endl
+			 << "   Provided node number : " << N << endl;
 
-        return false;
-    }
+		return false;
+	}
 
-    NodeNumber = N;
+	NodeNumber = N;
 
 	Input >> bcode[0] >> bcode[1] >> bcode[2] >> XYZ[0] >> XYZ[1] >> XYZ[2];
 
-    return true;
+	return true;
 }
 
 //	Output nodal point data to stream
@@ -60,32 +60,32 @@ void CNode::Write(COutputter& output, unsigned int np)
 //	Output equation numbers of nodal point to stream
 void CNode::WriteEquationNo(COutputter& output, unsigned int np)
 {
-    output << setw(9) << np + 1 << "       ";
+	output << setw(9) << np+1 << "       ";
 
-    for (unsigned int dof = 0; dof < CNode::NDF; dof++) // Loop over for DOFs of node np
-    {
-        output << setw(5) << bcode[dof];
-    }
+	for (unsigned int dof = 0; dof < CNode::NDF; dof++)	// Loop over for DOFs of node np
+	{
+		output << setw(5) << bcode[dof];
+	}
 
-    output << endl;
+	output << endl;
 }
 
 //	Write nodal displacement
 void CNode::WriteNodalDisplacement(COutputter& output, unsigned int np, double* Displacement)
 {
-    output << setw(5) << np + 1 << "        ";
+	output << setw(5) << np + 1 << "        ";
 
-    for (unsigned int j = 0; j < NDF; j++)
-    {
-        if (bcode[j] == 0)
-        {
-            output << setw(18) << 0.0;
-        }
-        else
-        {
-            output << setw(18) << Displacement[bcode[j] - 1];
-        }
-    }
+	for (unsigned int j = 0; j < NDF; j++)
+	{
+		if (bcode[j] == 0)
+		{
+			output << setw(18) << 0.0;
+		}
+		else
+		{
+			output << setw(18) << Displacement[bcode[j] - 1];
+		}
+	}
 
-    output << endl;
+	output << endl;
 }
