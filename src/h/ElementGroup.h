@@ -21,6 +21,7 @@
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/TimoshenkoEBMOD.h"
 #include "Elements/Plate.h"
+#include "Elements/Shell.h"
 #include "Material.h"
 #include "Node.h"
 
