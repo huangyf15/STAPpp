@@ -180,7 +180,12 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::TimoshenkoEBMOD:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
-
+			case ElementTypes::Plate:
+				PrintPlateElementData(EleGrp);
+				break;
+			case ElementTypes::Shell:
+				PrintShellElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -799,6 +804,33 @@ void COutputter::OutputElementStress()
 				*this << endl;
 
 				break;
+                        case ElementTypes::Shell:
+                                *this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+                                        << "                       GUASS POINTS STRESSES" << endl;
+                                *this << "     NUMBER    INDEX        X             Y             Z"
+                                        << "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX" << endl;
+                                double stresses4SE[15];
+                                double Positions4SE[15];
+                                for (unsigned int Ele = 0; Ele < NUME; Ele++)
+                                {
+                                        dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
+                                                .ElementStress(stresses4SE, Displacement, Positions4SE);
+
+                                        for (unsigned i = 0; i < 5; ++i){
+                                          // four gauss points;
+                                          //THE FIFTH POINT IS THE CENTRE POINT FOR IN-PLANE STRESSES
+                                                  *this << setw(8) << Ele + 1;
+                                                  *this << setw(10) << i + 1;
+                                                  *this << setw(17) << Positions4SE[i * 3] << setw(14) << Positions4SE[i * 3 + 1]
+                                                        << setw(14) << Positions4SE[i * 3 + 2];
+                                                  *this << setw(17) << stresses4SE[i * 3] << setw(14) << stresses4SE[i * 3 + 1]
+                                                        << setw(14) << stresses4SE[i * 3 + 2];
+                                               // *this << setw(32) << stresses[i] << std::endl;
+
+                                                  *this << std::endl;
+                                         }
+                                }
+                                break;
 
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
