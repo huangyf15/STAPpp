@@ -42,7 +42,7 @@ public:
 //! Boundary code flag marking whether the last 3 bcodes are given while inputting 
 /*!     1: Given       !*/
 /*!     0: Not given   !*/
-	unsigned int BcodeFlag;
+	unsigned int RotationDOFManuallyInputFlag;
 
 //!	Constructor
 	CNode(double X = 0, double Y = 0, double Z = 0);

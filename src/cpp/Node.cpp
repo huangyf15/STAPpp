@@ -27,7 +27,7 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[4] = 1;
     bcode[5] = 1;
 
-	BcodeFlag = 0;	// Boundary code flag
+	RotationDOFManuallyInputFlag = 0;	// Boundary code flag
 };
 
 //	Read element data from stream Input
@@ -54,7 +54,7 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	getline(Input, EndFlag,'\n');
 	if (!EndFlag.empty()) {
 		// the last 3 bcodes are given
-		BcodeFlag = 1;
+		RotationDOFManuallyInputFlag = 1;
 		bcode[3] = static_cast<int>(XYZ[0]);
 		bcode[4] = static_cast<int>(XYZ[1]);
 		bcode[5] = static_cast<int>(XYZ[2]);

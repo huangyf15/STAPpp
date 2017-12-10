@@ -147,11 +147,11 @@ void CDomain::CalculateEquationNumber()
                 CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
                 for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
                 {
-					if (!ElementNode[NumNode]->BcodeFlag) {
-						const unsigned int N = ElementNode[NumNode]->NodeNumber;
-						NodeList[N - 1].bcode[3] = 0;
-						NodeList[N - 1].bcode[4] = 0;
-						NodeList[N - 1].bcode[5] = 0;
+                        if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag) {
+                        const unsigned int N = ElementNode[NumNode]->NodeNumber;
+                        NodeList[N - 1].bcode[3] = 0;
+                        NodeList[N - 1].bcode[4] = 0;
+                        NodeList[N - 1].bcode[5] = 0;
 					}   
                 }
             }
