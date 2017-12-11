@@ -29,3 +29,7 @@ script:
   - python3 run-patch.py
   - cd ../plate
   - python3 run-patch.py
+  - cd ../TimoEBMOD
+  - python3 run-patch.py
+  - cd ../TimoSRINT
+  - python3 run-patch.py
