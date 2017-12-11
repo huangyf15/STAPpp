@@ -180,6 +180,12 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::TimoshenkoEBMOD:
 				PrintTimoshenkoSRINTElementData(EleGrp);
 				break;
+			case ElementTypes::Plate:
+				PrintPlateElementData(EleGrp);
+				break;
+			case ElementTypes::Shell:
+				PrintShellElementData(EleGrp);
+				break;
 
 			default:
 				std::cerr << "unknown ElementType " << ElementType << std::endl;
@@ -486,6 +492,75 @@ void COutputter::OutputLoadInfo()
 	}
 }
 
+void COutputter::PrintPlateElementData(unsigned int EleGrp)
+{
+    CDomain* FEMData = CDomain::Instance();
+
+    CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+    unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+    *this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
+    *this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+    *this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+          << endl
+          << endl;
+
+    *this << "  SET       YOUNG'S        THICKNESS        POISSON'S" << endl
+          << " NUMBER     MODULUS         (HEIGHT)          RATIO" << endl
+          << "               E               h                nu" << endl;
+
+    *this << setiosflags(ios::scientific) << setprecision(5);
+
+    //	Loop over for all property sets
+    for (unsigned int mset = 0; mset < NUMMAT; mset++)
+        ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
+    *this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+          << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+    //	Loop over for all elements in group EleGrp
+    for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+        ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+    *this << endl;
+}
+
+void COutputter::PrintShellElementData(unsigned int EleGrp)
+{
+    CDomain* FEMData = CDomain::Instance();
+
+    CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+    unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+    *this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
+    *this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+    *this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+          << endl
+          << endl;
+
+    *this << "  SET       YOUNG'S        THICKNESS        POISSON'S" << endl
+          << " NUMBER     MODULUS         (HEIGHT)          RATIO" << endl
+          << "               E               h                nu" << endl;
+
+    *this << setiosflags(ios::scientific) << setprecision(5);
+
+    //	Loop over for all property sets
+    for (unsigned int mset = 0; mset < NUMMAT; mset++)
+        ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+    *this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
+    *this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+          << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+    //	Loop over for all elements in group EleGrp
+    for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+        ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+    *this << endl;
+}
+
+
 //	Print nodal displacement
 void COutputter::OutputNodalDisplacement(unsigned int lcase)
 {
@@ -738,6 +813,60 @@ void COutputter::OutputElementStress()
 					*this << std::endl;
 				}
 				break;
+			case ElementTypes::Plate:
+				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+					<< "                       GUASS POINTS STRESSES"
+					<< endl;
+				*this << "     NUMBER    INDEX        X             Y             Z" 
+					<< "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX"
+					<< endl;
+				double stresses4PE[12];
+				double Positions4PE[12];
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					dynamic_cast<CPlate&>(
+						EleGrp.GetElement(Ele)).ElementStress(stresses4PE, Displacement, Positions4PE);
+					
+					for (unsigned i=0; i<4; ++i) { // four gauss points
+						*this << setw(8) << Ele + 1;
+						*this << setw(10) << i+1;
+						*this << setw(17) << Positions4PE[i*3] << setw(14) << Positions4PE[i*3+1] << setw(14) << Positions4PE[i*3+2];
+						*this << setw(17) << stresses4PE[i*3] << setw(14) << stresses4PE[i*3+1] << setw(14) << stresses4PE[i*3+2];
+						// *this << setw(32) << stresses[i] << std::endl;
+						
+						*this << std::endl;
+					}
+				}
+				*this << endl;
+
+				break;
+                        case ElementTypes::Shell:
+                                *this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
+                                        << "                       GUASS POINTS STRESSES" << endl;
+                                *this << "     NUMBER    INDEX        X             Y             Z"
+                                        << "               SX'X'_MAX     SY'Y'_MAX    SX'Y'_MAX" << endl;
+                                double stresses4SE[15];
+                                double Positions4SE[15];
+                                for (unsigned int Ele = 0; Ele < NUME; Ele++)
+                                {
+                                        dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
+                                                .ElementStress(stresses4SE, Displacement, Positions4SE);
+
+                                        for (unsigned i = 0; i < 5; ++i){
+                                          // four gauss points;
+                                          //THE FIFTH POINT IS THE CENTRE POINT FOR IN-PLANE STRESSES
+                                                  *this << setw(8) << Ele + 1;
+                                                  *this << setw(10) << i + 1;
+                                                  *this << setw(17) << Positions4SE[i * 3] << setw(14) << Positions4SE[i * 3 + 1]
+                                                        << setw(14) << Positions4SE[i * 3 + 2];
+                                                  *this << setw(17) << stresses4SE[i * 3] << setw(14) << stresses4SE[i * 3 + 1]
+                                                        << setw(14) << stresses4SE[i * 3 + 2];
+                                               // *this << setw(32) << stresses[i] << std::endl;
+
+                                                  *this << std::endl;
+                                         }
+                                }
+                                break;
 
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType

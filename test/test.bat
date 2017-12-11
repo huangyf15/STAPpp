@@ -31,6 +31,12 @@
 @cd ../8H
 @python run-patch.py
 @if not %errorlevel%==0 goto fail
+@cd ../shell
+@python run-patch.py
+@if not %errorlevel%==0 goto fail
+@cd ../plate
+@python run-patch.py
+@if not %errorlevel%==0 goto fail
 @echo test success
 @goto quit
 

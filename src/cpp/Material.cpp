@@ -163,6 +163,24 @@ bool CTimoshenkoMaterial::Read(ifstream& Input, unsigned int mset)
 	return true;
 }
 
+bool CPlateMaterial::Read(ifstream& Input, unsigned int mset)
+{
+    Input >> nset; // Number of property set
+
+    if (nset != mset + 1)
+    {
+        cerr << "*** Error *** Material sets must be inputted in order !" << endl
+             << "    Expected set : " << mset + 1 << endl
+             << "    Provided set : " << nset << endl;
+
+        return false;
+    }
+
+    Input >> E >> h >> nu; // Young's modulus and height and Poisson's ratio
+
+    return true;
+}
+
 //	Write material data to Stream
 void CTimoshenkoMaterial::Write(COutputter& output, unsigned int mset)
 {
@@ -176,4 +194,32 @@ void CTimoshenkoMaterial::Write(COutputter& output, unsigned int mset)
 
 	// Direction cosine of local axis
 	output << setw(14) << Thetay1 << setw(14) << Thetay2 << setw(14) << Thetay3 << endl;
+}
+
+void CPlateMaterial::Write(COutputter& output, unsigned int mset)
+{
+    output << setw(5) << mset + 1 << setw(16) << E << setw(16) << h << setw(16) << nu << endl;
+}
+
+bool CShellMaterial::Read(ifstream& Input, unsigned int mset)
+{
+    Input >> nset; // Number of property set
+
+    if (nset != mset + 1)
+    {
+        cerr << "*** Error *** Material sets must be inputted in order !" << endl
+             << "    Expected set : " << mset + 1 << endl
+             << "    Provided set : " << nset << endl;
+
+        return false;
+    }
+
+    Input >> E >> h >> nu; // Young's modulus and height and Poisson's ratio
+
+    return true;
+}
+
+void CShellMaterial::Write(COutputter& output, unsigned int mset)
+{
+    output << setw(5) << mset + 1 << setw(16) << E << setw(16) << h << setw(16) << nu << endl;
 }

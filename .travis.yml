@@ -25,3 +25,7 @@ script:
   - python3 run-patch.py
   - cd ../8H
   - python3 run-patch.py
+  - cd ../shell
+  - python3 run-patch.py
+  - cd ../plate
+  - python3 run-patch.py

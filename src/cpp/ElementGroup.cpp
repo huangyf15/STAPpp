@@ -86,6 +86,14 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CTimoshenkoEBMOD);
             MaterialSize_ = sizeof(CTimoshenkoMaterial);
             break;
+        case ElementTypes::Plate:
+            ElementSize_ = sizeof(CPlate);
+            MaterialSize_ = sizeof(CPlateMaterial);
+            break;
+        case ElementTypes::Shell:
+            ElementSize_ = sizeof(CShell);
+            MaterialSize_ = sizeof(CShellMaterial);
+            break;
  
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
@@ -119,6 +127,12 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::TimoshenkoEBMOD:
             ElementList_ = new CTimoshenkoEBMOD[size];
             break;
+        case ElementTypes::Plate:
+            ElementList_ = new CPlate[size];
+            break;
+        case ElementTypes::Shell:
+            ElementList_ = new CShell[size];
+            break;
 
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
@@ -150,6 +164,12 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             break;
         case ElementTypes::TimoshenkoEBMOD:
             MaterialList_ = new CTimoshenkoMaterial[size];
+            break;
+        case ElementTypes::Plate:
+            MaterialList_ = new CPlateMaterial[size];
+            break;
+        case ElementTypes::Shell:
+            MaterialList_ = new CShellMaterial[size];
             break;
 
         default:

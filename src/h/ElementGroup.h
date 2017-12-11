@@ -20,6 +20,8 @@
 #include "Elements/Beam.h"
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/TimoshenkoEBMOD.h"
+#include "Elements/Plate.h"
+#include "Elements/Shell.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -84,6 +86,12 @@ public:
 
     //! Read element data from the input data file
     bool ReadElementData(ifstream& Input);
+
+    //! Read quadrilateral element data from the input data file
+    bool ReadQuadrilateralElementData(ifstream& Input);
+
+    //! Read plate element data from the input data file
+    bool ReadPlateElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }
