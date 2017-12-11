@@ -73,14 +73,14 @@ def testPass(node):
 
     def dz():
         x = node.x
-        return 10 * (x**3) / 9 - 10 * (x**2) / 27 - x / 60
+        return -10 * (x**2) / 27
 
     def tx():
         return 0
 
     def ty():
         x = node.x
-        return -10 * (x**2) / 27 + 20 * x / 27
+        return 20 * x / 27
 
     def tz():
         return 0
