@@ -37,6 +37,12 @@
 @cd ../plate
 @python run-patch.py
 @if not %errorlevel%==0 goto fail
+@cd ../TimoEBMOD
+@python run-patch.py
+@if not %errorlevel%==0 goto fail
+@cd ../TimoSRINT
+@python run-patch.py
+@if not %errorlevel%==0 goto fail
 @echo test success
 @goto quit
 
