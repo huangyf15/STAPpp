@@ -49,12 +49,13 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 
 	// Read the dataline
 	string NodeInfo, ModiNodeInfo;
-	getline(Input, NodeInfo, '\n');
+	getline(Input, NodeInfo);
 
 	// Replace all spaces with tabs
 	int spaceTempPos = 0;
 	int spaceNextPos = NodeInfo.find(' ', spaceTempPos);
-	while(spaceNextPos >= 0) {
+	while(spaceNextPos >= 0)
+	{
 		NodeInfo.replace(spaceNextPos, 1, "\t");
 		spaceTempPos = spaceNextPos;
 		spaceNextPos = NodeInfo.find(' ', spaceTempPos);
@@ -65,11 +66,14 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	// Delete blocked tabs
 	int tabTempPos = 0;
 	int tabNextPos = NodeInfo.find("\t", tabTempPos + 1);
-	while (tabNextPos >= 0) {
-		if (tabNextPos - tabTempPos == 1) {
+	while (tabNextPos >= 0)
+	{
+		if (tabNextPos - tabTempPos == 1)
+		{
 			NodeInfo.erase(tabNextPos, 1);
 		}
-		else {
+		else
+		{
 			tabTempPos = tabNextPos;
 			tabBlockNum++;
 		}
@@ -82,13 +86,14 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	// Default values of the last 3 bcodes (related to the rotation):
 	//     Structure elements: active,     value = 0;
 	//     Solid elements:     not active, value = 1.
-	if (tabBlockNum == 9) {
+	if (tabBlockNum == 9 || tabBlockNum == 6)
+	{
 		// Rewrite the flag marking whether the rotation DOF are manually input
-		RotationDOFManuallyInputFlag = 1;
+		RotationDOFManuallyInputFlag = (tabBlockNum == 9);
 		// Save the nodal infos to bcode[1:6] and XYZ[]
 		int posTab = 0;
 		string tempStr;
-		for (unsigned int i = 0; i < 6; i++) {
+		for (unsigned int i = 0; i < tabBlockNum-3; i++) {
 			int posNextTab = NodeInfo.find('\t', posTab + 1);
 			tempStr.assign(NodeInfo, posTab, posNextTab - posTab);
 			posTab += posNextTab - posTab;
@@ -105,28 +110,8 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 		tempStr.assign(NodeInfo, posTab, LastStrLength);
 		XYZ[2] = atof(tempStr.c_str());
 	}
-	else if (tabBlockNum == 6) {
-		// Save the nodal infos to bcode[1:3] and XYZ[]
-		int posTab = 0;
-		string tempStr;
-		for (unsigned int i = 0; i < 3; i++) {
-			int posNextTab = NodeInfo.find('\t', posTab + 1);
-			tempStr.assign(NodeInfo, posTab, posNextTab - posTab);
-			posTab += posNextTab - posTab;
-			cout << tempStr << endl;
-			bcode[i] = atoi(tempStr.c_str());
-		}
-		for (unsigned int i = 0; i < 2; i++) {
-			int posNextTab = NodeInfo.find('\t', posTab + 1);
-			tempStr.assign(NodeInfo, posTab, posNextTab - posTab);
-			posTab += posNextTab - posTab;
-			XYZ[i] = atof(tempStr.c_str());
-		}
-		int LastStrLength = NodeInfo.at(NodeInfo.size() - 1) - posTab;
-		tempStr.assign(NodeInfo, posTab, LastStrLength);
-		XYZ[2] = atof(tempStr.c_str());
-	}
-	else {
+	else
+	{
 		cerr << "*** Error *** NodeInfos must be inputted in the correct format! " << endl
 			<< "  Present Number of Nodeinfos: " << tabBlockNum << endl
 			<< "  Correct Number of Nodeinfos: 6 or 9 !" << endl;
