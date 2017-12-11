@@ -73,14 +73,14 @@ def testPass(node):
 
     def dz():
         x = node.x
-        return -10 * (x**2) / 27
+        return 10 * (x**3) / 81 - 10 * (x**2) / 27 - x / 60
 
     def tx():
         return 0
 
     def ty():
         x = node.x
-        return 20 * x / 27
+        return -10 * (x**2) / 27 + 20 * x / 27
 
     def tz():
         return 0
@@ -94,9 +94,12 @@ def testPass(node):
 
 
 def equal(a, b):
-    res = abs(a - b) <= max(abs(a) * 1e-5, abs(b) * 1e-5, 1e-15)
+    delta = abs(a - b)
+    threshold = max(abs(a) * 1e-4, abs(b) * 1e-4, 1e-15)
+    res = delta < threshold
     if not res:
         print('failed equal: (a, b) = %s' % str((a, b)))
+        print('delta = %f, threshold = %f' % (delta, threshold))
     return res
 
 
