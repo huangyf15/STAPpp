@@ -27,8 +27,31 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[4] = 1;
     bcode[5] = 1;
 
-	RotationDOFManuallyInputFlag = 0;	// Boundary code flag
+    RotationDOFManuallyInputFlag = 0;	// Boundary code flag
 };
+
+// return total count of non-blank args in string
+int getArgsCount(std::string buff)
+{
+    int count = 0;
+    bool inNumFlag = false;
+    for (unsigned i=0; i<buff.length(); ++i)
+    {
+        if (buff[i] != ' ' && buff[i] != '\t')
+        {
+            if (!inNumFlag)
+            {
+                inNumFlag = true;
+                count++;
+            }
+        }
+        else
+        {
+            inNumFlag = false;
+        }
+    }
+    return count;
+}
 
 //	Read element data from stream Input
 bool CNode::Read(ifstream& Input, unsigned int np)
@@ -51,31 +74,7 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	string NodeInfo, ModiNodeInfo;
 	getline(Input, NodeInfo);
 
-	// Replace all spaces with tabs
-	int spaceNextPos = 0;
-	while((spaceNextPos = NodeInfo.find(' ', spaceNextPos)) >= 0)
-	{
-		NodeInfo.replace(spaceNextPos, 1, "\t");
-	}
-
-	// Number of NodalInfos, which is computed from the number of tab blocks
-	int tabBlockNum = 1;
-	// Delete blocked tabs
-	int tabTempPos = 0;
-	int tabNextPos = NodeInfo.find("\t", tabTempPos + 1);
-	while (tabNextPos >= 0)
-	{
-		if (tabNextPos - tabTempPos == 1)
-		{
-			NodeInfo.erase(tabNextPos, 1);
-		}
-		else
-		{
-			tabTempPos = tabNextPos;
-			tabBlockNum++;
-		}
-		tabNextPos = NodeInfo.find("\t", tabTempPos + 1);
-	}
+	int tabBlockNum = getArgsCount(NodeInfo);
 
 	// Determine the input format:
 	//     While the last 3 bcodes are manually input, tabBlockNum is 9;
@@ -83,29 +82,22 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	// Default values of the last 3 bcodes (related to the rotation):
 	//     Structure elements: active,     value = 0;
 	//     Solid elements:     not active, value = 1.
-	if (tabBlockNum == 9 || tabBlockNum == 6)
+	
+	// Rewrite the flag marking whether the rotation DOF are manually input
+	RotationDOFManuallyInputFlag = (tabBlockNum == 9);
+	// Save the nodal infos to bcode[0:5] and XYZ[]
+	if (tabBlockNum == 9)
 	{
-		// Rewrite the flag marking whether the rotation DOF are manually input
-		RotationDOFManuallyInputFlag = (tabBlockNum == 9);
-		// Save the nodal infos to bcode[1:6] and XYZ[]
-		int posTab = 0;
-		string tempStr;
-		for (unsigned int i = 0; i < tabBlockNum-3; i++) {
-			int posNextTab = NodeInfo.find('\t', posTab + 1);
-			tempStr.assign(NodeInfo, posTab, posNextTab - posTab);
-			posTab += posNextTab - posTab;
-			cout << tempStr << endl;
-			bcode[i] = atoi(tempStr.c_str());
-		}
-		for (unsigned int i = 0; i < 2; i++) {
-			int posNextTab = NodeInfo.find('\t',posTab+1);
-			tempStr.assign(NodeInfo, posTab, posNextTab - posTab);
-			posTab += posNextTab - posTab;
-			XYZ[i] = atof(tempStr.c_str());
-		}
-		int LastStrLength = NodeInfo.at(NodeInfo.size() - 1) - posTab;
-		tempStr.assign(NodeInfo, posTab, LastStrLength);
-		XYZ[2] = atof(tempStr.c_str());
+		sscanf(NodeInfo.c_str(), "%d%d%d%d%d%d%lf%lf%lf",
+			bcode, bcode+1, bcode+2,
+			bcode+3, bcode+4, bcode+5,
+			XYZ, XYZ+1, XYZ+2);
+	}
+	else if (tabBlockNum == 6)
+	{
+		sscanf(NodeInfo.c_str(), "%d%d%d%lf%lf%lf",
+			bcode, bcode+1, bcode+2,
+			XYZ, XYZ+1, XYZ+2);
 	}
 	else
 	{
