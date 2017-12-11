@@ -135,10 +135,13 @@ bool CDomain::ReadNodalPoints()
 //	Calculate global equation numbers corresponding to every degree of freedom of each node
 void CDomain::CalculateEquationNumber()
 {
-	// adjust bcode for nodes of structure elements
+	// Adjust bcode for nodes of structure elements
+	// Default values of the last 3 bcodes (related to the rotation):
+	//     Structure elements: active,     value = 0;
+	//     Solid elements:     not active, value = 1.
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
     {
-        if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 8))
+        if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 9))
         {
             const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
             for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
@@ -147,10 +150,12 @@ void CDomain::CalculateEquationNumber()
                 CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
                 for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
                 {
-                    const unsigned int N = ElementNode[NumNode]->NodeNumber;
-                    NodeList[N - 1].bcode[3] = 0;
-                    NodeList[N - 1].bcode[4] = 0;
-                    NodeList[N - 1].bcode[5] = 0;
+                        if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag) {
+                        const unsigned int N = ElementNode[NumNode]->NodeNumber;
+                        NodeList[N - 1].bcode[3] = 0;
+                        NodeList[N - 1].bcode[4] = 0;
+                        NodeList[N - 1].bcode[5] = 0;
+					}   
                 }
             }
         }

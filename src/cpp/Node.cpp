@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 #include "Node.h"
 
@@ -25,7 +26,32 @@ CNode::CNode(double X, double Y, double Z):NodeNumber(0)
     bcode[3] = 1;
     bcode[4] = 1;
     bcode[5] = 1;
+
+    RotationDOFManuallyInputFlag = 0;	// Boundary code flag
 };
+
+// return total count of non-blank args in string
+int getArgsCount(std::string buff)
+{
+    int count = 0;
+    bool inNumFlag = false;
+    for (unsigned i=0; i<buff.length(); ++i)
+    {
+        if (buff[i] != ' ' && buff[i] != '\t')
+        {
+            if (!inNumFlag)
+            {
+                inNumFlag = true;
+                count++;
+            }
+        }
+        else
+        {
+            inNumFlag = false;
+        }
+    }
+    return count;
+}
 
 //	Read element data from stream Input
 bool CNode::Read(ifstream& Input, unsigned int np)
@@ -44,7 +70,42 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 
 	NodeNumber = N;
 
-	Input >> bcode[0] >> bcode[1] >> bcode[2] >> XYZ[0] >> XYZ[1] >> XYZ[2];
+	// Read the dataline
+	string NodeInfo, ModiNodeInfo;
+	getline(Input, NodeInfo);
+
+	int tabBlockNum = getArgsCount(NodeInfo);
+
+	// Determine the input format:
+	//     While the last 3 bcodes are manually input, tabBlockNum is 9;
+	//     While the default values are chosen, tabBlockNum is 6.
+	// Default values of the last 3 bcodes (related to the rotation):
+	//     Structure elements: active,     value = 0;
+	//     Solid elements:     not active, value = 1.
+	
+	// Rewrite the flag marking whether the rotation DOF are manually input
+	RotationDOFManuallyInputFlag = (tabBlockNum == 9);
+	// Save the nodal infos to bcode[0:5] and XYZ[]
+	if (tabBlockNum == 9)
+	{
+		sscanf(NodeInfo.c_str(), "%d%d%d%d%d%d%lf%lf%lf",
+			bcode, bcode+1, bcode+2,
+			bcode+3, bcode+4, bcode+5,
+			XYZ, XYZ+1, XYZ+2);
+	}
+	else if (tabBlockNum == 6)
+	{
+		sscanf(NodeInfo.c_str(), "%d%d%d%lf%lf%lf",
+			bcode, bcode+1, bcode+2,
+			XYZ, XYZ+1, XYZ+2);
+	}
+	else
+	{
+		cerr << "*** Error *** NodeInfos must be inputted in the correct format! " << endl
+			<< "  Present Number of Nodeinfos: " << tabBlockNum << endl
+			<< "  Correct Number of Nodeinfos: 6 or 9 !" << endl;
+		return false;
+	}
 
 	return true;
 }
