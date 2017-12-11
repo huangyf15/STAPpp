@@ -52,13 +52,10 @@ bool CNode::Read(ifstream& Input, unsigned int np)
 	getline(Input, NodeInfo);
 
 	// Replace all spaces with tabs
-	int spaceTempPos = 0;
-	int spaceNextPos = NodeInfo.find(' ', spaceTempPos);
-	while(spaceNextPos >= 0)
+	int spaceNextPos = 0;
+	while((spaceNextPos = NodeInfo.find(' ', spaceNextPos)) >= 0)
 	{
 		NodeInfo.replace(spaceNextPos, 1, "\t");
-		spaceTempPos = spaceNextPos;
-		spaceNextPos = NodeInfo.find(' ', spaceTempPos);
 	}
 
 	// Number of NodalInfos, which is computed from the number of tab blocks
