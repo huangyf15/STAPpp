@@ -32,8 +32,6 @@ public:
 
     void markPosition(unsigned row, unsigned column)
     {
-        std::cout << row << std::endl;
-        std::cout << column << std::endl;
         // insert column
         _tempColumns[row - 1].insert(column);
     }
