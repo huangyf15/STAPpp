@@ -141,7 +141,7 @@ void CDomain::CalculateEquationNumber()
 	//     Solid elements:     not active, value = 1.
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
     {
-        if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 9))
+        if ((EleGrpList[EleGrp].GetElementType() == 5) || (EleGrpList[EleGrp].GetElementType() == 8) || (EleGrpList[EleGrp].GetElementType() == 9))
         {
             const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
             for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
@@ -156,6 +156,54 @@ void CDomain::CalculateEquationNumber()
                         NodeList[N - 1].bcode[4] = 0;
                         NodeList[N - 1].bcode[5] = 0;
 					}   
+                }
+            }
+        }
+        if ((EleGrpList[EleGrp].GetElementType() == 6) || (EleGrpList[EleGrp].GetElementType() == 7))
+        {
+            const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
+            for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
+            {
+                const unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
+                CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
+                bool x_inpl = 1; //judge if all points have the same x 
+                bool y_inpl = 1;
+                bool z_inpl = 1;
+                for (unsigned int NumNode = 1; NumNode < NEN; NumNode++)
+                {
+                    if (abs(ElementNode[NumNode]->XYZ[0] - ElementNode[0]->XYZ[0]) > DBL_EPSILON){
+                        x_inpl = 0;
+                    }
+                    if (abs(ElementNode[NumNode]->XYZ[1] - ElementNode[0]->XYZ[1]) > DBL_EPSILON){
+                        y_inpl = 0;
+                    }
+                    if (abs(ElementNode[NumNode]->XYZ[2] - ElementNode[0]->XYZ[2]) > DBL_EPSILON){
+                        z_inpl = 0;
+                    }
+                }
+                for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
+                {
+                    if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag) {
+                        const unsigned int N = ElementNode[NumNode]->NodeNumber;
+                        if (x_inpl){
+                            NodeList[N - 1].bcode[4] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+                        else if (y_inpl){
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+                        else if (z_inpl){
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[4] = 0;
+                        }
+                        else {
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[4] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+					}   
+
                 }
             }
         }
