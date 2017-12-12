@@ -10,12 +10,12 @@ private:
     T* values;
     unsigned* columns;
     unsigned* rowIndexs;
-    std::set<T>* _tempColumns;
+    std::set<unsigned>* _tempColumns;
 
 public:
     CSRMatrix(unsigned m)
     {
-        size = 0;
+        size = m;
         values = nullptr;
         columns = nullptr;
         rowIndexs = new unsigned[size + 1];
@@ -27,11 +27,13 @@ public:
     void beginPostionMark()
     {
         // _tempColumns = std::set[size]
-        _tempColumns = new std::set<T>[size];
+        _tempColumns = new std::set<unsigned>[size] {};
     }
 
     void markPosition(unsigned row, unsigned column)
     {
+        std::cout << row << std::endl;
+        std::cout << column << std::endl;
         // insert column
         _tempColumns[row - 1].insert(column);
     }
@@ -47,7 +49,7 @@ public:
         }
 
         // allocate columns
-        unsigned elementCount = rowIndexs[size + 1] - rowIndexs[0];
+        unsigned elementCount = rowIndexs[size] - rowIndexs[0];
         columns = new unsigned[elementCount];
 
         // write columns
@@ -55,7 +57,7 @@ public:
         for (unsigned row = 0; row < size; ++row)
         {
             // column already sorted in _tempColumns
-            for (const T& column : _tempColumns[row])
+            for (const auto& column : _tempColumns[row])
             {
                 columns[count] = column;
                 count++;

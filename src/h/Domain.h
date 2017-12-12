@@ -14,6 +14,7 @@
 #include <fstream>
 #include <vector>
 #include <cstddef>
+#include <algorithm>
 
 #include "Node.h"
 #include "ElementGroup.h"

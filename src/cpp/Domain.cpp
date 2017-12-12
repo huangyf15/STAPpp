@@ -336,17 +336,36 @@ void CDomain::AllocateMatrices()
 
 void CDomain::CalculateCSRColumns()
 {
-	auto& matrix = GetCSRStiffnessMatrix();
-	matrix.beginPostionMark();
+    auto& matrix = GetCSRStiffnessMatrix();
+    matrix.beginPostionMark();
 
-	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
+    for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
     {
         CElementGroup& ElementGrp = EleGrpList[EleGrp];
         unsigned int NUME = ElementGrp.GetNUME();
         
-		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
-			ElementGrp.GetElement(Ele);
+        for (unsigned int Ele = 0; Ele < NUME; Ele++)
+        {
+            auto& element = ElementGrp.GetElement(Ele);
+            unsigned LMSize = element.GetLMSize();
+            unsigned* LM = element.GetLocationMatrix();
+            for (unsigned i=0; i<LMSize; ++i)
+            {
+                unsigned index1 = LM[i];
+                if (!index1) continue;
+                for (unsigned j=i; j<LMSize; ++j)
+                {
+                    unsigned index2 = LM[j];
+                    if (!index2) continue;
+                    unsigned row = std::min(index1, index2);
+                    unsigned column = std::max(index1, index2);
+                    std::cout << row << std::endl;
+                    std::cout << column << std::endl;
+                    matrix.markPosition(row, column);
+                }
+            }
+        }
     }
 
-	matrix.allocate();
+    matrix.allocate();
 }
