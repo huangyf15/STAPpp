@@ -47,6 +47,7 @@ CDomain::CDomain()
 
 	Force = nullptr;
 	StiffnessMatrix = nullptr;
+	CSRStiffnessMatrix = nullptr;
 }
 
 //	Desconstructor
@@ -61,6 +62,7 @@ CDomain::~CDomain()
 
 	delete [] Force;
 	delete StiffnessMatrix;
+	delete CSRStiffnessMatrix;
 }
 
 //	Return pointer to the instance of the Domain class
@@ -315,15 +317,36 @@ void CDomain::AllocateMatrices()
 //  Create the banded stiffness matrix
     StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
 
+	CSRStiffnessMatrix = new CSRMatrix<double>(NEQ);
+
 //	Calculate column heights
 	CalculateColumnHeights();
 
 //	Calculate address of diagonal elements in banded matrix
 	CalculateDiagnoalAddress();
 
+	CalculateCSRColumns();
+
 //	Allocate for banded global stiffness matrix
     StiffnessMatrix->Allocate();
 
 	COutputter* Output = COutputter::Instance();
 	Output->OutputTotalSystemData();
+}
+
+void CDomain::CalculateCSRColumns()
+{
+	auto& matrix = GetCSRStiffnessMatrix();
+	matrix.beginPostionMark();
+
+	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
+    {
+        CElementGroup& ElementGrp = EleGrpList[EleGrp];
+        unsigned int NUME = ElementGrp.GetNUME();
+        
+		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
+			ElementGrp.GetElement(Ele);
+    }
+
+	matrix.allocate();
 }

@@ -21,6 +21,7 @@
 #include "Solver.h"
 #include "LoadCaseData.h"
 #include "SkylineMatrix.h"
+#include "CSRMatrix.h"
 
 using namespace std;
 
@@ -83,6 +84,8 @@ private:
     global stiffness matrix. */
     CSkylineMatrix<double>* StiffnessMatrix;
 
+	CSRMatrix<double>* CSRStiffnessMatrix;
+
 //!	Global nodal force/displacement vector
 	double* Force;
 
@@ -117,6 +120,8 @@ public:
 
 //!	Calculate address of diagonal elements in banded matrix
 	void CalculateDiagnoalAddress();
+
+	void CalculateCSRColumns();
 
 //! Allocate storage for matrices
 /*!	Allocate Force, ColumnHeights, DiagonalAddress and StiffnessMatrix and 
@@ -173,5 +178,7 @@ public:
 
 //!	Return pointer to the banded stiffness matrix
 	inline CSkylineMatrix<double>* GetStiffnessMatrix() { return StiffnessMatrix; }
+
+	CSRMatrix<double>& GetCSRStiffnessMatrix() { return *CSRStiffnessMatrix; }
 
 };
