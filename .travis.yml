@@ -2,9 +2,18 @@ language: cpp
 compiler:
   - clang
   - gcc
+cache:
+  - pip: true
 install:
   - mkdir temp
   - cd temp
+  # install MKL
+  - wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+  - sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+  - sudo wget https://apt.repos.intel.com/setup/intelproducts.list -O /etc/apt/sources.list.d/intelproducts.list
+  - sudo apt-get update
+  - sudo apt-get install intel-mkl-2018.1-038 -y
+  # download eigen
   - wget http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
   - tar -zxvf 3.3.4.tar.gz
   - mv eigen-eigen-5a0156e40feb ../src/eigen-3
@@ -13,6 +22,28 @@ script:
   - mkdir build
   - cd build
   - cmake ../src
+  - make
+  - ./stap++ ../data/test_truss_22.dat > nul
+  - ./stap++ ../data/truss > nul
+  - ./stap++ ../data/bar-6 > nul
+  - cd ../data/4Q
+  - python3 run-patch.py
+  - cd ../3T
+  - python3 run-patch.py
+  - cd ../Beam
+  - python3 run-patch.py
+  - cd ../8H
+  - python3 run-patch.py
+  - cd ../shell
+  - python3 run-patch.py
+  - cd ../plate
+  - python3 run-patch.py
+  - cd ../TimoEBMOD
+  - python3 run-patch.py
+  - cd ../TimoSRINT
+  - python3 run-patch.py
+  # run with MKL on
+  - cmake ../../src -DUSE_MKL=ON
   - make
   - ./stap++ ../data/test_truss_22.dat > nul
   - ./stap++ ../data/truss > nul
