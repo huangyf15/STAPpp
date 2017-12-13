@@ -10,21 +10,21 @@
 template <typename T> class CSRMatrix : public SparseMatrix<T>
 {
 private:
-    std::set<int>* _tempColumns;
+    std::set<std::size_t>* _tempColumns;
 
 public:
-    int size;
-    int elementCount;
+    std::size_t size;
+    std::size_t elementCount;
     T* values;
-    int* columns;
-    int* rowIndexs;
+    std::size_t* columns;
+    std::size_t* rowIndexs;
 
-    CSRMatrix(int m) : SparseMatrix<T>(m)
+    CSRMatrix(std::size_t m) : SparseMatrix<T>(m)
     {
         size = m;
         values = nullptr;
         columns = nullptr;
-        rowIndexs = new int[size + 1];
+        rowIndexs = new std::size_t[size + 1];
         _tempColumns = nullptr;
     }
 
@@ -33,10 +33,10 @@ public:
     void beginPostionMark()
     {
         // _tempColumns = std::set[size]
-        _tempColumns = new std::set<int>[size] {};
+        _tempColumns = new std::set<std::size_t>[size] {};
     }
 
-    void markPosition(int row, int column)
+    void markPosition(std::size_t row, std::size_t column)
     {
         // insert column
         _tempColumns[row - 1].insert(column);
@@ -47,18 +47,18 @@ public:
         // first, calculate row indexs.
         // notice row index starts from 1
         rowIndexs[0] = 1;
-        for (int row = 0; row < size; ++row)
+        for (std::size_t row = 0; row < size; ++row)
         {
             rowIndexs[row + 1] = rowIndexs[row] + _tempColumns[row].size();
         }
 
         // allocate columns
         elementCount = rowIndexs[size] - rowIndexs[0];
-        columns = new int[elementCount];
+        columns = new std::size_t[elementCount];
 
         // write columns
-        int count = 0;
-        for (int row = 0; row < size; ++row)
+        std::size_t count = 0;
+        for (std::size_t row = 0; row < size; ++row)
         {
             // column already sorted in _tempColumns
             for (const auto& column : _tempColumns[row])
@@ -85,14 +85,14 @@ public:
         {
             return this->operator()(column, row);
         }
-        int offset1 = rowIndexs[row - 1] - 1;
-        int offset2 = rowIndexs[row] - 1;
+        std::size_t offset1 = rowIndexs[row - 1] - 1;
+        std::size_t offset2 = rowIndexs[row] - 1;
         // index lies in [offset1, offset2)
         // find index by bisection
 
         while (offset2 != (offset1 + 1))
         {
-            int offset = (offset1 + offset2) / 2;
+            std::size_t offset = (offset1 + offset2) / 2;
             if (columns[offset] > column)
             {
                 offset2 = offset;
@@ -106,7 +106,7 @@ public:
         return values[offset1];
     }
 
-    int dim() const { return size; }
+    std::size_t dim() const { return size; }
 };
 
 template <typename T> std::ostream& operator<<(std::ostream& out, CSRMatrix<T> mat)

@@ -977,14 +977,14 @@ void COutputter::PrintStiffnessMatrix()
 
 	*this << "*** _Debug_ *** Full stiffness matrix" << endl;
 
-	for (int I = 1; I <= NEQ; I++)
+	for (unsigned I = 1; I <= NEQ; I++)
 	{
-		for (int J = 1; J <= NEQ; J++)
+		for (unsigned J = 1; J <= NEQ; J++)
 		{
-            int i, j;
+            unsigned i, j;
             i = std::min(I, J);
             j = std::max(I, J);
-			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			unsigned H = DiagonalAddress[j] - DiagonalAddress[j - 1];
 			if (j - i - H >= 0)
 			{
 				*this << setw(14) << 0.0;
