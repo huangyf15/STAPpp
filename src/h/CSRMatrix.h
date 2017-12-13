@@ -1,17 +1,20 @@
 #pragma once
+#include <iomanip>
+#include <iostream>
 #include <set>
 #include <vector>
+
 
 #include "SparseMatrix.h"
 
 template <typename T> class CSRMatrix : public SparseMatrix<T>
 {
 private:
-    int elementCount;
     std::set<int>* _tempColumns;
 
 public:
     int size;
+    int elementCount;
     T* values;
     int* columns;
     int* rowIndexs;
@@ -50,7 +53,7 @@ public:
         }
 
         // allocate columns
-        int elementCount = rowIndexs[size] - rowIndexs[0];
+        elementCount = rowIndexs[size] - rowIndexs[0];
         columns = new int[elementCount];
 
         // write columns
@@ -71,11 +74,17 @@ public:
 
         // allocate values last to save memory
         values = new T[elementCount];
+        for (std::size_t i = 0; i < elementCount; ++i)
+            values[i] = T(0);
     }
 
     // get item at (row, column)
     T& operator()(unsigned row, unsigned column)
     {
+        if (row > column)
+        {
+            return this->operator()(column, row);
+        }
         int offset1 = rowIndexs[row - 1] - 1;
         int offset2 = rowIndexs[row] - 1;
         // index lies in [offset1, offset2)
@@ -93,8 +102,31 @@ public:
                 offset1 = offset;
             }
         }
+
         return values[offset1];
     }
 
     int dim() const { return size; }
 };
+
+template <typename T> std::ostream& operator<<(std::ostream& out, CSRMatrix<T> mat)
+{
+    out << "CSR Matrix, size = " << mat.size << std::endl;
+    out << "values = " << std::endl << "(";
+    for (unsigned i = 0; i < mat.elementCount; ++i)
+    {
+        out << std::setw(14) << mat.values[i];
+    }
+    out << ")\ncolumns = \n(";
+    for (unsigned i = 0; i < mat.elementCount; ++i)
+    {
+        out << std::setw(14) << mat.columns[i];
+    }
+    out << ")\nrowIndexs = \n(";
+    for (unsigned i = 0; i <= mat.size; ++i)
+    {
+        out << std::setw(14) << mat.rowIndexs[i];
+    }
+    out << ")";
+    return out;
+}

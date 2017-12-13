@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     CSRSolver* Solver = new CSRSolver(FEMData->GetCSRStiffnessMatrix());
     for (unsigned int lcase = 0; lcase < FEMData->GetNLCASE(); lcase++)
         FEMData->AssembleForce(lcase + 1);
-    Solver.solve();
+    Solver->solve(FEMData->GetDisplacement(), FEMData->GetNLCASE());
 #else
     CLDLTSolver* Solver = new CLDLTSolver(FEMData->GetStiffnessMatrix());
     Solver->LDLT();

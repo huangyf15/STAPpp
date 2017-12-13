@@ -9,7 +9,6 @@
 /*****************************************************************************/
 
 #include "Solver.h"
-#include "Domain.h"
 
 #include <cmath>
 #include <cfloat>
@@ -95,11 +94,11 @@ void CLDLTSolver::BackSubstitution(double* Force)
 void CSRSolver::solve(double* Force, unsigned NLCase)
 {
 	void* pt[64];
-	clear(pt, 64);
+    for (unsigned _ = 0; _ < 64; _++) pt[_] = 0;
     
     const int mtype = 2;
     int iparm[64] = { 0 };
-	iparm[5] = 1;
+	iparm[5] = 0; // write back to Force
 
     const int one = 1;
     const int size = K.size;
@@ -107,11 +106,14 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     int* columns = K.columns;
     int* rowIndexs = K.rowIndexs;
 
+	std::cout << K << std::endl;
+
     const int rhsCount = NLCase;
     double* rhs = Force;
 
     int phase = 13;
     double* res = new double[rhsCount*size];
+    for (std::size_t _ = 0; _ < rhsCount*size; _++) res[_] = 0;
     
     int msglvl = 1; // print info
     int* perm = new int[size];
@@ -135,9 +137,17 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
         res,
         &error // see if any error
     );
+    if (error)
+    {
+        std::cerr << "ERROR IN PARDISO SOLVER: " << error << std::endl;
+        exit(8);
+    }
+
 	delete[] perm;
 	for (unsigned _=0; _<size; _++)
 		std::cout << "res[" << _ << "] = " << res[_] << std::endl;
 	delete[] res;
+    for (unsigned _ = 0; _<size; _++)
+        std::cout << "rhs[" << _ << "] = " << rhs[_] << std::endl;
 }
 #endif

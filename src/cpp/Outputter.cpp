@@ -953,7 +953,8 @@ void COutputter::PrintStiffnessMatrix()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	unsigned int* DiagonalAddress = FEMData->GetStiffnessMatrix().GetDiagonalAddress();
+	CSkylineMatrix<double>& StiffnessMatrix = FEMData->GetStiffnessMatrix();
+	unsigned int* DiagonalAddress = StiffnessMatrix.GetDiagonalAddress();
 
 	*this << setiosflags(ios::scientific) << setprecision(5);
 
