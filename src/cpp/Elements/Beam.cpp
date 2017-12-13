@@ -119,14 +119,14 @@ void CBeam::ElementStiffness(double* Matrix)
     double n[3][3];
 
     for (unsigned int i = 0; i < 3; i++)
-        n[0][i] = DX[i] / L; //计算X'轴指向
+        n[0][i] = DX[i] / L; //orientation of x'
 
-    n[1][0] = material.n1;
-    n[1][1] = material.n2;
-    n[1][2] = material.n3; // Y'轴指向从材料/截面行中读入
+    n[1][0] = material->n1;
+    n[1][1] = material->n2;
+    n[1][2] = material->n3; // orientation of y'
     n[2][0] = n[0][1] * n[1][2] - n[0][2] * n[1][1];
     n[2][1] = n[0][2] * n[1][0] - n[0][0] * n[1][2];
-    n[2][2] = n[0][0] * n[1][1] - n[0][1] * n[1][0]; //叉乘得到Z'轴指向
+    n[2][2] = n[0][0] * n[1][1] - n[0][1] * n[1][0]; //orientation of z'
 
     double N1 = n[0][0] * n[0][0];
     double N2 = n[0][1] * n[0][1];
