@@ -42,6 +42,11 @@ public:
 
 class CSRSolver : public CSolver
 {
+protected:
+    CSRMatrix<double>& K;
+
 public:
-    CSRSolver(CSRMatrix<double>& _K) : CSolver(_K){};
+    CSRSolver(CSRMatrix<double>& _K) : CSolver(_K), K(_K){};
+
+    void Solver(double* Force, unsigned NLCase);
 };

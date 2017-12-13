@@ -64,7 +64,7 @@ void CLDLTSolver::BackSubstitution(double* Force)
 	const unsigned int N = K.dim();
     const unsigned int* ColumnHeights = K.GetColumnHeights();   // Column Hights
 
-//	Reduce right-hand-side load vector (LV = R)
+	//	Reduce right-hand-side load vector (LV = R)
 	for (unsigned int i = 2; i <= N; i++)	// Loop for i=2:N (Numering starting from 1)
 	{
         unsigned int mi = i - ColumnHeights[i-1];
@@ -73,7 +73,7 @@ void CLDLTSolver::BackSubstitution(double* Force)
 			Force[i-1] -= K(j,i) * Force[j-1];	// V_i = R_i - sum_j (L_ji V_j)
 	}
 
-//	Back substitute (Vbar = D^(-1) V, L^T a = Vbar)
+	//	Back substitute (Vbar = D^(-1) V, L^T a = Vbar)
 	for (unsigned int i = 1; i <= N; i++)	// Loop for i=1:N
 		Force[i-1] /= K(i,i);	// Vbar = D^(-1) V
 
@@ -85,3 +85,8 @@ void CLDLTSolver::BackSubstitution(double* Force)
 			Force[i-1] -= K(i,j) * Force[j-1];	// a_i = Vbar_i - sum_j(L_ij Vbar_j)
 	}
 };
+
+void CSRSolver::Solver(double* Force, unsigned NLCase)
+{
+	
+}
