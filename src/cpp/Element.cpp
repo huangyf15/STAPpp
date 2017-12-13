@@ -28,10 +28,6 @@ CElement::~CElement()
 //  Calculate the column height, used with the skyline storage scheme
 void CElement::CalculateColumnHeight(unsigned int* ColumnHeight)
 {
-    
-//  Generate location matrix
-    GenerateLocationMatrix();
-
 //  Look for the row number of the first non-zero element
     unsigned int nfirstrow = INT_MAX;
     for (unsigned int i = 0; i < ND; i++)
@@ -51,7 +47,9 @@ void CElement::CalculateColumnHeight(unsigned int* ColumnHeight)
 }
 
 //	Assemble the banded global stiffness matrix (skyline storage scheme)
-void CElement::assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix)
+void CElement::assembly(double* Matrix,
+						CSkylineMatrix<double>* StiffnessMatrixPtr,
+						CSRMatrix<double>* CSRStiffnessMatrixPtr)
 {
 //	Calculate element stiffness matrix
 	ElementStiffness(Matrix);
@@ -72,8 +70,12 @@ void CElement::assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix)
 
 			if (!Li)
 				continue;
-            
-            (*StiffnessMatrix)(Li,Lj) += Matrix[DiagjElement + j - i - 1];
+
+			#ifdef MKL
+			(*CSRStiffnessMatrixPtr)(Li, Lj) += Matrix[DiagjElement + j - i - 1];
+            #else
+			(*StiffnessMatrixPtr)(Li, Lj) += Matrix[DiagjElement + j - i - 1];
+			#endif
 		}
 	}
 

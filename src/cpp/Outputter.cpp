@@ -905,8 +905,7 @@ void COutputter::PrintColumnHeights()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
+	unsigned int* ColumnHeights = FEMData->GetStiffnessMatrix().GetColumnHeights();
 
 	for (unsigned int col = 0; col < NEQ; col++)
 	{
@@ -930,8 +929,7 @@ void COutputter::PrintDiagonalAddress()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	unsigned int* DiagonalAddress = FEMData->GetStiffnessMatrix().GetDiagonalAddress();
 
 	for (unsigned int col = 0; col <= NEQ; col++)
 	{
@@ -950,19 +948,23 @@ void COutputter::PrintDiagonalAddress()
 //	Print banded and full stiffness matrix for debuging
 void COutputter::PrintStiffnessMatrix()
 {
+#ifdef MKL
+	*this << "*** _Debug_ *** CSR stiffness matrix" << std::endl;
+	*this << CDomain::Instance()->GetCSRStiffnessMatrix() << std::endl;
+#else
 	*this << "*** _Debug_ *** Banded stiffness matrix" << endl;
 
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	CSkylineMatrix<double>& StiffnessMatrix = FEMData->GetStiffnessMatrix();
+	unsigned int* DiagonalAddress = StiffnessMatrix.GetDiagonalAddress();
 
 	*this << setiosflags(ios::scientific) << setprecision(5);
 
 	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
 	{
-		*this << setw(14) << (*StiffnessMatrix)(i);
+		*this << setw(14) << StiffnessMatrix(i);
 
 		if ((i + 1) % 6 == 0)
 		{
@@ -975,27 +977,27 @@ void COutputter::PrintStiffnessMatrix()
 
 	*this << "*** _Debug_ *** Full stiffness matrix" << endl;
 
-	for (int I = 1; I <= NEQ; I++)
+	for (unsigned I = 1; I <= NEQ; I++)
 	{
-		for (int J = 1; J <= NEQ; J++)
+		for (unsigned J = 1; J <= NEQ; J++)
 		{
-            int i, j;
+            unsigned i, j;
             i = std::min(I, J);
             j = std::max(I, J);
-			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			unsigned H = DiagonalAddress[j] - DiagonalAddress[j - 1];
 			if (j - i - H >= 0)
 			{
 				*this << setw(14) << 0.0;
 			}
 			else
 			{
-				*this << setw(14) << (*StiffnessMatrix)(i, j);
+				*this << setw(14) << StiffnessMatrix(i, j);
 			}
 		}
 
 		*this << endl;
 	}
-
+#endif
 	*this << endl;
 }
 

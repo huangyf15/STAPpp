@@ -21,6 +21,7 @@
 #include "Node.h"
 #include "Material.h"
 #include "SkylineMatrix.h"
+#include "CSRMatrix.h"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ public:
 	void CalculateColumnHeight(unsigned int* ColumnHeight); 
 
 //!	Assemble the element stiffness matrix to the global stiffness matrix
-	void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix);
+	void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix, CSRMatrix<double>* CSRMatrix);
 
 //!	Calculate element stiffness matrix (Upper triangular matrix, stored as an array column by colum)
 	virtual void ElementStiffness(double* stiffness) = 0; 
@@ -90,8 +91,14 @@ public:
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }
 
-    //! Return NEN
+//! Return NEN
     inline int GetNEN() { return NEN; }
+
+	virtual unsigned GetLMSize() { return ND; }
+
+//! return LocationMatrix
+	unsigned* GetLocationMatrix() { return LocationMatrix; }
+
 //!	Return material of the element
 	inline CMaterial* GetElementMaterial() { return ElementMaterial; }
 
