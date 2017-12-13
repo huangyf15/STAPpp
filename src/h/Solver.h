@@ -48,5 +48,5 @@ protected:
 public:
     CSRSolver(CSRMatrix<double>& _K) : CSolver(_K), K(_K){};
 
-    void Solver(double* Force, unsigned NLCase);
+    void solve(double* Force, unsigned NLCase);
 };

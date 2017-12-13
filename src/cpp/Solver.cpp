@@ -9,11 +9,16 @@
 /*****************************************************************************/
 
 #include "Solver.h"
+#include "Domain.h"
 
 #include <cmath>
 #include <cfloat>
 #include <iostream>
 #include <algorithm>
+
+#ifdef MKL
+#include "mkl.h"
+#endif
 
 using namespace std;
 
@@ -86,7 +91,53 @@ void CLDLTSolver::BackSubstitution(double* Force)
 	}
 };
 
-void CSRSolver::Solver(double* Force, unsigned NLCase)
+#ifdef MKL
+void CSRSolver::solve(double* Force, unsigned NLCase)
 {
-	
+	void* pt[64];
+	clear(pt, 64);
+    
+    const int mtype = 2;
+    int iparm[64] = { 0 };
+	iparm[5] = 1;
+
+    const int one = 1;
+    const int size = K.size;
+    double* values = K.values;
+    int* columns = K.columns;
+    int* rowIndexs = K.rowIndexs;
+
+    const int rhsCount = NLCase;
+    double* rhs = Force;
+
+    int phase = 13;
+    double* res = new double[rhsCount*size];
+    
+    int msglvl = 1; // print info
+    int* perm = new int[size];
+    int error;
+
+    pardiso(
+        pt, // handle to some shit
+        &one, // maxfct
+        &one, // mnum
+        &mtype, // sym pos matrix
+        &phase, // go through all
+        &size,  // size of matrix
+        values,
+        rowIndexs,
+        columns,
+        perm, // idk wtf this is
+        &rhsCount,
+        iparm, // sort like settings
+        &msglvl, // print info or not
+        rhs,
+        res,
+        &error // see if any error
+    );
+	delete[] perm;
+	for (unsigned _=0; _<size; _++)
+		std::cout << "res[" << _ << "] = " << res[_] << std::endl;
+	delete[] res;
 }
+#endif
