@@ -300,7 +300,14 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 		unsigned int dof = NodeList[LoadData->node[lnum] - 1].bcode[LoadData->dof[lnum] - 1];
         
         if(dof) // The DOF is activated
-            Force[dof - 1] += LoadData->load[lnum];
+		{
+			#ifdef MKL
+				Force[dof - 1 + (NEQ*NLCASE*(LoadCase-1))] += LoadData->load[lnum];
+			#else
+				Force[dof - 1] += LoadData->load[lnum];
+			#endif
+		}
+            
 	}
 
 	return true;
@@ -311,7 +318,11 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 void CDomain::AllocateMatrices()
 {
 //	Allocate for global force/displacement vector
+	#ifdef MKL
+	Force = new double[NEQ * NLCASE];
+	#else
 	Force = new double[NEQ];
+	#endif
     clear(Force, NEQ);
 
 //  Create the banded stiffness matrix
