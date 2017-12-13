@@ -43,8 +43,8 @@ def test():
         if os.system(STAP + ' ' + DataDir + os.sep + name + ' > nul'):
             print('test failed for file ' + name)
             quit(2)
-    # run('bar-6')
-    # run('test_truss_22')
+    run('bar-6')
+    run('test_truss_22')
     run('truss')
 
     def run(name):
