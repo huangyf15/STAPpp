@@ -19,6 +19,10 @@ IF(USE_MKL)
         ADD_COMPILE_OPTIONS(-I/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include)
         INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include/ /opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include)
         LINK_DIRECTORIES(/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64)
+    ELSE()
+        #ADD_COMPILE_OPTIONS(-I\"C:/Program\ Files\ \(x86\)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mkl/include\")
+        #INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mkl/include")
+        #LINK_DIRECTORIES("C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mkl/lib/intel64_win")
     ENDIF()
 ENDIF()
 
@@ -39,6 +43,6 @@ source_group(HEADER\ FILES FILES ${HEAD})
 
 ADD_EXECUTABLE(stap++ ${SRC} ${SRC_ELEMENTS} ${HEAD})
 
-IF(USE_MKL AND UNIX)
+IF(USE_MKL)
     TARGET_LINK_LIBRARIES(stap++ mkl_intel_lp64 mkl_sequential mkl_core)
 ENDIF()
