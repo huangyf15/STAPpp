@@ -23,7 +23,7 @@ def winmake(mkl=False):
     os.chdir(ProjectDir)
 
 
-def unix(mkl=False):
+def unixmake(mkl=False):
     os.chdir(ProjectDir)
     if not os.path.exists('build'):
         os.mkdir('build')
