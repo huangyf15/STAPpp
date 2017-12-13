@@ -55,7 +55,7 @@ def test():
     run('3T')
     run('4Q')
     run('8H')
-    # run('Beam')
+    run('Beam')
     run('plate')
     run('shell')
     run('TimoEBMOD')
