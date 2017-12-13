@@ -15,6 +15,9 @@
 #include <vector>
 #include <cstddef>
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <cfloat>
 
 #include "Node.h"
 #include "ElementGroup.h"

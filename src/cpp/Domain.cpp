@@ -11,9 +11,6 @@
 #include "Domain.h"
 #include "Material.h"
 
-#include <iomanip>
-#include <iostream>
-
 using namespace std;
 
 //	Clear an array
@@ -154,7 +151,10 @@ void CDomain::CalculateEquationNumber()
 	//     Solid elements:     not active, value = 1.
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
     {
-        if ((EleGrpList[EleGrp].GetElementType() >= 5) && (EleGrpList[EleGrp].GetElementType() <= 9))
+        ElementTypes eleType = EleGrpList[EleGrp].GetElementType();
+        if (eleType == ElementTypes::Beam ||
+            eleType == ElementTypes::TimoshenkoEBMOD ||
+            eleType == ElementTypes::TimoshenkoSRINT)
         {
             const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
             for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
@@ -163,12 +163,70 @@ void CDomain::CalculateEquationNumber()
                 CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
                 for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
                 {
-                        if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag) {
+                    if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag)
+                    {
                         const unsigned int N = ElementNode[NumNode]->NodeNumber;
                         NodeList[N - 1].bcode[3] = 0;
                         NodeList[N - 1].bcode[4] = 0;
                         NodeList[N - 1].bcode[5] = 0;
-					}   
+                    }   
+                }
+            }
+        }
+        else if (eleType == ElementTypes::Shell || 
+                 eleType == ElementTypes::Plate)
+        {
+            const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
+            for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
+            {
+                const unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
+                CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
+                bool x_inpl = true; //judge if all points have the same x 
+                bool y_inpl = true;
+                bool z_inpl = true;
+                for (unsigned int NumNode = 1; NumNode < NEN; NumNode++)
+                {
+                    if (x_inpl && abs(ElementNode[NumNode]->XYZ[0] - ElementNode[0]->XYZ[0]) > DBL_EPSILON)
+                    {
+                        x_inpl = false;
+                    }
+                    if (y_inpl && abs(ElementNode[NumNode]->XYZ[1] - ElementNode[0]->XYZ[1]) > DBL_EPSILON)
+                    {
+                        y_inpl = false;
+                    }
+                    if (z_inpl && abs(ElementNode[NumNode]->XYZ[2] - ElementNode[0]->XYZ[2]) > DBL_EPSILON)
+                    {
+                        z_inpl = false;
+                    }
+                }
+                for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
+                {
+                    if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag)
+                    {
+                        const unsigned int N = ElementNode[NumNode]->NodeNumber;
+                        if (x_inpl)
+                        {
+                            NodeList[N - 1].bcode[4] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+                        else if (y_inpl)
+                        {
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+                        else if (z_inpl)
+                        {
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[4] = 0;
+                        }
+                        else
+                        {
+                            NodeList[N - 1].bcode[3] = 0;
+                            NodeList[N - 1].bcode[4] = 0;
+                            NodeList[N - 1].bcode[5] = 0;
+                        }
+                    }   
+
                 }
             }
         }
