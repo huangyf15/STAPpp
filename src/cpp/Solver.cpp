@@ -147,9 +147,9 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     }
 
 #ifdef _DEBUG_
-    for (unsigned _ = 0; _<size; _++)
+    for (int _ = 0; _<size; _++)
         std::cout << "res[" << _ << "] = " << res[_] << std::endl;
-    for (unsigned _ = 0; _<size; _++)
+    for (int _ = 0; _<size; _++)
         std::cout << "rhs[" << _ << "] = " << rhs[_] << std::endl;
 #endif // _DEBUG_
     delete[] perm;

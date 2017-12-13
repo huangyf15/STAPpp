@@ -49,7 +49,7 @@ public:
         rowIndexs[0] = 1;
         for (int row = 0; row < size; ++row)
         {
-            rowIndexs[row + 1] = rowIndexs[row] + _tempColumns[row].size();
+            rowIndexs[row + 1] = rowIndexs[row] + int(_tempColumns[row].size());
         }
 
         // allocate columns
@@ -93,7 +93,7 @@ public:
         while (offset2 != (offset1 + 1))
         {
             int offset = (offset1 + offset2) / 2;
-            if (columns[offset] > column)
+            if (columns[offset] > int(column))
             {
                 offset2 = offset;
             }
@@ -113,17 +113,17 @@ template <typename T> std::ostream& operator<<(std::ostream& out, CSRMatrix<T> m
 {
     out << "CSR Matrix, size = " << mat.size << std::endl;
     out << "values = " << std::endl << "(";
-    for (unsigned i = 0; i < mat.elementCount; ++i)
+    for (int i = 0; i < mat.elementCount; ++i)
     {
         out << std::setw(14) << mat.values[i];
     }
     out << ")\ncolumns = \n(";
-    for (unsigned i = 0; i < mat.elementCount; ++i)
+    for (std::size_t i = 0; i < mat.elementCount; ++i)
     {
         out << std::setw(14) << mat.columns[i];
     }
     out << ")\nrowIndexs = \n(";
-    for (unsigned i = 0; i <= mat.size; ++i)
+    for (std::size_t i = 0; i <= mat.size; ++i)
     {
         out << std::setw(14) << mat.rowIndexs[i];
     }
