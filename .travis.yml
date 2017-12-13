@@ -43,7 +43,8 @@ script:
   - cd ../TimoSRINT
   - python3 run-patch.py
   # run with MKL on
-  - cmake ../../src -DUSE_MKL=ON
+  - cd ../../build
+  - cmake ../src -DUSE_MKL=ON
   - make
   - ./stap++ ../data/test_truss_22.dat > nul
   - ./stap++ ../data/truss > nul
