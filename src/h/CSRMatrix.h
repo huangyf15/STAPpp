@@ -90,6 +90,6 @@ public:
                 offset1 = offset;
             }
         }
-        return columns[offset1];
+        return values[offset1];
     }
 };

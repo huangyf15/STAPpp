@@ -273,7 +273,7 @@ void CDomain::AssembleStiffnessMatrix()
 
 //		Loop over for all elements in group EleGrp
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)
-			ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix);
+			ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix, *CSRStiffnessMatrix);
 
 		delete[] Matrix;
 		Matrix = nullptr;
@@ -329,6 +329,7 @@ void CDomain::AllocateMatrices()
 
 //	Allocate for banded global stiffness matrix
     StiffnessMatrix->Allocate();
+	GetCSRStiffnessMatrix().allocate();
 
 	COutputter* Output = COutputter::Instance();
 	Output->OutputTotalSystemData();
@@ -364,6 +365,4 @@ void CDomain::CalculateCSRColumns()
             }
         }
     }
-
-    matrix.allocate();
 }
