@@ -178,7 +178,7 @@ public:
 	inline CLoadCaseData* GetLoadCases() { return LoadCases; }
 
 //!	Return pointer to the banded stiffness matrix
-	inline CSkylineMatrix<double>* GetStiffnessMatrix() { return StiffnessMatrix; }
+	CSkylineMatrix<double>& GetStiffnessMatrix() { return *StiffnessMatrix; }
 
 	CSRMatrix<double>& GetCSRStiffnessMatrix() { return *CSRStiffnessMatrix; }
 

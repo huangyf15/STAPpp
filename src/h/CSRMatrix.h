@@ -2,7 +2,9 @@
 #include <set>
 #include <vector>
 
-template <typename T> class CSRMatrix
+#include "SparseMatrix.h"
+
+template <typename T> class CSRMatrix : public SparseMatrix<T>
 {
 private:
     unsigned size;
@@ -13,7 +15,7 @@ private:
     std::set<unsigned>* _tempColumns;
 
 public:
-    CSRMatrix(unsigned m)
+    CSRMatrix(unsigned m) : SparseMatrix<T>(m)
     {
         size = m;
         values = nullptr;

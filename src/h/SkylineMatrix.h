@@ -11,10 +11,11 @@
 #pragma once
 
 #include <string>
+#include "SparseMatrix.h"
 
 //! CSkylineMatrix class is used to store the FEM stiffness matrix in skyline storage
 template <class T_>
-class CSkylineMatrix
+class CSkylineMatrix : public SparseMatrix<T_>
 {
 //! Store the stiffness matrkix in skyline storage
     T_* data_;
@@ -67,7 +68,7 @@ public:
 
 //! constructor functions
 template <class T_>
-inline CSkylineMatrix<T_>::CSkylineMatrix()
+inline CSkylineMatrix<T_>::CSkylineMatrix() : SparseMatrix<T_>(0)
 {
     NEQ_ = 0;
     
@@ -77,7 +78,7 @@ inline CSkylineMatrix<T_>::CSkylineMatrix()
 }
 
 template <class T_>
-inline CSkylineMatrix<T_>::CSkylineMatrix(unsigned int N):NWK_(0)
+inline CSkylineMatrix<T_>::CSkylineMatrix(unsigned int N) : NWK_(0), SparseMatrix<T_>(N)
 {
     NEQ_ = N;
 

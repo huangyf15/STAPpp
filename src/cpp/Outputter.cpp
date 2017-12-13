@@ -905,8 +905,7 @@ void COutputter::PrintColumnHeights()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* ColumnHeights = StiffnessMatrix->GetColumnHeights();
+	unsigned int* ColumnHeights = FEMData->GetStiffnessMatrix().GetColumnHeights();
 
 	for (unsigned int col = 0; col < NEQ; col++)
 	{
@@ -930,8 +929,7 @@ void COutputter::PrintDiagonalAddress()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	unsigned int* DiagonalAddress = FEMData->GetStiffnessMatrix().GetDiagonalAddress();
 
 	for (unsigned int col = 0; col <= NEQ; col++)
 	{
@@ -955,14 +953,13 @@ void COutputter::PrintStiffnessMatrix()
 	CDomain* FEMData = CDomain::Instance();
 
 	unsigned int NEQ = FEMData->GetNEQ();
-	CSkylineMatrix<double> *StiffnessMatrix = FEMData->GetStiffnessMatrix();
-	unsigned int* DiagonalAddress = StiffnessMatrix->GetDiagonalAddress();
+	unsigned int* DiagonalAddress = FEMData->GetStiffnessMatrix().GetDiagonalAddress();
 
 	*this << setiosflags(ios::scientific) << setprecision(5);
 
 	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
 	{
-		*this << setw(14) << (*StiffnessMatrix)(i);
+		*this << setw(14) << StiffnessMatrix(i);
 
 		if ((i + 1) % 6 == 0)
 		{
@@ -986,7 +983,7 @@ void COutputter::PrintStiffnessMatrix()
 			}
 			else
 			{
-				*this << setw(14) << (*StiffnessMatrix)(I, J);
+				*this << setw(14) << StiffnessMatrix(I, J);
 			}
 		}
 
