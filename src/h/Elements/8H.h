@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Element.h"
+#include "Eigen/Dense"
 
 using namespace std;
 
