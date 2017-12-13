@@ -122,16 +122,27 @@ bool CDomain::ReadData(string FileName, string OutFile)
 //	Read nodal point data
 bool CDomain::ReadNodalPoints()
 {
-
-//	Read nodal point data lines
+	//	Read nodal point data lines
 	NodeList = new CNode[NUMNP];
 
-//	Loop over for all nodal points
+	//	Loop over for all nodal points
 	for (unsigned int np = 0; np < NUMNP; np++)
 		if (!NodeList[np].Read(Input, np))
 			return false;
 
 	return true;
+}
+
+void CDomain::GenerateLocationMatrix()
+{
+	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)		//	Loop over for all element groups
+    {
+        CElementGroup& ElementGrp = EleGrpList[EleGrp];
+        unsigned int NUME = ElementGrp.GetNUME();
+        
+		for (unsigned int Ele = 0; Ele < NUME; Ele++)	//	Loop over for all elements in group EleGrp
+			ElementGrp.GetElement(Ele).GenerateLocationMatrix();
+    }
 }
 
 //	Calculate global equation numbers corresponding to every degree of freedom of each node
@@ -220,7 +231,7 @@ void CDomain::CalculateColumnHeights()
 			ElementGrp.GetElement(Ele).CalculateColumnHeight(ColumnHeights);
     }
 
-//	Maximum half bandwidth ( = max(ColumnHeights) + 1 )
+	//	Maximum half bandwidth ( = max(ColumnHeights) + 1 )
 	MK = ColumnHeights[0];
 
 	for (unsigned int i=1; i<NEQ; i++)
@@ -273,14 +284,13 @@ void CDomain::AssembleStiffnessMatrix()
 
 //		Loop over for all elements in group EleGrp
 		for (unsigned int Ele = 0; Ele < NUME; Ele++)
-			ElementGrp.GetElement(Ele).assembly(Matrix, *StiffnessMatrix, *CSRStiffnessMatrix);
+			ElementGrp.GetElement(Ele).assembly(Matrix, StiffnessMatrix, CSRStiffnessMatrix);
 
 		delete[] Matrix;
 		Matrix = nullptr;
 	}
 
 #ifdef _DEBUG_
-	std::cout << *CSRStiffnessMatrix << std::endl;
 	COutputter::Instance()->PrintStiffnessMatrix();
 #endif
 
@@ -294,7 +304,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 
 	const CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];
 
-//	Loop over for all concentrated loads in load case LoadCase
+	//	Loop over for all concentrated loads in load case LoadCase
 	for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)
 	{
 		unsigned int dof = NodeList[LoadData->node[lnum] - 1].bcode[LoadData->dof[lnum] - 1];
@@ -318,30 +328,30 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 void CDomain::AllocateMatrices()
 {
 //	Allocate for global force/displacement vector
-	#ifdef MKL
+#ifdef MKL
 	Force = new double[NEQ * NLCASE];
-	#else
+	clear(Force, NEQ * NLCASE);
+#else
 	Force = new double[NEQ];
-	#endif
-    clear(Force, NEQ);
+	clear(Force, NEQ);
+#endif
+
+	GenerateLocationMatrix();
 
 //  Create the banded stiffness matrix
-    StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
-
+#ifdef MKL
 	CSRStiffnessMatrix = new CSRMatrix<double>(NEQ);
-
-//	Calculate column heights
-	CalculateColumnHeights();
-
-//	Calculate address of diagonal elements in banded matrix
-	CalculateDiagnoalAddress();
-
 	CalculateCSRColumns();
-
-//	Allocate for banded global stiffness matrix
-    StiffnessMatrix->Allocate();
 	GetCSRStiffnessMatrix().allocate();
-
+#else
+    StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
+	//	Calculate column heights
+	CalculateColumnHeights();
+	//	Calculate address of diagonal elements in banded matrix
+	CalculateDiagnoalAddress();
+	StiffnessMatrix->Allocate();
+#endif
+	
 	COutputter* Output = COutputter::Instance();
 	Output->OutputTotalSystemData();
 }

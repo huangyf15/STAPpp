@@ -114,8 +114,11 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     int phase = 13;
     double* res = new double[rhsCount*size];
     for (std::size_t _ = 0; _ < rhsCount*size; _++) res[_] = 0;
-    
-    int msglvl = 1; // print info
+
+    int msglvl = 0; // print info
+#ifdef _DEBUG_
+    msglvl = 1;
+#endif // _DEBUG_
     int* perm = new int[size];
     int error;
 
@@ -143,11 +146,13 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
         exit(8);
     }
 
-	delete[] perm;
-	for (unsigned _=0; _<size; _++)
-		std::cout << "res[" << _ << "] = " << res[_] << std::endl;
-	delete[] res;
+#ifdef _DEBUG_
+    for (unsigned _ = 0; _<size; _++)
+        std::cout << "res[" << _ << "] = " << res[_] << std::endl;
     for (unsigned _ = 0; _<size; _++)
         std::cout << "rhs[" << _ << "] = " << rhs[_] << std::endl;
+#endif // _DEBUG_
+    delete[] perm;
+    delete[] res;
 }
 #endif

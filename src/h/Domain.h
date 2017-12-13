@@ -122,6 +122,9 @@ public:
 //!	Calculate address of diagonal elements in banded matrix
 	void CalculateDiagnoalAddress();
 
+// 	generate Location Matrix for each element
+	void GenerateLocationMatrix();
+
 	void CalculateCSRColumns();
 
 //! Allocate storage for matrices

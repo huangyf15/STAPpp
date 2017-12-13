@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
 #endif
-        
+
 //  Loop over for all load cases
     for (unsigned int lcase = 0; lcase < FEMData->GetNLCASE(); lcase++)
     {
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         FEMData->AssembleForce(lcase + 1);
         Solver->BackSubstitution(FEMData->GetForce());
 #endif
-            
+
 #ifdef _DEBUG_
         Output->PrintDisplacement(lcase);
 #endif

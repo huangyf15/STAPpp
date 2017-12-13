@@ -80,7 +80,7 @@ public:
 	void CalculateColumnHeight(unsigned int* ColumnHeight); 
 
 //!	Assemble the element stiffness matrix to the global stiffness matrix
-	void assembly(double* Matrix, CSkylineMatrix<double>& StiffnessMatrix, CSRMatrix<double>& CSRMatrix);
+	void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix, CSRMatrix<double>* CSRMatrix);
 
 //!	Calculate element stiffness matrix (Upper triangular matrix, stored as an array column by colum)
 	virtual void ElementStiffness(double* stiffness) = 0; 

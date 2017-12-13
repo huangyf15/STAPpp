@@ -948,6 +948,10 @@ void COutputter::PrintDiagonalAddress()
 //	Print banded and full stiffness matrix for debuging
 void COutputter::PrintStiffnessMatrix()
 {
+#ifdef MKL
+	*this << "*** _Debug_ *** CSR stiffness matrix" << std::endl;
+	*this << CDomain::Instance()->GetCSRStiffnessMatrix() << std::endl;
+#else
 	*this << "*** _Debug_ *** Banded stiffness matrix" << endl;
 
 	CDomain* FEMData = CDomain::Instance();
@@ -990,7 +994,7 @@ void COutputter::PrintStiffnessMatrix()
 
 		*this << endl;
 	}
-
+#endif
 	*this << endl;
 }
 
