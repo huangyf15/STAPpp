@@ -1,5 +1,6 @@
 import os
 import sys
+import platform
 
 ProjectDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DataDir = ProjectDir + os.sep + 'data'
@@ -64,21 +65,20 @@ def test():
 
 def main():
     global PY
-    if len(sys.argv) == 1:
-        print('Usage: py test.py <win/unix>')
-        quit(1)
-    if sys.argv[1] == 'win':
+    if platform.system() == 'Windows':
         PY = 'python'
         winmake(False)
         test()
         winmake(True)
         test()
-    elif sys.argv[1] == 'unix':
+    elif platform.system() == 'Linux':
         PY = 'python3'
         unixmake(False)
         test()
         unixmake(True)
         test()
+    else:
+        print('unsupported platform')
     print('test passed.')
 
 
