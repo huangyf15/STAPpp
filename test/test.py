@@ -12,9 +12,9 @@ def winmake(mkl=False):
         os.mkdir('vsbuild')
     os.chdir(ProjectDir + os.sep + 'vsbuild')
     if os.system('cmake ../src -G "Visual Studio 15 2017 Win64" -DUSE_MKL=%s' %
-                     ('ON' if mkl else 'OFF')):
+                 ('ON' if mkl else 'OFF')):
         quit(1)
-    if os.system('msbuild stap++.sln'):
+    if os.system('msbuild stap++.vcxproj /m'):
         print('build failed.')
         quit(1)
     global STAP
@@ -68,7 +68,7 @@ def main():
         print('Usage: py test.py <win/unix>')
         quit(1)
     if sys.argv[1] == 'win':
-        PY = 'py'
+        PY = 'python'
         winmake(False)
         test()
         winmake(True)
