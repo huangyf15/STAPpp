@@ -979,14 +979,17 @@ void COutputter::PrintStiffnessMatrix()
 	{
 		for (int J = 1; J <= NEQ; J++)
 		{
-			int H = DiagonalAddress[J] - DiagonalAddress[J - 1];
-			if (J - I - H >= 0)
+            int i, j;
+            i = std::min(I, J);
+            j = std::max(I, J);
+			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			if (j - i - H >= 0)
 			{
 				*this << setw(14) << 0.0;
 			}
 			else
 			{
-				*this << setw(14) << (*StiffnessMatrix)(I, J);
+				*this << setw(14) << (*StiffnessMatrix)(i, j);
 			}
 		}
 
