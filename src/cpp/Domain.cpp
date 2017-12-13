@@ -342,8 +342,6 @@ void CDomain::AllocateMatrices()
     StiffnessMatrix->Allocate();
 	GetCSRStiffnessMatrix().allocate();
 
-    std::cout << GetCSRStiffnessMatrix() << std::endl;
-
 	COutputter* Output = COutputter::Instance();
 	Output->OutputTotalSystemData();
 }

@@ -98,15 +98,15 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     
     const int mtype = 2;
     int iparm[64] = { 0 };
-	iparm[5] = 0; // write back to Force
+
+    pardisoinit(pt, &mtype, iparm);
+	iparm[5] = 1; // write back to Force
 
     const int one = 1;
     const int size = K.size;
     double* values = K.values;
     int* columns = K.columns;
     int* rowIndexs = K.rowIndexs;
-
-	std::cout << K << std::endl;
 
     const int rhsCount = NLCase;
     double* rhs = Force;
