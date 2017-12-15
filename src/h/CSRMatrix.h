@@ -4,7 +4,6 @@
 #include <set>
 #include <vector>
 
-
 #include "SparseMatrix.h"
 
 template <typename T> class CSRMatrix : public SparseMatrix<T>
@@ -107,6 +106,13 @@ public:
     }
 
     int dim() const { return size; }
+
+    ~CSRMatrix()
+    {
+        delete[] rowIndexs;
+        delete[] values;
+        delete[] columns;
+    }
 };
 
 template <typename T> std::ostream& operator<<(std::ostream& out, CSRMatrix<T> mat)
