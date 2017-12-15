@@ -3,16 +3,14 @@ compiler:
   - clang
   - gcc
 cache:
-  - pip: true
+  - apt: true
+  - directories:
+    - /opt/intel/compilers_and_libraries_2018.1.163/linux/mkl
 install:
-  - mkdir temp
+  - mkdir temp -p
   - cd temp
   # install MKL
-  - wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-  - sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-  - sudo wget https://apt.repos.intel.com/setup/intelproducts.list -O /etc/apt/sources.list.d/intelproducts.list
-  - sudo apt-get update
-  - sudo apt-get install intel-mkl-2018.1-038 -y
+  - sudo python3 ../test/installMKL.py
   # download eigen
   - wget http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
   - tar -zxvf 3.3.4.tar.gz > nul
