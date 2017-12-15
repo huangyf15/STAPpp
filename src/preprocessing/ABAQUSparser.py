@@ -428,7 +428,7 @@ class Parser():
 
     def indexElements(self):
         elementTypeDict = {
-            'S4R': 6,  # Plate
+            'S4R': 7,  # Shell
             'C3D8R': 4,  # 8H
             'B31': 5,  # Beam
             'T3D2': 1  # Bar
@@ -450,6 +450,7 @@ class Parser():
             if not material:
                 materialIndex = len(elementGroup.materials) + 1
                 material = convertSection2Material(
+                    part.type,
                     part.section, self.materialsDict, materialIndex)
                 self.stapppMaterialsDictByPartName[part.name] = material
                 elementGroup.materials.append(material)
@@ -799,16 +800,32 @@ def isLocalNodeIndexInInstanceNsets(localNodeIndex, instance):
     return False
 
 
-def convertSection2Material(section, materialsDict, index):
+def convertSection2Material(elementType, section, materialsDict, index):
     material = materialsDict[section.materialName]
     res = Material()
     res.index = index
-    res.attributes += (material.E, material.v) + section.args
+    # 'S4R': 7,  # Shell
+    # 'C3D8R': 4,  # 8H
+    # 'B31': 5,  # Beam
+    # 'T3D2':
+    if elementType == 'B31': # Beam
+        res.attributes = (material.E, material.v, *section.args)
+    elif elementType == 'C3D8R':
+        assert len(section.args) == 0
+        res.attributes = (material.E, material.v)
+    elif elementType == 'S4R':
+        assert len(section.args) == 2
+        res.attributes = (material.E, material.v, section.args[0])
+    elif elementType == 'T3D2': # Bar
+        assert len(section.args) == 1
+        res.attributes = (material.E, *section.args)
+    else:
+        raise Exception('unknown element type')
     return res
 
 
 if __name__ == '__main__':
-    Parser('data/Job-2.inp').parse()
+    Parser('data/Job-1.inp').parse()
     # ABAQUS nodes:
     # Job-1: 4163
     # Job-2: 37185
