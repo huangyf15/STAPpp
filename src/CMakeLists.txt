@@ -12,6 +12,11 @@ IF(STAP++_TEST)
     ADD_DEFINITIONS(-D__TEST__)
 ENDIF()
 
+OPTION(STAP++_RUN "Skip print screen at running." OFF)
+IF(STAP++_RUN)
+    ADD_DEFINITIONS(-D_RUN_)
+ENDIF()
+
 OPTION(USE_MKL "Use MKL PARDISO solver instead of LDLT solver." OFF)
 IF(USE_MKL)
     ADD_DEFINITIONS(-DMKL)

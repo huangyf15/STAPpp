@@ -92,8 +92,11 @@ int main(int argc, char *argv[])
     double time_solution = timer.ElapsedTime();
 
 //  Calculate and output stresses of all elements
+
+#ifndef _RUN_
 	Output->OutputElementStress();
-    
+#endif    
+
     double time_stress = timer.ElapsedTime();
     
     timer.Stop();
