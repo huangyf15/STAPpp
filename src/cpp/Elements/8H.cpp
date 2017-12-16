@@ -53,7 +53,7 @@ bool CHex::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNod
 	unsigned int N1, N2, N3, N4, N5, N6, N7, N8;	// node numbers
 
 	Input >> N1 >> N2 >> N3 >> N4 >> N5 >> N6 >> N7 >> N8 >> MSet;
-    ElementMaterial = dynamic_cast<CHexMaterial*>(MaterialSets) + MSet - 1; //stored in local node number
+    ElementMaterial = static_cast<CHexMaterial*>(MaterialSets) + MSet - 1; //stored in local node number
 	nodes[0] = &NodeList[N1 - 1];
 	nodes[1] = &NodeList[N2 - 1];
 	nodes[2] = &NodeList[N3 - 1];
@@ -101,7 +101,7 @@ void CHex::ElementStiffness(double* Matrix)
 	clear(Matrix, SizeOfStiffnessMatrix());
 
 	// Construct constitutive matrix
-	CHexMaterial* material = dynamic_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
+	CHexMaterial* material = static_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
 	double v = material->nu;
 	double k = material->E * (1 - v) / (1 + v) / (1 - 2 * v);
 	double D[3];
@@ -514,7 +514,7 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 	}
 
 	// Construct constitutive matrix
-	CHexMaterial* material = dynamic_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
+	CHexMaterial* material = static_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
 	double v = material->nu;
 	double k = material->E * (1-v)/(1+v)/(1-2*v);
 	double D[3];
