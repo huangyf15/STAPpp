@@ -53,7 +53,7 @@ bool CTimoshenkoEBMOD::Read(ifstream& Input, unsigned int Ele, CMaterial* Materi
     unsigned int N1, N2; // Left node number and right node number
 
     Input >> N1 >> N2 >> MSet;
-    ElementMaterial = dynamic_cast<CTimoshenkoMaterial*>(MaterialSets) + MSet - 1;
+    ElementMaterial = static_cast<CTimoshenkoMaterial*>(MaterialSets) + MSet - 1;
     nodes[0] = &NodeList[N1 - 1];
     nodes[1] = &NodeList[N2 - 1];
 
@@ -99,7 +99,7 @@ void CTimoshenkoEBMOD::ElementStiffness(double* Matrix)
 
     // Get the Material/Section property
     // Pointer to material of the element
-    CTimoshenkoMaterial* material = dynamic_cast<CTimoshenkoMaterial*>(ElementMaterial);
+    CTimoshenkoMaterial* material = static_cast<CTimoshenkoMaterial*>(ElementMaterial);
 
     // Calculate the transform matrix
     // Q = [Q11,Q21,Q31,Q12,Q22,Q32,Q13,Q23,Q33],
@@ -240,7 +240,7 @@ void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double*
 {
     // Get the Material/Section property
     // Pointer to material of the element
-    CTimoshenkoMaterial* material = dynamic_cast<CTimoshenkoMaterial*>(ElementMaterial);
+    CTimoshenkoMaterial* material = static_cast<CTimoshenkoMaterial*>(ElementMaterial);
 
     // Calculate beam length
     // DX[3] = {x2-x1, y2-y1, z2-z1}

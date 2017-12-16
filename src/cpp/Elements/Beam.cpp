@@ -50,7 +50,7 @@ bool CBeam::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CNo
     unsigned int MSet;   // Material property set number
     unsigned int N1, N2; // Left node number and right node number
     Input >> N1 >> N2 >> MSet;
-    ElementMaterial = dynamic_cast<CBeamMaterial*>(MaterialSets) + MSet - 1;
+    ElementMaterial = static_cast<CBeamMaterial*>(MaterialSets) + MSet - 1;
     nodes[0] = &NodeList[N1 - 1];
     nodes[1] = &NodeList[N2 - 1];
 
@@ -99,7 +99,7 @@ void CBeam::ElementStiffness(double* Matrix)
 
     //计算局部坐标系的矩阵需要的元素
     const CBeamMaterial& material =
-        dynamic_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
+        static_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
     double Iz = (material.a * material.a * material.a) * material.b / 12 -
                 pow(material.a - material.t1 - material.t3, 3.0) *
                     (material.b - material.t2 - material.t4) / 12;
@@ -239,7 +239,7 @@ void CBeam::ElementStiffness(double* Matrix)
 void CBeam::ElementStress(double* stress, double* Displacement)
 {
     const CBeamMaterial& material =
-        dynamic_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
+        static_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
     clear(stress, 3);
     double DX[3]; //	dx = x2-x1, dy = y2-y1, dz = z2-z1
     double L = 0; //	 beam length

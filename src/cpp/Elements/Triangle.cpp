@@ -55,7 +55,7 @@ bool CTriangle::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets,
     unsigned int N1, N2, N3; // node number
 
     Input >> N1 >> N2 >> N3 >> MSet;
-    ElementMaterial = dynamic_cast<CTriangleMaterial*>(MaterialSets) + MSet - 1;
+    ElementMaterial = static_cast<CTriangleMaterial*>(MaterialSets) + MSet - 1;
     nodes[0] = NodeList + N1 - 1;
     nodes[1] = NodeList + N2 - 1;
     nodes[2] = NodeList + N3 - 1;
@@ -182,7 +182,7 @@ void CTriangle::ElementStiffness(double* Matrix)
     double x21 = dot(p21, i);
 
     CTriangleMaterial& material =
-        *dynamic_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
+        *static_cast<CTriangleMaterial*>(ElementMaterial); // Pointer to material of the element
 
     auto E = material.E;
     auto v = material.nu;
@@ -273,7 +273,7 @@ void CTriangle::ElementStress(double stress[3], double* Displacement, double Gau
         j[0] * d[6] + j[1] * d[7] + j[2] * d[8] // node 3 (2d)
     };
 
-    CTriangleMaterial& material = *dynamic_cast<CTriangleMaterial*>(ElementMaterial);
+    CTriangleMaterial& material = *static_cast<CTriangleMaterial*>(ElementMaterial);
 
     double v = material.nu;
     double cof = material.E / (4 * Area * (1 - v * v));
