@@ -100,7 +100,7 @@ void CHex::ElementStiffness(double* Matrix)
 {
 	clear(Matrix, SizeOfStiffnessMatrix());
 
-	//Construct constitutive matrix
+	// Construct constitutive matrix
 	CHexMaterial* material = dynamic_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
 	double v = material->nu;
 	double k = material->E * (1 - v) / (1 + v) / (1 - 2 * v);
@@ -110,7 +110,7 @@ void CHex::ElementStiffness(double* Matrix)
 	D[1] = k * v / (1 - v);
 	D[2] = k * (1 - 2 * v) / 2.0 / (1 - v);
 
-	//construct coordinate matrix
+	// Construct coordinate matrix
 	double COORXYZ[24];
 	for (unsigned int i = 0; i < 8; i++)
 	{
@@ -135,7 +135,7 @@ void CHex::ElementStiffness(double* Matrix)
 		GN[0] = (1-eta)*(1-zeta) / 8.0;
 		GN[1] = (1+eta)*(1-zeta) / 8.0;
 		GN[2] = (1-eta)*(1+zeta) / 8.0;
-		GN[3] = (1+eta)*(1+zeta / 8.0);
+		GN[3] = (1+eta)*(1+zeta) / 8.0;
 		GN[4] = (1+xi)*(1-zeta) / 8.0;
 		GN[5] = (1-xi)*(1-zeta) / 8.0;
 		GN[6] = (1+xi)*(1+zeta) / 8.0;
@@ -498,7 +498,7 @@ void CHex::ElementStiffness(double* Matrix)
 		Matrix[299] += detJ*(D[1] * kerB[0] * kerB[23] + D[2] * kerB[2] * kerB[21]);
 	}
 }
-	
+
 
 //	Calculate element stress 
 void CHex::ElementStress(double* stressHex, double* Displacement)
@@ -545,18 +545,18 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		double zeta = zeta8[p];
 
 		double GN[12];
-		GN[0] = (1-eta)*(1-zeta);
-		GN[1] = (1+eta)*(1-zeta);
-		GN[2] = (1-eta)*(1+zeta);
-		GN[3] = (1+eta)*(1+zeta);
-		GN[4] = (1+xi)*(1-zeta);
-		GN[5] = (1-xi)*(1-zeta);
-		GN[6] = (1+xi)*(1+zeta);
-		GN[7] = (1-xi)*(1+zeta);
-		GN[8] = (1+xi)*(1-eta);
-		GN[9] = (1+xi)*(1+eta);
-		GN[10] = (1-xi)*(1+eta);
-		GN[11] = (1-xi)*(1-eta);
+		GN[0] = (1-eta)*(1-zeta) / 8.0;
+		GN[1] = (1+eta)*(1-zeta) / 8.0;
+		GN[2] = (1-eta)*(1+zeta) / 8.0;
+		GN[3] = (1+eta)*(1+zeta) / 8.0;
+		GN[4] = (1+xi)*(1-zeta) / 8.0;
+		GN[5] = (1-xi)*(1-zeta) / 8.0;
+		GN[6] = (1+xi)*(1+zeta) / 8.0;
+		GN[7] = (1-xi)*(1+zeta) / 8.0;
+		GN[8] = (1+xi)*(1-eta) / 8.0;
+		GN[9] = (1+xi)*(1+eta) / 8.0;
+		GN[10] = (1-xi)*(1+eta) / 8.0;
+		GN[11] = (1-xi)*(1-eta) / 8.0;
 
 		double J[9];
 		J[0] = COORXYZ[0] * GN[0] + COORXYZ[3] * GN[1] - COORXYZ[6] * GN[1] - COORXYZ[9] * GN[0] + COORXYZ[12] * GN[2] + COORXYZ[15] * GN[3] - COORXYZ[18] * GN[3] - COORXYZ[21] * GN[2];
@@ -631,7 +631,7 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		recovery[7] = interpo[2]*stressXYZ[i][0] + interpo[1]*stressXYZ[i][3] + interpo[2]*stressXYZ[i][2] + interpo[3]*stressXYZ[i][1] + interpo[1]*stressXYZ[i][4] + interpo[0]*stressXYZ[i][7] + interpo[1]*stressXYZ[i][6] + interpo[2]*stressXYZ[i][5];
 		for (unsigned j = 0; j < 8; j++)
 		{
-			stressHex[6 * j + i] = recovery[i];
+			stressHex[6 * j + i] = recovery[j];
 		}
 	}
 }
