@@ -147,13 +147,13 @@ void CHex::ElementStiffness(double* Matrix)
 
 		double J[9];
 		J[0] = COORXYZ[0]*GN[0]+COORXYZ[3]*GN[1]-COORXYZ[6]*GN[1]-COORXYZ[9]*GN[0]+COORXYZ[12]*GN[2]+COORXYZ[15]*GN[3]-COORXYZ[18]*GN[3]-COORXYZ[21]*GN[2];
-		J[1] = COORXYZ[0]*GN[4]-COORXYZ[3]*GN[4]+COORXYZ[6]*GN[5]-COORXYZ[9]*GN[5]-COORXYZ[12]*GN[6]+COORXYZ[15]*GN[6]+COORXYZ[18]*GN[7]-COORXYZ[21]*GN[7];
+		J[1] = -COORXYZ[0]*GN[4]+COORXYZ[3]*GN[4]+COORXYZ[6]*GN[5]-COORXYZ[9]*GN[5]-COORXYZ[12]*GN[6]+COORXYZ[15]*GN[6]+COORXYZ[18]*GN[7]-COORXYZ[21]*GN[7];
 		J[2] = -COORXYZ[0]*GN[8]-COORXYZ[3]*GN[9]-COORXYZ[6]*GN[10]-COORXYZ[9]*GN[11]+COORXYZ[12]*GN[8]+COORXYZ[15]*GN[9]+COORXYZ[18]*GN[10]+COORXYZ[21]*GN[11];
 		J[3] = COORXYZ[1]*GN[0]+COORXYZ[4]*GN[1]-COORXYZ[7]*GN[1]-COORXYZ[10]*GN[0]+COORXYZ[13]*GN[2]+COORXYZ[16]*GN[3]-COORXYZ[19]*GN[3]-COORXYZ[22]*GN[2];
-		J[4] = COORXYZ[1]*GN[4]-COORXYZ[4]*GN[4]+COORXYZ[7]*GN[5]-COORXYZ[10]*GN[5]-COORXYZ[13]*GN[6]+COORXYZ[16]*GN[6]+COORXYZ[19]*GN[7]-COORXYZ[22]*GN[7];
+		J[4] = -COORXYZ[1]*GN[4]+COORXYZ[4]*GN[4]+COORXYZ[7]*GN[5]-COORXYZ[10]*GN[5]-COORXYZ[13]*GN[6]+COORXYZ[16]*GN[6]+COORXYZ[19]*GN[7]-COORXYZ[22]*GN[7];
 		J[5] = -COORXYZ[1]*GN[8]-COORXYZ[4]*GN[9]-COORXYZ[7]*GN[10]-COORXYZ[10]*GN[11]+COORXYZ[13]*GN[8]+COORXYZ[16]*GN[9]+COORXYZ[19]*GN[10]+COORXYZ[22]*GN[11];
 		J[6] = COORXYZ[2]*GN[0]+COORXYZ[5]*GN[1]-COORXYZ[8]*GN[1]-COORXYZ[11]*GN[0]+COORXYZ[14]*GN[2]+COORXYZ[17]*GN[3]-COORXYZ[20]*GN[3]-COORXYZ[23]*GN[2];
-		J[7] = COORXYZ[2]*GN[4]-COORXYZ[5]*GN[4]+COORXYZ[8]*GN[5]-COORXYZ[11]*GN[5]-COORXYZ[14]*GN[6]+COORXYZ[17]*GN[6]+COORXYZ[20]*GN[7]-COORXYZ[23]*GN[7];
+		J[7] = -COORXYZ[2]*GN[4]+COORXYZ[5]*GN[4]+COORXYZ[8]*GN[5]-COORXYZ[11]*GN[5]-COORXYZ[14]*GN[6]+COORXYZ[17]*GN[6]+COORXYZ[20]*GN[7]-COORXYZ[23]*GN[7];
 		J[8] = -COORXYZ[2]*GN[8]-COORXYZ[5]*GN[9]-COORXYZ[8]*GN[10]-COORXYZ[11]*GN[11]+COORXYZ[14]*GN[8]+COORXYZ[17]*GN[9]+COORXYZ[20]*GN[10]+COORXYZ[23]*GN[11];
 
 		double detJ = J[0]*J[4]*J[8] - J[0]*J[5]*J[7] - J[1]*J[3]*J[8] + J[1]*J[5]*J[6] + J[2]*J[3]*J[7] - J[2]*J[4]*J[6];
@@ -170,30 +170,30 @@ void CHex::ElementStiffness(double* Matrix)
 		invJ[8] = (J[0]*J[4]-J[1]*J[3])/detJ;
 
 		double kerB[24];
-		kerB[0] = GN[0]*invJ[0]+GN[4]*invJ[3]-GN[8]*invJ[6];
-		kerB[1] = GN[0]*invJ[1]+GN[4]*invJ[4]-GN[8]*invJ[7];
-		kerB[2] = GN[0]*invJ[2]+GN[4]*invJ[5]-GN[8]*invJ[8];
-		kerB[3] = GN[1]*invJ[0]-GN[4]*invJ[3]-GN[9]*invJ[6];
-		kerB[4] = GN[1]*invJ[1]-GN[4]*invJ[4]-GN[9]*invJ[7];
-		kerB[5] = GN[1]*invJ[2]-GN[4]*invJ[5]-GN[9]*invJ[8];
-		kerB[6] = -GN[1]*invJ[0]+GN[5]*invJ[3]-GN[10]*invJ[6];
-		kerB[7] = -GN[1]*invJ[1]+GN[5]*invJ[4]-GN[10]*invJ[7];
-		kerB[8] = -GN[1]*invJ[2]+GN[5]*invJ[5]-GN[10]*invJ[8];
-		kerB[9] = -GN[0]*invJ[0]-GN[5]*invJ[3]-GN[11]*invJ[6];
-		kerB[10] = -GN[0]*invJ[1]-GN[5]*invJ[4]-GN[11]*invJ[7];
-		kerB[11] = -GN[0]*invJ[2]-GN[5]*invJ[5]-GN[11]*invJ[8];
-		kerB[12] = GN[2]*invJ[0]-GN[6]*invJ[3]+GN[8]*invJ[6];
-		kerB[13] = GN[2]*invJ[1]-GN[6]*invJ[4]+GN[8]*invJ[7];
-		kerB[14] = GN[2]*invJ[2]-GN[6]*invJ[5]+GN[8]*invJ[8];
-		kerB[15] = GN[3]*invJ[0]+GN[6]*invJ[3]+GN[9]*invJ[6];
-		kerB[16] = GN[3]*invJ[1]+GN[6]*invJ[4]+GN[9]*invJ[7];
-		kerB[17] = GN[3]*invJ[2]+GN[6]*invJ[5]+GN[9]*invJ[8];
-		kerB[18] = -GN[3]*invJ[0]+GN[7]*invJ[3]+GN[10]*invJ[6];
-		kerB[19] = -GN[3]*invJ[1]+GN[7]*invJ[4]+GN[10]*invJ[7];
-		kerB[20] = -GN[3]*invJ[2]+GN[7]*invJ[5]+GN[10]*invJ[8];
-		kerB[21] = -GN[2]*invJ[0]-GN[7]*invJ[3]+GN[11]*invJ[6];
-		kerB[22] = -GN[2]*invJ[1]-GN[7]*invJ[4]+GN[11]*invJ[7];
-		kerB[23] = -GN[2]*invJ[2]-GN[7]*invJ[5]+GN[11]*invJ[8];
+		kerB[0] = GN[0] * invJ[0] - GN[4] * invJ[3] - GN[8] * invJ[6];
+		kerB[1] = GN[0] * invJ[1] - GN[4] * invJ[4] - GN[8] * invJ[7];
+		kerB[2] = GN[0] * invJ[2] - GN[4] * invJ[5] - GN[8] * invJ[8];
+		kerB[3] = GN[1] * invJ[0] + GN[4] * invJ[3] - GN[9] * invJ[6];
+		kerB[4] = GN[1] * invJ[1] + GN[4] * invJ[4] - GN[9] * invJ[7];
+		kerB[5] = GN[1] * invJ[2] + GN[4] * invJ[5] - GN[9] * invJ[8];
+		kerB[6] = -GN[1] * invJ[0] + GN[5] * invJ[3] - GN[10] * invJ[6];
+		kerB[7] = -GN[1] * invJ[1] + GN[5] * invJ[4] - GN[10] * invJ[7];
+		kerB[8] = -GN[1] * invJ[2] + GN[5] * invJ[5] - GN[10] * invJ[8];
+		kerB[9] = -GN[0] * invJ[0] - GN[5] * invJ[3] - GN[11] * invJ[6];
+		kerB[10] = -GN[0] * invJ[1] - GN[5] * invJ[4] - GN[11] * invJ[7];
+		kerB[11] = -GN[0] * invJ[2] - GN[5] * invJ[5] - GN[11] * invJ[8];
+		kerB[12] = GN[2] * invJ[0] - GN[6] * invJ[3] + GN[8] * invJ[6];
+		kerB[13] = GN[2] * invJ[1] - GN[6] * invJ[4] + GN[8] * invJ[7];
+		kerB[14] = GN[2] * invJ[2] - GN[6] * invJ[5] + GN[8] * invJ[8];
+		kerB[15] = GN[3] * invJ[0] + GN[6] * invJ[3] + GN[9] * invJ[6];
+		kerB[16] = GN[3] * invJ[1] + GN[6] * invJ[4] + GN[9] * invJ[7];
+		kerB[17] = GN[3] * invJ[2] + GN[6] * invJ[5] + GN[9] * invJ[8];
+		kerB[18] = -GN[3] * invJ[0] + GN[7] * invJ[3] + GN[10] * invJ[6];
+		kerB[19] = -GN[3] * invJ[1] + GN[7] * invJ[4] + GN[10] * invJ[7];
+		kerB[20] = -GN[3] * invJ[2] + GN[7] * invJ[5] + GN[10] * invJ[8];
+		kerB[21] = -GN[2] * invJ[0] - GN[7] * invJ[3] + GN[11] * invJ[6];
+		kerB[22] = -GN[2] * invJ[1] - GN[7] * invJ[4] + GN[11] * invJ[7];
+		kerB[23] = -GN[2] * invJ[2] - GN[7] * invJ[5] + GN[11] * invJ[8];
 
 		// construct element stiffness matrix
 		Matrix[0] = detJ*(D[0]*(kerB[0]*kerB[0])+D[2]*(kerB[1]*kerB[1])+D[2]*(kerB[2]*kerB[2]));
@@ -538,7 +538,7 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 	const double zeta8[8] = { -0.577350269189626 ,-0.577350269189626 ,-0.577350269189626 ,-0.577350269189626 , 0.577350269189626 ,0.577350269189626 , 0.577350269189626 , 0.577350269189626 };
 
 	double stressXYZ[6][8];	// 8 gauss points, 6 stress components
-	for (unsigned p=0;p<8;p++)
+	for (unsigned p = 0; p < 8; p++)
 	{
 		double xi   = xi8[p];
 		double eta  = eta8[p];
@@ -559,15 +559,15 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		GN[11] = (1-xi)*(1-eta);
 
 		double J[9];
-		J[0] = COORXYZ[0]*GN[0]+COORXYZ[3]*GN[1]-COORXYZ[6]*GN[1]-COORXYZ[9]*GN[0]+COORXYZ[12]*GN[2]+COORXYZ[15]*GN[3]-COORXYZ[18]*GN[3]-COORXYZ[21]*GN[2];
-		J[1] = COORXYZ[0]*GN[4]-COORXYZ[3]*GN[4]+COORXYZ[6]*GN[5]-COORXYZ[9]*GN[5]-COORXYZ[12]*GN[6]+COORXYZ[15]*GN[6]+COORXYZ[18]*GN[7]-COORXYZ[21]*GN[7];
-		J[2] = -COORXYZ[0]*GN[8]-COORXYZ[3]*GN[9]-COORXYZ[6]*GN[10]-COORXYZ[9]*GN[11]+COORXYZ[12]*GN[8]+COORXYZ[15]*GN[9]+COORXYZ[18]*GN[10]+COORXYZ[21]*GN[11];
-		J[3] = COORXYZ[1]*GN[0]+COORXYZ[4]*GN[1]-COORXYZ[7]*GN[1]-COORXYZ[10]*GN[0]+COORXYZ[13]*GN[2]+COORXYZ[16]*GN[3]-COORXYZ[19]*GN[3]-COORXYZ[22]*GN[2];
-		J[4] = COORXYZ[1]*GN[4]-COORXYZ[4]*GN[4]+COORXYZ[7]*GN[5]-COORXYZ[10]*GN[5]-COORXYZ[13]*GN[6]+COORXYZ[16]*GN[6]+COORXYZ[19]*GN[7]-COORXYZ[22]*GN[7];
-		J[5] = -COORXYZ[1]*GN[8]-COORXYZ[4]*GN[9]-COORXYZ[7]*GN[10]-COORXYZ[10]*GN[11]+COORXYZ[13]*GN[8]+COORXYZ[16]*GN[9]+COORXYZ[19]*GN[10]+COORXYZ[22]*GN[11];
-		J[6] = COORXYZ[2]*GN[0]+COORXYZ[5]*GN[1]-COORXYZ[8]*GN[1]-COORXYZ[11]*GN[0]+COORXYZ[14]*GN[2]+COORXYZ[17]*GN[3]-COORXYZ[20]*GN[3]-COORXYZ[23]*GN[2];
-		J[7] = COORXYZ[2]*GN[4]-COORXYZ[5]*GN[4]+COORXYZ[8]*GN[5]-COORXYZ[11]*GN[5]-COORXYZ[14]*GN[6]+COORXYZ[17]*GN[6]+COORXYZ[20]*GN[7]-COORXYZ[23]*GN[7];
-		J[8] = -COORXYZ[2]*GN[8]-COORXYZ[5]*GN[9]-COORXYZ[8]*GN[10]-COORXYZ[11]*GN[11]+COORXYZ[14]*GN[8]+COORXYZ[17]*GN[9]+COORXYZ[20]*GN[10]+COORXYZ[23]*GN[11];
+		J[0] = COORXYZ[0] * GN[0] + COORXYZ[3] * GN[1] - COORXYZ[6] * GN[1] - COORXYZ[9] * GN[0] + COORXYZ[12] * GN[2] + COORXYZ[15] * GN[3] - COORXYZ[18] * GN[3] - COORXYZ[21] * GN[2];
+		J[1] = -COORXYZ[0] * GN[4] + COORXYZ[3] * GN[4] + COORXYZ[6] * GN[5] - COORXYZ[9] * GN[5] - COORXYZ[12] * GN[6] + COORXYZ[15] * GN[6] + COORXYZ[18] * GN[7] - COORXYZ[21] * GN[7];
+		J[2] = -COORXYZ[0] * GN[8] - COORXYZ[3] * GN[9] - COORXYZ[6] * GN[10] - COORXYZ[9] * GN[11] + COORXYZ[12] * GN[8] + COORXYZ[15] * GN[9] + COORXYZ[18] * GN[10] + COORXYZ[21] * GN[11];
+		J[3] = COORXYZ[1] * GN[0] + COORXYZ[4] * GN[1] - COORXYZ[7] * GN[1] - COORXYZ[10] * GN[0] + COORXYZ[13] * GN[2] + COORXYZ[16] * GN[3] - COORXYZ[19] * GN[3] - COORXYZ[22] * GN[2];
+		J[4] = -COORXYZ[1] * GN[4] + COORXYZ[4] * GN[4] + COORXYZ[7] * GN[5] - COORXYZ[10] * GN[5] - COORXYZ[13] * GN[6] + COORXYZ[16] * GN[6] + COORXYZ[19] * GN[7] - COORXYZ[22] * GN[7];
+		J[5] = -COORXYZ[1] * GN[8] - COORXYZ[4] * GN[9] - COORXYZ[7] * GN[10] - COORXYZ[10] * GN[11] + COORXYZ[13] * GN[8] + COORXYZ[16] * GN[9] + COORXYZ[19] * GN[10] + COORXYZ[22] * GN[11];
+		J[6] = COORXYZ[2] * GN[0] + COORXYZ[5] * GN[1] - COORXYZ[8] * GN[1] - COORXYZ[11] * GN[0] + COORXYZ[14] * GN[2] + COORXYZ[17] * GN[3] - COORXYZ[20] * GN[3] - COORXYZ[23] * GN[2];
+		J[7] = -COORXYZ[2] * GN[4] + COORXYZ[5] * GN[4] + COORXYZ[8] * GN[5] - COORXYZ[11] * GN[5] - COORXYZ[14] * GN[6] + COORXYZ[17] * GN[6] + COORXYZ[20] * GN[7] - COORXYZ[23] * GN[7];
+		J[8] = -COORXYZ[2] * GN[8] - COORXYZ[5] * GN[9] - COORXYZ[8] * GN[10] - COORXYZ[11] * GN[11] + COORXYZ[14] * GN[8] + COORXYZ[17] * GN[9] + COORXYZ[20] * GN[10] + COORXYZ[23] * GN[11];
 
 		double detJ = J[0]*J[4]*J[8] - J[0]*J[5]*J[7] - J[1]*J[3]*J[8] + J[1]*J[5]*J[6] + J[2]*J[3]*J[7] - J[2]*J[4]*J[6];
 
@@ -583,30 +583,30 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		invJ[8] = (J[0]*J[4]-J[1]*J[3])/detJ;
 
 		double kerB[24];
-		kerB[0] = GN[0]*invJ[0]+GN[4]*invJ[3]-GN[8]*invJ[6];
-		kerB[1] = GN[0]*invJ[1]+GN[4]*invJ[4]-GN[8]*invJ[7];
-		kerB[2] = GN[0]*invJ[2]+GN[4]*invJ[5]-GN[8]*invJ[8];
-		kerB[3] = GN[1]*invJ[0]-GN[4]*invJ[3]-GN[9]*invJ[6];
-		kerB[4] = GN[1]*invJ[1]-GN[4]*invJ[4]-GN[9]*invJ[7];
-		kerB[5] = GN[1]*invJ[2]-GN[4]*invJ[5]-GN[9]*invJ[8];
-		kerB[6] = -GN[1]*invJ[0]+GN[5]*invJ[3]-GN[10]*invJ[6];
-		kerB[7] = -GN[1]*invJ[1]+GN[5]*invJ[4]-GN[10]*invJ[7];
-		kerB[8] = -GN[1]*invJ[2]+GN[5]*invJ[5]-GN[10]*invJ[8];
-		kerB[9] = -GN[0]*invJ[0]-GN[5]*invJ[3]-GN[11]*invJ[6];
-		kerB[10] = -GN[0]*invJ[1]-GN[5]*invJ[4]-GN[11]*invJ[7];
-		kerB[11] = -GN[0]*invJ[2]-GN[5]*invJ[5]-GN[11]*invJ[8];
-		kerB[12] = GN[2]*invJ[0]-GN[6]*invJ[3]+GN[8]*invJ[6];
-		kerB[13] = GN[2]*invJ[1]-GN[6]*invJ[4]+GN[8]*invJ[7];
-		kerB[14] = GN[2]*invJ[2]-GN[6]*invJ[5]+GN[8]*invJ[8];
-		kerB[15] = GN[3]*invJ[0]+GN[6]*invJ[3]+GN[9]*invJ[6];
-		kerB[16] = GN[3]*invJ[1]+GN[6]*invJ[4]+GN[9]*invJ[7];
-		kerB[17] = GN[3]*invJ[2]+GN[6]*invJ[5]+GN[9]*invJ[8];
-		kerB[18] = -GN[3]*invJ[0]+GN[7]*invJ[3]+GN[10]*invJ[6];
-		kerB[19] = -GN[3]*invJ[1]+GN[7]*invJ[4]+GN[10]*invJ[7];
-		kerB[20] = -GN[3]*invJ[2]+GN[7]*invJ[5]+GN[10]*invJ[8];
-		kerB[21] = -GN[2]*invJ[0]-GN[7]*invJ[3]+GN[11]*invJ[6];
-		kerB[22] = -GN[2]*invJ[1]-GN[7]*invJ[4]+GN[11]*invJ[7];
-		kerB[23] = -GN[2]*invJ[2]-GN[7]*invJ[5]+GN[11]*invJ[8];
+		kerB[0] = GN[0] * invJ[0] - GN[4] * invJ[3] - GN[8] * invJ[6];
+		kerB[1] = GN[0] * invJ[1] - GN[4] * invJ[4] - GN[8] * invJ[7];
+		kerB[2] = GN[0] * invJ[2] - GN[4] * invJ[5] - GN[8] * invJ[8];
+		kerB[3] = GN[1] * invJ[0] + GN[4] * invJ[3] - GN[9] * invJ[6];
+		kerB[4] = GN[1] * invJ[1] + GN[4] * invJ[4] - GN[9] * invJ[7];
+		kerB[5] = GN[1] * invJ[2] + GN[4] * invJ[5] - GN[9] * invJ[8];
+		kerB[6] = -GN[1] * invJ[0] + GN[5] * invJ[3] - GN[10] * invJ[6];
+		kerB[7] = -GN[1] * invJ[1] + GN[5] * invJ[4] - GN[10] * invJ[7];
+		kerB[8] = -GN[1] * invJ[2] + GN[5] * invJ[5] - GN[10] * invJ[8];
+		kerB[9] = -GN[0] * invJ[0] - GN[5] * invJ[3] - GN[11] * invJ[6];
+		kerB[10] = -GN[0] * invJ[1] - GN[5] * invJ[4] - GN[11] * invJ[7];
+		kerB[11] = -GN[0] * invJ[2] - GN[5] * invJ[5] - GN[11] * invJ[8];
+		kerB[12] = GN[2] * invJ[0] - GN[6] * invJ[3] + GN[8] * invJ[6];
+		kerB[13] = GN[2] * invJ[1] - GN[6] * invJ[4] + GN[8] * invJ[7];
+		kerB[14] = GN[2] * invJ[2] - GN[6] * invJ[5] + GN[8] * invJ[8];
+		kerB[15] = GN[3] * invJ[0] + GN[6] * invJ[3] + GN[9] * invJ[6];
+		kerB[16] = GN[3] * invJ[1] + GN[6] * invJ[4] + GN[9] * invJ[7];
+		kerB[17] = GN[3] * invJ[2] + GN[6] * invJ[5] + GN[9] * invJ[8];
+		kerB[18] = -GN[3] * invJ[0] + GN[7] * invJ[3] + GN[10] * invJ[6];
+		kerB[19] = -GN[3] * invJ[1] + GN[7] * invJ[4] + GN[10] * invJ[7];
+		kerB[20] = -GN[3] * invJ[2] + GN[7] * invJ[5] + GN[10] * invJ[8];
+		kerB[21] = -GN[2] * invJ[0] - GN[7] * invJ[3] + GN[11] * invJ[6];
+		kerB[22] = -GN[2] * invJ[1] - GN[7] * invJ[4] + GN[11] * invJ[7];
+		kerB[23] = -GN[2] * invJ[2] - GN[7] * invJ[5] + GN[11] * invJ[8];
 
 		stressXYZ[0][p] = D[1] * Disp[1] * kerB[1] + D[1] * Disp[2] * kerB[2] + D[0] * Disp[3] * kerB[3] + D[1] * Disp[4] * kerB[4] + D[1] * Disp[5] * kerB[5] + D[0] * Disp[6] * kerB[6] + D[1] * Disp[7] * kerB[7] + D[1] * Disp[8] * kerB[8] + D[0] * Disp[9] * kerB[9] + D[1] * Disp[10] * kerB[10] + D[1] * Disp[11] * kerB[11] + D[0] * Disp[12] * kerB[12] + D[1] * Disp[13] * kerB[13] + D[1] * Disp[14] * kerB[14] + D[0] * Disp[15] * kerB[15] + D[1] * Disp[16] * kerB[16] + D[1] * Disp[17] * kerB[17] + D[0] * Disp[18] * kerB[18] + D[1] * Disp[19] * kerB[19] + D[1] * Disp[20] * kerB[20] + D[0] * Disp[21] * kerB[21] + D[1] * Disp[22] * kerB[22] + D[1] * Disp[23] * kerB[23] + D[0] * Disp[0] * kerB[0];
 		stressXYZ[1][p] = D[0] * Disp[1] * kerB[1] + D[1] * Disp[2] * kerB[2] + D[1] * Disp[3] * kerB[3] + D[0] * Disp[4] * kerB[4] + D[1] * Disp[5] * kerB[5] + D[1] * Disp[6] * kerB[6] + D[0] * Disp[7] * kerB[7] + D[1] * Disp[8] * kerB[8] + D[1] * Disp[9] * kerB[9] + D[0] * Disp[10] * kerB[10] + D[1] * Disp[11] * kerB[11] + D[1] * Disp[12] * kerB[12] + D[0] * Disp[13] * kerB[13] + D[1] * Disp[14] * kerB[14] + D[1] * Disp[15] * kerB[15] + D[0] * Disp[16] * kerB[16] + D[1] * Disp[17] * kerB[17] + D[1] * Disp[18] * kerB[18] + D[0] * Disp[19] * kerB[19] + D[1] * Disp[20] * kerB[20] + D[1] * Disp[21] * kerB[21] + D[0] * Disp[22] * kerB[22] + D[1] * Disp[23] * kerB[23] + D[1] * Disp[0] * kerB[0];
