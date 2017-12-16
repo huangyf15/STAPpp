@@ -103,12 +103,12 @@ void CHex::ElementStiffness(double* Matrix)
 	//Construct constitutive matrix
 	CHexMaterial* material = dynamic_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
 	double v = material->nu;
-	double k = material->E * (1-v)/(1+v)/(1-2*v);
+	double k = material->E * (1 - v) / (1 + v) / (1 - 2 * v);
 	double D[3];
 
 	D[0] = k;
 	D[1] = k * v / (1 - v);
-	D[2] = k * (1 - 2 * v) / 2 / (1 - v);
+	D[2] = k * (1 - 2 * v) / 2.0 / (1 - v);
 
 	//construct coordinate matrix
 	double COORXYZ[24];
@@ -116,7 +116,7 @@ void CHex::ElementStiffness(double* Matrix)
 	{
 		for (unsigned int j = 0; j < 3; j++)
 		{
-			COORXYZ[3 * i + j]=nodes[i]->XYZ[j];
+			COORXYZ[3 * i + j] = nodes[i]->XYZ[j];
 		}
 	}
 
@@ -127,23 +127,23 @@ void CHex::ElementStiffness(double* Matrix)
 
 	for (unsigned p = 0; p < 8; p++)
 	{
-		double xi   = xi8[p];
-		double eta  = eta8[p];
+		double xi = xi8[p];
+		double eta = eta8[p];
 		double zeta = zeta8[p];
 
 		double GN[12];
-		GN[0] = (1-eta)*(1-zeta);
-		GN[1] = (1+eta)*(1-zeta);
-		GN[2] = (1-eta)*(1+zeta);
-		GN[3] = (1+eta)*(1+zeta);
-		GN[4] = (1+xi)*(1-zeta);
-		GN[5] = (1-xi)*(1-zeta);
-		GN[6] = (1+xi)*(1+zeta);
-		GN[7] = (1-xi)*(1+zeta);
-		GN[8] = (1+xi)*(1-eta);
-		GN[9] = (1+xi)*(1+eta);
-		GN[10] = (1-xi)*(1+eta);
-		GN[11] = (1-xi)*(1-eta);
+		GN[0] = (1-eta)*(1-zeta) / 8.0;
+		GN[1] = (1+eta)*(1-zeta) / 8.0;
+		GN[2] = (1-eta)*(1+zeta) / 8.0;
+		GN[3] = (1+eta)*(1+zeta / 8.0);
+		GN[4] = (1+xi)*(1-zeta) / 8.0;
+		GN[5] = (1-xi)*(1-zeta) / 8.0;
+		GN[6] = (1+xi)*(1+zeta) / 8.0;
+		GN[7] = (1-xi)*(1+zeta) / 8.0;
+		GN[8] = (1+xi)*(1-eta) / 8.0;
+		GN[9] = (1+xi)*(1+eta) / 8.0;
+		GN[10] = (1-xi)*(1+eta) / 8.0;
+		GN[11] = (1-xi)*(1-eta) / 8.0;
 
 		double J[9];
 		J[0] = COORXYZ[0]*GN[0]+COORXYZ[3]*GN[1]-COORXYZ[6]*GN[1]-COORXYZ[9]*GN[0]+COORXYZ[12]*GN[2]+COORXYZ[15]*GN[3]-COORXYZ[18]*GN[3]-COORXYZ[21]*GN[2];
