@@ -627,26 +627,26 @@ void COutputter::OutputElementStress()
 			case ElementTypes::Quadrilateral: // Quadrilateral element
 				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
 					<< "                       GUASS POINTS STRESSES"
-					#ifdef __TEST__
+					#ifdef _TEST_
 					<< "                      GUASS POINTS DISPLACEMENTS            INTEGRATE"
 					#endif
 					<< endl;
 				*this << "     NUMBER    INDEX        X             Y             Z" 
 					<< "               SX'X'         SY'Y'        SX'Y'"
-					#ifdef __TEST__
+					#ifdef _TEST_
 					<< "              UX            UY           UZ            WEIGHTS"
 					#endif
 					<< endl;
 				double stresses[12];
 				double Positions[12];
-				#ifdef __TEST__
+				#ifdef _TEST_
 				double GaussDisplacements[12];
 				double weights[4];
 				#endif
 
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
-					#ifndef __TEST__
+					#ifndef _TEST_
 					static_cast<CQuadrilateral&>(
 						EleGrp.GetElement(Ele)).ElementStress(stresses, Displacement, Positions);
 					#else
@@ -661,7 +661,7 @@ void COutputter::OutputElementStress()
 						*this << setw(17) << Positions[i*3] << setw(14) << Positions[i*3+1] << setw(14) << Positions[i*3+2];
 						*this << setw(17) << stresses[i*3] << setw(14) << stresses[i*3+1] << setw(14) << stresses[i*3+2];
 						// *this << setw(32) << stresses[i] << std::endl;
-						#ifdef __TEST__
+						#ifdef _TEST_
 						*this << setw(17) << GaussDisplacements[i*3] 
 							<< setw(14) << GaussDisplacements[i*3+1] 
 							<< setw(14) << GaussDisplacements[i*3+2];
@@ -696,7 +696,7 @@ void COutputter::OutputElementStress()
 
 			case ElementTypes::Triangle: // 3T element
 				double stress3T[3];
-				#ifndef __TEST__
+				#ifndef _TEST_
 				*this << "  ELEMENT            LOCAL    ELEMENT    STRESS" << endl
 					  << "  NUMBER         SXX            SYY            SXY" << endl;
 				#else
@@ -716,14 +716,14 @@ void COutputter::OutputElementStress()
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp.GetElement(Ele);
-					#ifndef __TEST__
+					#ifndef _TEST_
 					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement);
 					#else
 					static_cast<CTriangle&>(Element).ElementStress(stress3T, Displacement, GPPosition, GPDisplacement, weights3T);
 					#endif
 					CTriangleMaterial material = *static_cast<CTriangleMaterial*>(Element.GetElementMaterial());
 					
-					#ifndef __TEST__
+					#ifndef _TEST_
 					*this << setw(5) << Ele + 1 << setw(20) << stress3T[0] 
 					      << setw(15) << stress3T[1] << setw(15) << stress3T[2] << endl;
 					#else

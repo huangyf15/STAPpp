@@ -283,7 +283,7 @@ void CTriangle::ElementStress(double stress[3], double* Displacement, double Gau
     stress[1] = 2 * (v * y23 * de[0] + x32 * de[1] + v * y31 * de[2] + x13 * de[3] + x21 * de[5]);
     stress[2] = (1 - v) * (x32 * de[0] + y23 * de[1] + x13 * de[2] + y31 * de[3] + x21 * de[4]);
 
-#ifdef __TEST__
+#ifdef _TEST_
     for (unsigned index = 0; index < 3; index++)
     {
         weights[index] = Area / 3;

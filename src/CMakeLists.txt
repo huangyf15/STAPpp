@@ -9,7 +9,7 @@ ENDIF()
 
 OPTION(STAP++_TEST "Output test infomation to validate." OFF)
 IF(STAP++_TEST)
-    ADD_DEFINITIONS(-D__TEST__)
+    ADD_DEFINITIONS(-D_TEST_)
 ENDIF()
 
 OPTION(STAP++_RUN "Skip print screen at running." OFF)
