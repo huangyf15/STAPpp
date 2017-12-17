@@ -116,7 +116,7 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     for (std::size_t _ = 0; _ < rhsCount*size; _++) res[_] = 0;
 
     int msglvl = 0; // print info
-#ifdef _DEBUG_
+#if defined(_DEBUG_) || defined(_RUN_)
     msglvl = 1;
 #endif // _DEBUG_
     int* perm = new int[size];
