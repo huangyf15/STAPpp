@@ -1,6 +1,7 @@
 import re
 import math
 import numpy as np
+from multiprocessing.dummy import Pool
 
 from STAPpp import *
 import ABAQUS
@@ -497,11 +498,12 @@ class Parser():
         # {index: {direction: force, }}
         self.globalForcesByGlobalNodeIndexDict = dict()
 
-        count = 0  # for progress bar
+        self.bar.count = 0
         for insIndex in self.instancesDict:
             ins = self.instancesDict[insIndex]
             part = ins.part
-            for elementIndex in part.localElementsDict:
+
+            def run(elementIndex):
                 element = part.localElementsDict[elementIndex]
 
                 # calculate a unit body force at each node
@@ -527,10 +529,14 @@ class Parser():
                             forces[direction] = force
                             load.forces.append(force)  # append new force only
                         force.mag += fs[direction] * nodeForces[localNodeIndex]
-
-                count += 1
-                if count / self.elementCount > self.bar.currentCount / self.bar.maxCount:
+                self.bar.count += 1
+                if self.bar.count / self.elementCount > self.bar.currentCount / self.bar.maxCount:
                     self.bar.grow()
+
+            # for elementIndex in part.localElementsDict:
+            pool = Pool()
+            pool.map(run, part.localElementsDict)
+            pool.close()
 
         self.loads.append(load)
         del self.bar
