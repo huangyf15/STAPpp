@@ -52,7 +52,7 @@ bool CQuadrilateral::Read(ifstream& Input, unsigned int Ele, CMaterial* Material
     unsigned int N1, N2, N3, N4; // node indexs
 
     Input >> N1 >> N2 >> N3 >> N4 >> MSet;
-    ElementMaterial = dynamic_cast<CQuadrilateralMaterial*>(MaterialSets) + MSet - 1;
+    ElementMaterial = static_cast<CQuadrilateralMaterial*>(MaterialSets) + MSet - 1;
     nodes[0] = NodeList + N1 - 1;
     nodes[1] = NodeList + N2 - 1;
     nodes[2] = NodeList + N3 - 1;
@@ -321,7 +321,7 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
     const double psis[2] = {-pos, pos};
     const double weights[2][2] = {{1.0, 1.0}, {1.0, 1.0}};
 
-    const CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
+    const CQuadrilateralMaterial* material = static_cast<CQuadrilateralMaterial*>(
         ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
@@ -443,7 +443,7 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
         d[9] * i[0] + d[10] * i[1] + d[11] * i[2], d[9] * j[0] + d[10] * j[1] + d[11] * j[2]};
 
     // ======================= calculate stress ========================
-    CQuadrilateralMaterial* material = dynamic_cast<CQuadrilateralMaterial*>(
+    CQuadrilateralMaterial* material = static_cast<CQuadrilateralMaterial*>(
         ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
