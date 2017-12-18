@@ -6,7 +6,7 @@ assert platform.system() == 'Linux'
 necessaries = (
     '/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include',
     '/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64',
-    '/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler'
+    '/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64'
 )
 
 if all(os.path.exists(item) for item in necessaries):
