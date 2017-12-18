@@ -270,3 +270,7 @@ void CBeam::ElementStress(double* stress, double* Displacement)
         }
     }
 }
+
+void CBeam::ElementStress2(double* stress, double* Displacement, double* PositionBeam)
+{
+}

@@ -1097,3 +1097,7 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     position[13] = ymid;
     position[14] = zmid;
 }
+
+void CShell::ElementStress2(double* stress, double* Displacement, double* Positions4SE)
+{
+}

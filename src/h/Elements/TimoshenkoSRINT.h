@@ -41,6 +41,9 @@ public:
     //!	Calculate element stress
     virtual void ElementStress(double* stress, double* force, double* Displacement);
 
+	 //!	Calculate element stress
+    virtual void ElementStress2(double* stress, double* force, double* Displacement, double* PositionTB );
+
     //!	Return the size of the element stiffness matrix (stored as an array column by column)
     virtual unsigned int SizeOfStiffnessMatrix();
 };

@@ -88,6 +88,10 @@ public:
 //!	Calculate element stress 
 	virtual void ElementStress(double* stress, double* Displacement){};
 
+//!	Calculate element stress 
+	virtual void ElementStress2(double* stress, double* Displacement, double* Positions){};
+
+
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }
 

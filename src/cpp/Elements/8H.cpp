@@ -501,7 +501,7 @@ void CHex::ElementStiffness(double* Matrix)
 
 
 //	Calculate element stress 
-void CHex::ElementStress(double* stressHex, double* Displacement)
+void CHex::ElementStress(double* stressHex, double* Displacement )
 {
 	// Get nodal displacements [LM can be used here]
 	double Disp[24];
@@ -634,4 +634,8 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 			stressHex[6 * j + i] = recovery[j];
 		}
 	}
+}
+
+void  CHex::ElementStress2(double* stress, double* Displacement ,double* Positions)
+{
 }

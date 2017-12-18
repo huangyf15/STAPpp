@@ -302,3 +302,7 @@ void CTriangle::ElementStress(double stress[3], double* Displacement, double Gau
     }
 #endif
 }
+
+void CTriangle::ElementStress2(double* stress, double* Displacement, double*  Position3T)
+{
+}

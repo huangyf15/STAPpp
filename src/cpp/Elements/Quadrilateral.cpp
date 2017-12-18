@@ -476,3 +476,7 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
     weights[3] = 1.0 * CalculateWeightAt(etas[1], psis[1], xe, ye);
 #endif
 }
+
+void CQuadrilateral::ElementStress2(double stress[12], double* Displacement, double Positions[12])
+{
+}

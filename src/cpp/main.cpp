@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     }
 	string InFile = filename + ".dat";
 	string OutFile = filename + ".out";
+	string OutFile2 = filename + "_post.out";
 
 	CDomain* FEMData = CDomain::Instance();
 
@@ -69,6 +70,8 @@ int main(int argc, char *argv[])
 
     COutputter* Output = COutputter::Instance();
 
+	COutputter2* Output2 = COutputter2::Instance2(OutFile2);
+
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
 #endif
@@ -82,7 +85,7 @@ int main(int argc, char *argv[])
         Solver->BackSubstitution(FEMData->GetForce());
 #endif
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
         Output->PrintDisplacement(lcase);
 #endif
 
@@ -96,6 +99,9 @@ int main(int argc, char *argv[])
 #ifndef _RUN_
 	Output->OutputElementStress();
 #endif    
+
+	// post processs 
+    Output2->OutputElementStress2();
 
     double time_stress = timer.ElapsedTime();
     
