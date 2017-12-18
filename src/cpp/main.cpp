@@ -101,7 +101,12 @@ int main(int argc, char *argv[])
     
     timer.Stop();
     
-    *Output << "\n S O L U T I O N   T I M E   L O G   I N   S E C \n\n"
+    *(Output->GetOutputFile()) << "\n S O L U T I O N   T I M E   L O G   I N   S E C \n\n"
+            << "     TIME FOR INPUT PHASE = " << time_input << endl
+            << "     TIME FOR CALCULATION OF STIFFNESS MATRIX = " << time_assemble - time_input << endl
+            << "     TIME FOR FACTORIZATION AND LOAD CASE SOLUTIONS = " << time_solution - time_assemble << endl << endl
+            << "     T O T A L   S O L U T I O N   T I M E = " << time_stress << endl;
+    std::cout << "\n S O L U T I O N   T I M E   L O G   I N   S E C \n\n"
             << "     TIME FOR INPUT PHASE = " << time_input << endl
             << "     TIME FOR CALCULATION OF STIFFNESS MATRIX = " << time_assemble - time_input << endl
             << "     TIME FOR FACTORIZATION AND LOAD CASE SOLUTIONS = " << time_solution - time_assemble << endl << endl
