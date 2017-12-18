@@ -3,8 +3,13 @@ import os
 
 assert platform.system() == 'Linux'
 
-if os.path.exists('/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include') and \
-   os.path.exists('/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64') :
+necessaries = (
+    '/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include',
+    '/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64',
+    '/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler'
+)
+
+if all(os.path.exists(item) for item in necessaries):
     print('MKL installed or cached.')
 else:
     print('installing MKL.')
