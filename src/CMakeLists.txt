@@ -23,9 +23,11 @@ IF(USE_MKL)
     IF(UNIX)
         INCLUDE_DIRECTORIES(/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/include)
         LINK_DIRECTORIES(/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64)
+        LINK_DIRECTORIES(/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64)
     ELSE()
         INCLUDE_DIRECTORIES("C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mkl/include")
         LINK_DIRECTORIES("C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mkl/lib/intel64_win")
+        LINK_DIRECTORIES("C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/compiler/lib/intel64_win")
     ENDIF()
 ENDIF()
 
@@ -46,5 +48,10 @@ source_group(HEADER\ FILES FILES ${HEAD})
 ADD_EXECUTABLE(stap++ ${SRC} ${SRC_ELEMENTS} ${HEAD})
 
 IF(USE_MKL)
-    TARGET_LINK_LIBRARIES(stap++ mkl_intel_lp64 mkl_sequential mkl_core)
+    TARGET_LINK_LIBRARIES(
+        stap++
+        mkl_intel_lp64
+        mkl_intel_thread
+        mkl_core
+        libiomp5md)
 ENDIF()

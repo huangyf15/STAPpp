@@ -100,6 +100,7 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     int iparm[64] = { 0 };
 
     pardisoinit(pt, &mtype, iparm);
+    iparm[1] = 2; // The parallel (OpenMP) version of the nested dissection algorithm.
 	iparm[5] = 1; // write back to Force
 
     const int one = 1;
