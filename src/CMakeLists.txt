@@ -48,10 +48,10 @@ source_group(HEADER\ FILES FILES ${HEAD})
 ADD_EXECUTABLE(stap++ ${SRC} ${SRC_ELEMENTS} ${HEAD})
 
 IF(USE_MKL)
-    TARGET_LINK_LIBRARIES(
-        stap++
-        mkl_intel_lp64
-        mkl_intel_thread
-        mkl_core
-        libiomp5md)
+    TARGET_LINK_LIBRARIES(stap++ mkl_intel_lp64 mkl_intel_thread mkl_core)
+    IF(UNIX)
+        TARGET_LINK_LIBRARIES(stap++ iomp5)
+    ELSE()
+        TARGET_LINK_LIBRARIES(stap++ libiomp5md)
+    ENDIF()
 ENDIF()
