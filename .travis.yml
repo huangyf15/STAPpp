@@ -6,6 +6,7 @@ cache:
   - apt: true
   - directories:
     - /opt/intel/compilers_and_libraries_2018.1.163/linux/mkl
+    - /opt/intel/compilers_and_libraries_2018.1.163/linux/compiler
 install:
   - mkdir temp -p
   - cd temp

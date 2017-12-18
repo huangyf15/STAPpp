@@ -1,15 +1,26 @@
 #pragma once
 #include <iomanip>
 #include <iostream>
-#include <set>
 #include <vector>
+#include <set>
+#include <algorithm>
 
 #include "SparseMatrix.h"
+
+#define CSR_USE_VECTOR
+
+#ifdef CSR_USE_VECTOR
+typedef std::vector<int> STL_t;
+#define CSR_OPT push_back
+#else
+typedef std::set<int> STL_t;
+#define CSR_OPT insert
+#endif
 
 template <typename T> class CSRMatrix : public SparseMatrix<T>
 {
 private:
-    std::set<int>* _tempColumns;
+    STL_t* _tempColumns;
 
 public:
     int size;
@@ -32,19 +43,26 @@ public:
     void beginPostionMark()
     {
         // _tempColumns = std::set[size]
-        _tempColumns = new std::set<int>[size] {};
+        _tempColumns = new STL_t[size] {};
     }
 
     void markPosition(int row, int column)
     {
         // insert column
-        _tempColumns[row - 1].insert(column);
+        _tempColumns[row - 1].CSR_OPT(column);
     }
 
     void allocate()
     {
-        // first, calculate row indexs.
-        // notice row index starts from 1
+        #ifdef CSR_USE_VECTOR
+        for (int row = 0; row < size; ++row)
+        {
+            std::vector<int>& v = _tempColumns[row];
+            std::sort(v.begin(), v.end());
+            v.erase(std::unique(v.begin(), v.end()), v.end());
+        }
+        #endif
+        // first, calculate row indexs. Notice row index starts from 1
         rowIndexs[0] = 1;
         for (int row = 0; row < size; ++row)
         {

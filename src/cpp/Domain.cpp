@@ -246,6 +246,20 @@ void CDomain::CalculateEquationNumber()
 			}
 		}
 	}
+
+    GenerateLocationMatrix();
+
+#ifdef MKL
+    CSRStiffnessMatrix = new CSRMatrix<double>(NEQ);
+    CalculateCSRColumns();
+#else
+    StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
+    //	Calculate column heights
+	CalculateColumnHeights();
+	//	Calculate address of diagonal elements in banded matrix
+	CalculateDiagnoalAddress();
+#endif
+
 }
 
 //	Read load case data
@@ -394,19 +408,10 @@ void CDomain::AllocateMatrices()
 	clear(Force, NEQ);
 #endif
 
-	GenerateLocationMatrix();
-
 //  Create the banded stiffness matrix
 #ifdef MKL
-	CSRStiffnessMatrix = new CSRMatrix<double>(NEQ);
-	CalculateCSRColumns();
 	GetCSRStiffnessMatrix().allocate();
 #else
-    StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
-	//	Calculate column heights
-	CalculateColumnHeights();
-	//	Calculate address of diagonal elements in banded matrix
-	CalculateDiagnoalAddress();
 	StiffnessMatrix->Allocate();
 #endif
 	
@@ -437,9 +442,13 @@ void CDomain::CalculateCSRColumns()
                 {
                     unsigned index2 = LM[j];
                     if (!index2) continue;
-                    unsigned row = std::min(index1, index2);
-                    unsigned column = std::max(index1, index2);
-                    matrix.markPosition(row, column);
+                    if (index1 < index2) {
+                        matrix.markPosition(index1, index2);
+                    }
+                    else 
+                    {
+                        matrix.markPosition(index2, index1);
+                    }
                 }
             }
         }

@@ -464,7 +464,7 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
     CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, stress + 6);
     CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, stress + 9);
 
-#ifdef __TEST__
+#ifdef _TEST_
     CalculateDisplacementAt(etas[0], psis[0], de, i, j, GaussDisplacements + 0);
     CalculateDisplacementAt(etas[0], psis[1], de, i, j, GaussDisplacements + 3);
     CalculateDisplacementAt(etas[1], psis[0], de, i, j, GaussDisplacements + 6);
