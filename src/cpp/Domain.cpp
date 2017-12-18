@@ -442,9 +442,13 @@ void CDomain::CalculateCSRColumns()
                 {
                     unsigned index2 = LM[j];
                     if (!index2) continue;
-                    unsigned row = std::min(index1, index2);
-                    unsigned column = std::max(index1, index2);
-                    matrix.markPosition(row, column);
+                    if (index1 < index2) {
+                        matrix.markPosition(index1, index2);
+                    }
+                    else 
+                    {
+                        matrix.markPosition(index2, index1);
+                    }
                 }
             }
         }
