@@ -9,14 +9,17 @@
 
 #define CSR_USE_VECTOR
 
+#ifdef CSR_USE_VECTOR
+typedef std::vector<int> STL_t;
+#define CSR_OPT push_back
+#else
+typedef std::set<int> STL_t;
+#define CSR_OPT insert
+#endif
+
 template <typename T> class CSRMatrix : public SparseMatrix<T>
 {
 private:
-    #ifdef CSR_USE_VECTOR
-    typedef std::vector<int> STL_t;
-    #else
-    typedef std::set<int> STL_t;
-    #endif
     STL_t* _tempColumns;
 
 public:
@@ -46,11 +49,7 @@ public:
     void markPosition(int row, int column)
     {
         // insert column
-        #ifdef CSR_USE_VECTOR
-        _tempColumns[row - 1].push_back(column);
-        #else
-        _tempColumns[row - 1].insert(column);
-        #endif
+        _tempColumns[row - 1].CSR_OPT(column);
     }
 
     void allocate()
