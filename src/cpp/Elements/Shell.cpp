@@ -39,7 +39,7 @@ bool CShell::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, CN
     unsigned int N1, N2, N3, N4; // node numbers in counter-clock sequence
 
     Input >> N1 >> N2 >> N3 >> N4 >> MSet;
-    ElementMaterial = dynamic_cast<CShellMaterial*>(MaterialSets) + MSet - 1;
+    ElementMaterial = static_cast<CShellMaterial*>(MaterialSets) + MSet - 1;
     nodes[0] = &NodeList[N1 - 1];
     nodes[1] = &NodeList[N2 - 1];
     nodes[2] = &NodeList[N3 - 1];
@@ -102,7 +102,7 @@ void CShell::ElementStiffness(double* Matrix)
     zdir[2] = xdir[0] * ydir[1] - xdir[1] * ydir[0];
 
     CShellMaterial* material =
-        dynamic_cast<CShellMaterial*>(ElementMaterial); // Pointer to material of the element
+        static_cast<CShellMaterial*>(ElementMaterial); // Pointer to material of the element
 
     double nu = material->nu;
     const double k = material->E * material->h * material->h * material->h * 0.0833333333333333 /
@@ -842,7 +842,7 @@ void CShell::ElementStiffness(double* Matrix)
 void CShell::ElementStress(double* stress, double* Displacement, double* position)
 {
     CShellMaterial* material =
-        dynamic_cast<CShellMaterial*>(ElementMaterial); // Pointer to material of the element
+        static_cast<CShellMaterial*>(ElementMaterial); // Pointer to material of the element
 
     double xdir[3];
     double ydir[3];

@@ -176,7 +176,7 @@ bool CPlateMaterial::Read(ifstream& Input, unsigned int mset)
         return false;
     }
 
-    Input >> E >> h >> nu; // Young's modulus and height and Poisson's ratio
+    Input >> E >> nu >> h; // Young's modulus and Poisson's ratio and height 
 
     return true;
 }
@@ -214,7 +214,7 @@ bool CShellMaterial::Read(ifstream& Input, unsigned int mset)
         return false;
     }
 
-    Input >> E >> h >> nu; // Young's modulus and height and Poisson's ratio
+    Input >> E >> nu >> h; // Young's modulus and Poisson's ratio and height 
 
     return true;
 }
