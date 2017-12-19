@@ -88,12 +88,22 @@ class Calculator():
     def run(self):
         self.loadData()
         self.calc()
+        self.output()
+
+    def output(self):
+        print('%8d %8d' % (1, len(self.forces)),
+              file=self.fout)
+        for nodeIndex, force in self.forces.items():
+            print(
+                '%8d %4d %20f' % (nodeIndex, 3, force),
+                file=self.fout
+            )
 
     def calc(self):
         self.forces = dict()
 
-        direct = 3
-        mag = -10
+        self.direct = 3
+        self.mag = -10
 
         for eleGrp in self.elementGroups:
             eleType = eleGrp.eleType
@@ -106,12 +116,11 @@ class Calculator():
                 for i in range(len(element.nodesIndexs)):
                     nodeIndex = element.nodesIndexs[i]
 
-                    force = mag * nodeForces[nodeIndex]
+                    force = self.mag * nodeForces[nodeIndex]
                     if nodeIndex in self.forces:
                         self.forces[nodeIndex] += force
                     else:
                         self.forces[nodeIndex] = force
-        print(self.forces)
 
     def calculateBodyForceAtElement(self, element, eleGrp):
         eleType = eleGrp.eleType
