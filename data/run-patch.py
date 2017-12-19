@@ -20,6 +20,9 @@ def run(name):
 
 def main():
     run('3T')
+    run('4Q')
+    run('8H')
+    run('beam')
     print('patch test passed for all.')
 
 

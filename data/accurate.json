@@ -1,11 +1,41 @@
 {
     "3T": {
-        "args":{
-            "b":10,
-            "E":1.0e6,
-            "v":0.3
+        "args": {
+            "b": 10,
+            "E": 1.0e6,
+            "v": 0.3
         },
         "dx": "b / E * node.x",
         "dy": "-v * b / E * node.y"
+    },
+    "4Q": {
+        "args": {
+            "b": 10,
+            "E": 1.0e6,
+            "v": 0.3
+        },
+        "dx": "b / E * node.x",
+        "dy": "-v * b / E * node.y"
+    },
+    "8H": {
+        "args": {
+            "E": 1e6,
+            "v": 0.2,
+            "P": 0.25e3,
+            "l_x": 5,
+            "l_y": 5,
+            "l_z": 5
+        },
+        "dx": "-v * 4 * P * node.x / (E * l_z * l_x)",
+        "dy": "-v * 4 * P * node.y / (E * l_z * l_y)",
+        "dz": "4 * P * node.z / (E * l_z * l_z)"
+    },
+    "beam": {
+        "args": {
+            "EI": 458533,
+            "M": 100
+        },
+        "dy": "M * (node.x - 10) * node.x / (2 * EI)",
+        "tz": "M * (node.x - 5) / EI"
     }
 }
