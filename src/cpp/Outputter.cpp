@@ -873,8 +873,8 @@ void COutputter::OutputElementStress()
                                 for (unsigned int Ele = 0; Ele < NUME; Ele++)
                                 {
 
-                                        dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
-                                                .ElementStress2(stresses4SE, Displacement, Positions4SE);
+                                        static_cast<CShell&>(EleGrp.GetElement(Ele))
+                                                .ElementStress(stresses4SE, Displacement, Positions4SE);
 
                                         for (unsigned i = 0; i < 5; ++i){
                                           // four gauss points;
@@ -1128,6 +1128,7 @@ void COutputter2::OutputElementStress2()
                                 double Positions4SE[15];
                                 for (unsigned int Ele = 0; Ele < NUME; Ele++)
                                 {
+									 
                                         dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
                                                 .ElementStress2(stresses4SE, Displacement, Positions4SE);
 
