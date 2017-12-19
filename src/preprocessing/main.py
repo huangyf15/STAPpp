@@ -1,13 +1,26 @@
 import sys
 from optparse import OptionParser
+import os
 
 import ABAQUSparser
 import outputter
+import ABAQUSCalc
 
 
 def convert(fin, fout):
     data = ABAQUSparser.Parser(fin).parse()
     outputter.Outputter(data, fout).print()
+    del data
+    ABAQUSCalc.Calculator(fout).run()
+
+    with open(fout, 'w') as f:
+        for i in range(3):
+            finname = fout + '.' + str(i+1)
+            with open(finname) as fin_:
+                for line in fin_:
+                    f.write(line)
+            os.remove(finname)
+
 
 
 def main():

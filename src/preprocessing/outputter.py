@@ -37,7 +37,8 @@ class Outputter():
         print('%8d %8d %8d %8d' % (
             len(self.data['nodes']),
             len(self.data['elementGroups']),
-            len(self.data['loads']),
+            # len(self.data['loads']),
+            1,
             1
         ), file=self.f1)
         print(file=self.f1)

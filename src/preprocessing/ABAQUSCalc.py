@@ -28,12 +28,12 @@ class ElementGroup():
 
 
 class Calculator():
-    def __init__(self):
-        self.fout = open('data/Job-1.dat.2', 'w')
+    def __init__(self, datname):
+        self.fout = open(datname + '.2', 'w')
 
-        self.fin1 = open('data/Job-1.dat.1', 'r')
+        self.fin1 = open(datname + '.1', 'r')
 
-        self.fin3 = open('data/Job-1.dat.3', 'r')
+        self.fin3 = open(datname + '.3', 'r')
 
         with open('data/material.json') as f:
             self.materialInfo = json.load(f)
@@ -261,7 +261,7 @@ def getGaussIntegrateFor8HAtPos(pos, w):
 
 
 def main():
-    Calculator().run()
+    Calculator('data/Job-1').run()
 
 
 if __name__ == '__main__':
