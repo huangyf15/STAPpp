@@ -58,6 +58,9 @@ class Calculator():
             self.nodes.append(node)
 
     def loadElements(self):
+        self.bar = ProgressBar(1000, printTime=True, printCount=False)
+        self.bar.nel = 0
+        self.bar.count = 0
         self.elementGroups = []
         for eleGrpIndex in range(self.NEG):
             line = self.getLine3()
@@ -75,6 +78,7 @@ class Calculator():
                     int(args[-1])
                 )
                 eleGrp.elements.append(ele)
+            self.bar.nel += eleGrp.nel
             self.elementGroups.append(eleGrp)
 
     def getLine1(self, n=1):
@@ -122,6 +126,9 @@ class Calculator():
                         self.forces[nodeIndex] += force
                     else:
                         self.forces[nodeIndex] = force
+                self.bar.count += 1
+                if self.bar.count / self.bar.nel > self.bar.currentCount / self.bar.maxCount:
+                    self.bar.grow()
 
     def calculateBodyForceAtElement(self, element, eleGrp):
         eleType = eleGrp.eleType

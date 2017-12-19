@@ -15,12 +15,11 @@ def convert(fin, fout):
 
     with open(fout, 'w') as f:
         for i in range(3):
-            finname = fout + '.' + str(i+1)
+            finname = fout + '.' + str(i + 1)
             with open(finname) as fin_:
                 for line in fin_:
                     f.write(line)
             os.remove(finname)
-
 
 
 def main():

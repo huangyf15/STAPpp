@@ -4,9 +4,9 @@ from ProgressBar import ProgressBar
 class Outputter():
     def __init__(self, data, fout):
         self.data = data
-        self.fout1 = fout + '.1' # nodes
-        self.fout2 = fout + '.2' # forces
-        self.fout3 = fout + '.3' # elements
+        self.fout1 = fout + '.1'  # nodes
+        self.fout2 = fout + '.2'  # forces
+        self.fout3 = fout + '.3'  # elements
 
     def print(self):
         self.f1 = open(self.fout1, 'w')
@@ -23,7 +23,7 @@ class Outputter():
         self.printNodalDataLines()
         self.printLoadDataLines()
         self.printElementDataLines()
-        
+
         self.f1.close()
         self.f2.close()
         self.f3.close()
