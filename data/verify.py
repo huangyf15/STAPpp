@@ -1,7 +1,7 @@
 import os
 import re
-
-TIMES = 10000
+import json
+import copy
 
 
 class Node():
@@ -26,18 +26,20 @@ class Node():
         )
 
 
-class Element():
-    def __init__(self, nodes):
-        self.nodes = nodes
+def getRoot():
+    return os.path.dirname(os.path.abspath(__file__))
 
 
-def verify(filename):
-    # print(filename)
+def getFileName(name):
+    return getRoot() + os.sep + name + os.sep + 'patch.out'
+
+
+def verify(name):
     mark1 = False
     mark2 = False
     nodes = dict()
 
-    with open(filename, 'r') as fp:
+    with open(getFileName(name), 'r') as fp:
         for line in fp:
             if mark1:
                 try:
@@ -61,44 +63,57 @@ def verify(filename):
                     mark2 = True
 
     # 判断是否通过分片试验
-    return all(testPass(node) for _, node in nodes.items())
+    return all(testPass(name, node) for _, node in nodes.items())
 
 
-def testPass(node):
+def testPass(name, node):
+    with open(getRoot() + os.sep + 'accurate.json') as f:
+        js = json.load(f)[name]
 
-    def dx():
-        return -(node.x + 1) / 60
+    if 'args' in js:
+        globals().update(js['args'])
 
-    def dy():
-        return (node.y + 1) / 12
+    for item in ('dx', 'dy', 'dz', 'tx', 'ty', 'tz'):
+        if item in js:
+            globals()[item + 's'] = js[item]
+        else:
+            globals()[item + 's'] = '0'
 
-    def dz():
-        return node.x**2 - 0.2 * node.y**2
+    globals()['node'] = node
+    globals()['x'] = node.x
+    globals()['y'] = node.y
+    globals()['z'] = node.z
 
-    def tx():
-        return -0.4 * node.y
+    def dx(): return eval(dxs)
 
-    def ty():
-        return -2 * node.x
+    def dy(): return eval(dys)
+
+    def dz(): return eval(dzs)
+
+    def tx(): return eval(txs)
+
+    def ty(): return eval(tys)
+
+    def tz(): return eval(tzs)
 
     res = equal(node.dx, dx()) and equal(node.dy, dy()) and \
-        equal(node.dz, dz()) and equal(node.tx, tx()) and equal(node.ty, ty()) and \
-        equal(node.tz, 0)
+        equal(node.dz, dz()) and equal(node.tx, tx()) and \
+        equal(node.ty, ty()) and equal(node.tz, tz())
     if not res:
         print('failed at node %s' % node)
     return res
 
 
 def equal(a, b):
-    res = abs(a - b) <= max(abs(a) * 1e-5, abs(b) * 1e-5, 1e-13)
+    delta = abs(a - b)
+    threshold = max(abs(a) * 1e-4, abs(b) * 1e-4, 1e-13)
+    res = delta < threshold
     if not res:
+        print('delta = %f, threshold = %f' % (delta, threshold))
         print('failed equal: (a, b) = %s' % str((a, b)))
+        print('delta = %f, threshold = %f' % (delta, threshold))
     return res
 
 
-def main():
-    return verify('patch.out')
-
-
 if __name__ == '__main__':
-    main()
+    print(verify('3T'))

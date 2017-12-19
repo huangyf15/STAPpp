@@ -1,3 +1,5 @@
+import os
+import json
 import re
 import math
 import numpy as np
@@ -17,6 +19,12 @@ class Parser():
         self.eleGrpDict = dict()
         self.stapppMaterialsDictByPartName = dict()
         self.loads = []
+        self.outputMaterials = dict()
+        # {
+        #   eleGrpIndex: {
+        #     materialIndex: []
+        #   }
+        # }
 
     def parse(self):
         '''
@@ -456,6 +464,11 @@ class Parser():
                 self.stapppMaterialsDictByPartName[part.name] = material
                 elementGroup.materials.append(material)
 
+                if elementType not in self.outputMaterials:
+                    self.outputMaterials[elementType] = dict()
+                self.outputMaterials[elementType][material.index] = (
+                    part.section)
+
             if part.type == 'B31':  # special material processing for beam
                 fakeNode = ABAQUS.Node()
                 fakeNode.pos = material.attributes[-3:]
@@ -559,7 +572,7 @@ class Parser():
         self.indexElements()
 
         # 3. assembly force
-        self.calculateForce()
+        # self.calculateForce()
 
         for index, eleGrp in sorted(self.eleGrpDict.items(), key=lambda x: x[0]):
             print(
@@ -573,7 +586,23 @@ class Parser():
         print('  boundary nodes   : %d' % len(self.linkedNodes))
         print('  inside nodes     : %d' %
               (self.nodeCount - len(self.linkedNodes)))
-        print('Total forces       : %d' % len(self.loads[0].forces))
+        # print('Total forces       : %d' % len(self.loads[0].forces))
+
+        self.storeMaterial()
+
+    def storeMaterial(self):
+        res = dict()
+        for eleGrpType, sections in self.outputMaterials.items():
+            res[eleGrpType] = {}
+            for index, section in sections.items():
+                res[eleGrpType][index] = [
+                    self.materialsDict[section.materialName].density,
+                    *(arg for arg in section.args)
+                ]
+        
+        fname = os.path.dirname(os.path.abspath(self.fin)) + os.sep + 'material.json'
+        with open(fname, 'w') as f:
+            json.dump(res, f)
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:
@@ -588,7 +617,8 @@ class Parser():
             'heading': self.heading,
             'nodes': tuple(self.globalNodesDict.values()),
             'elementGroups': tuple(self.eleGrpDict.values()),
-            'loads': self.loads
+            # 'loads': self.loads
+            'loads': []
         }
 
     def calculateBodyForceAtElement(self, element, ins):
@@ -814,7 +844,7 @@ def convertSection2Material(elementType, section, materialsDict, index):
     # 'C3D8R': 4,  # 8H
     # 'B31': 5,  # Beam
     # 'T3D2':
-    if elementType == 'B31': # Beam
+    if elementType == 'B31':  # Beam
         res.attributes = (material.E, material.v, *section.args)
     elif elementType == 'C3D8R':
         assert len(section.args) == 0
@@ -822,7 +852,7 @@ def convertSection2Material(elementType, section, materialsDict, index):
     elif elementType == 'S4R':
         assert len(section.args) == 2
         res.attributes = (material.E, material.v, section.args[0])
-    elif elementType == 'T3D2': # Bar
+    elif elementType == 'T3D2':  # Bar
         assert len(section.args) == 1
         res.attributes = (material.E, *section.args)
     else:
