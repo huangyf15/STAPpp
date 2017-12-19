@@ -1,3 +1,5 @@
+import os
+import json
 import re
 import math
 import numpy as np
@@ -17,6 +19,12 @@ class Parser():
         self.eleGrpDict = dict()
         self.stapppMaterialsDictByPartName = dict()
         self.loads = []
+        self.outputMaterials = dict()
+        # {
+        #   eleGrpIndex: {
+        #     materialIndex: []
+        #   }
+        # }
 
     def parse(self):
         '''
@@ -456,6 +464,11 @@ class Parser():
                 self.stapppMaterialsDictByPartName[part.name] = material
                 elementGroup.materials.append(material)
 
+                if elementType not in self.outputMaterials:
+                    self.outputMaterials[elementType] = dict()
+                self.outputMaterials[elementType][material.index] = (
+                    part.section)
+
             if part.type == 'B31':  # special material processing for beam
                 fakeNode = ABAQUS.Node()
                 fakeNode.pos = material.attributes[-3:]
@@ -574,6 +587,22 @@ class Parser():
         print('  inside nodes     : %d' %
               (self.nodeCount - len(self.linkedNodes)))
         # print('Total forces       : %d' % len(self.loads[0].forces))
+
+        self.storeMaterial()
+
+    def storeMaterial(self):
+        res = dict()
+        for eleGrpType, sections in self.outputMaterials.items():
+            res[eleGrpType] = {}
+            for index, section in sections.items():
+                res[eleGrpType][index] = [
+                    self.materialsDict[section.materialName].density,
+                    *(arg for arg in section.args)
+                ]
+        
+        fname = os.path.dirname(os.path.abspath(self.fin)) + os.sep + 'material.json'
+        with open(fname, 'w') as f:
+            json.dump(res, f)
 
     def matchGlobalNode(self, gPos):
         for node in self.linkedNodes:

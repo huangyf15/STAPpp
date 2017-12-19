@@ -1,3 +1,12 @@
+import os
+import json
+
+from ProgressBar import ProgressBar
+import numpy as np
+import math
+from ABAQUSparser import Vector
+
+
 class Node():
     def __init__(self, pos):
         self.pos = pos
@@ -16,12 +25,6 @@ class ElementGroup():
         self.nel = nel
         self.nmt = nmt
         self.elements = []
-        self.materials = []
-
-
-class Material():
-    def __init__(self, args):
-        self.args = args
 
 
 class Calculator():
@@ -31,6 +34,9 @@ class Calculator():
         self.fin1 = open('data/Job-1.dat.1', 'r')
 
         self.fin3 = open('data/Job-1.dat.3', 'r')
+
+        with open('data/material.json') as f:
+            self.materialInfo = json.load(f)
 
     def loadData(self):
         line = self.getLine1(3)
@@ -57,22 +63,19 @@ class Calculator():
             line = self.getLine3()
             eleType, nel, nmt = line.split()
             eleGrp = ElementGroup(int(eleType), int(nel), int(nmt))
-            print(eleGrp)
 
             for i in range(eleGrp.nmt):
-                _, *args = self.getLine3().split()
-                material = Material(args)
-                eleGrp.materials.append(material)
+                self.getLine3()
 
             for i in range(eleGrp.nel):
                 _, *args = self.getLine3().split()
                 ele = Element(
                     int(_),
-                    tuple(int(item) for item in args[:-2]),
+                    tuple(int(item) for item in args[:-1]),
                     int(args[-1])
                 )
-                eleGrp.materials.append(ele)
-        self.elementGroups.append(eleGrp)
+                eleGrp.elements.append(ele)
+            self.elementGroups.append(eleGrp)
 
     def getLine1(self, n=1):
         for i in range(n):
@@ -87,7 +90,164 @@ class Calculator():
         self.calc()
 
     def calc(self):
-        pass
+        self.forces = dict()
+
+        direct = 3
+        mag = -10
+
+        for eleGrp in self.elementGroups:
+            eleType = eleGrp.eleType
+            for element in eleGrp.elements:
+                # calculate a unit body force at each node
+                # returns as {1:3.2, 2:2.4}
+                nodeForces = self.calculateBodyForceAtElement(
+                    element, eleGrp)
+
+                for i in range(len(element.nodesIndexs)):
+                    nodeIndex = element.nodesIndexs[i]
+
+                    force = mag * nodeForces[nodeIndex]
+                    if nodeIndex in self.forces:
+                        self.forces[nodeIndex] += force
+                    else:
+                        self.forces[nodeIndex] = force
+        print(self.forces)
+
+    def calculateBodyForceAtElement(self, element, eleGrp):
+        eleType = eleGrp.eleType
+        nodes = [self.nodes[index - 1] for index in element.nodesIndexs]
+        args = self.materialInfo[str(eleType)][str(element.materialIndex)]
+        if eleType == 7:  # Plate
+            dens = args[0]
+            thickness = args[1]
+            res = getGaussIntegrateFor4Q(
+                element, nodes, thickness * dens)
+            return res
+
+        elif eleType == 4:  # 8H
+            dens = args[0]
+            return getGaussIntegrateFor8H(element, nodes, dens)
+
+        elif eleType == 5:  # Beam
+            # dens, a, b, t1, t2, t3, t4
+            dens = args[0]
+            length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
+
+            area = args[1] * args[2] - \
+                (args[1] - args[3] - args[5]) * (args[2] - args[4] - args[6])
+
+            grav = length * area * dens
+            return {index: grav / 2 for index in element.nodesIndexs}
+
+        elif eleType == 1:  # Bar
+            dens = args[0]
+            length = abs(Vector(nodes[0].pos) - Vector(nodes[1].pos))
+            grav = length * args[1] * dens
+            return {index: grav / 2 for index in element.nodesIndexs}
+
+        else:
+            raise Exception()
+
+
+def getGaussIntegrateFor4Q(element, nodes, c):
+    # convert w from 3d to 2d
+    if all(node.pos[2] == 0 for node in nodes):
+        w = np.array([list(node.pos[:2]) for node in nodes])
+    else:
+        # for this particular case, there is no need to calc.
+        raise
+    a = 1 / math.sqrt(3)
+    b = (-a, a)
+    s = np.array([0.0 for i in range(4)])
+    for i in b:
+        for j in b:
+            s += (getGaussIntegrateFor4QAtPos((i, j), w) * 4)
+
+    return {element.nodesIndexs[i]: s[i] * c for i in range(4)}
+
+
+def getGaussIntegrateFor8H(element, nodes, c):
+    w = np.array([list(node.pos) for node in nodes])
+    a = 1 / math.sqrt(3)
+    b = (-a, a)
+    s = np.array([0.0 for i in range(8)])
+    for i in b:
+        for j in b:
+            for k in b:
+                s += getGaussIntegrateFor8HAtPos((i, j, k), w)
+
+    return {element.nodesIndexs[i]: s[i] * c for i in range(8)}
+
+
+NGNs = dict()
+NGN4Qs = dict()
+
+
+def getGaussIntegrateFor4QAtPos(pos, w):
+    global NGN4Qs
+    if pos in NGN4Qs:
+        N, GN = NGN4Qs[pos]
+    else:
+        a, b = pos
+        N = np.array([
+            (1 - a) * (1 - b),
+            (1 + a) * (1 - b),
+            (1 + a) * (1 + b),
+            (1 - a) * (1 + b)]) / 4
+        GN = np.array([
+            [-1 + b, 1 - b, 1 + b, -1 - b],
+            [-1 + a, -1 - a, 1 + a, 1 - a]]) / 4
+        NGN4Qs[pos] = N, GN
+        assert len(NGN4Qs) <= 4
+
+    J = GN.dot(w)
+    Jdet = np.linalg.det(J)
+    assert(Jdet > 0)
+
+    res = N * Jdet
+
+    return res
+
+
+def getGaussIntegrateFor8HAtPos(pos, w):
+    global NGNs
+    if pos in NGNs:
+        N, GN = NGNs[pos]
+    else:
+        a, b, c = pos
+        N = np.array(
+            [(1 - a) * (1 - b) * (1 - c),
+             (1 + a) * (1 - b) * (1 - c),
+             (1 + a) * (1 + b) * (1 - c),
+             (1 - a) * (1 + b) * (1 - c),
+             (1 - a) * (1 - b) * (1 + c),
+             (1 + a) * (1 - b) * (1 + c),
+             (1 + a) * (1 + b) * (1 + c),
+             (1 - a) * (1 + b) * (1 + c)]
+        ) / 8
+        GN = np.array(
+            [[- (1 - b) * (1 - c),   (1 - b) * (1 - c),
+                (1 + b) * (1 - c), - (1 + b) * (1 - c),
+              - (1 - b) * (1 + c),   (1 - b) * (1 + c),
+                (1 + b) * (1 + c), - (1 + b) * (1 + c)],
+             [- (1 - a) * (1 - c), - (1 + a) * (1 - c),
+                (1 + a) * (1 - c),   (1 - a) * (1 - c),
+              - (1 - a) * (1 + c), - (1 + a) * (1 + c),
+                (1 + a) * (1 + c),   (1 - a) * (1 + c)],
+             [- (1 - a) * (1 - b), - (1 + a) * (1 - b),
+              - (1 + a) * (1 + b), - (1 - a) * (1 + b),
+                (1 - a) * (1 - b),   (1 + a) * (1 - b),
+                (1 + a) * (1 + b),   (1 - a) * (1 + b)]]) / 8
+        NGNs[pos] = N, GN
+        assert len(NGNs) <= 8
+
+    J = GN.dot(w)
+    Jdet = np.linalg.det(J)
+    assert(Jdet > 0)
+
+    res = N * Jdet
+
+    return res
 
 
 def main():
