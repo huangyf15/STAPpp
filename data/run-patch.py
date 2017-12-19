@@ -23,6 +23,10 @@ def main():
     run('4Q')
     run('8H')
     run('beam')
+    run('plate')
+    run('shell')
+    run('TimoEBMOD')
+    run("TimoSRINT")
     print('patch test passed for all.')
 
 

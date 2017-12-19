@@ -105,9 +105,13 @@ def testPass(name, node):
 
 
 def equal(a, b):
-    res = abs(a - b) <= max(abs(a) * 1e-5, abs(b) * 1e-5, 1e-13)
+    delta = abs(a - b)
+    threshold = max(abs(a) * 1e-4, abs(b) * 1e-4, 1e-13)
+    res = delta < threshold
     if not res:
+        print('delta = %f, threshold = %f' % (delta, threshold))
         print('failed equal: (a, b) = %s' % str((a, b)))
+        print('delta = %f, threshold = %f' % (delta, threshold))
     return res
 
 

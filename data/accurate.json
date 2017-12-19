@@ -37,5 +37,25 @@
         },
         "dy": "M * (node.x - 10) * node.x / (2 * EI)",
         "tz": "M * (node.x - 5) / EI"
+    },
+    "plate": {
+        "dz": "node.x**2 - 0.2*node.y**2",
+        "tx": "-0.4 * node.y",
+        "ty": "-2 * node.x"
+    },
+    "shell": {
+        "dx": "-(node.x + 1) / 60",
+        "dy": "(node.y + 1) / 12",
+        "dz": "node.x**2 - 0.2 * node.y**2",
+        "tx": "-0.4 * y",
+        "ty": "-2 * x"
+    },
+    "TimoEBMOD": {
+        "dz": "10 * (x**3) / 81 - 10 * (x**2) / 27 - x / 60",
+        "ty": "-10 * (x**2) / 27 + 20 * x / 27"
+    },
+    "TimoSRINT": {
+        "dz": "-10 * x**2 / 27",
+        "ty": "20 * x / 27"
     }
 }
