@@ -93,7 +93,8 @@ class Calculator():
     def output(self):
         print('%8d %8d' % (1, len(self.forces)),
               file=self.fout)
-        for nodeIndex, force in self.forces.items():
+        for nodeIndex in range(1, len(self.forces) + 1):
+            force = self.forces[nodeIndex]
             print(
                 '%8d %4d %20f' % (nodeIndex, 3, force),
                 file=self.fout
