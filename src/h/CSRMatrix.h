@@ -44,7 +44,7 @@ public:
     {
         // _tempColumns = std::set[size]
 
-        _tempColumns = new STL_t[size] ;
+        _tempColumns = new STL_t[size]{} ;
 
     }
 
