@@ -196,13 +196,7 @@ void CBar::ElementStress2(double* stress, double* Displacement, double* Position
 	
 	for (unsigned int i =0 ; i<3; i++)
 	{
-		double flag1 = Displacement[0];
-		double flag2 = Displacement[1];
-		double flag3 = Displacement[2];
-		double flag4 = Displacement[3];
-		double flag5 = Displacement[4];
-		double flag6 = Displacement[5];
-		double flag7 = Displacement[6];
+		
 
 		if (LocationMatrix[i])
 		{
