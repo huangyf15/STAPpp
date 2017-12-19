@@ -48,19 +48,9 @@ def test():
     run('test_truss_22')
     run('truss')
 
-    def run(name):
-        os.chdir(DataDir + os.sep + name)
-        if os.system(PY + ' run-patch.py ' + STAP):
-            print('patch test failed for element type ' + name)
-            quit(2)
-    run('3T')
-    run('4Q')
-    run('8H')
-    run('Beam')
-    run('plate')
-    run('shell')
-    run('TimoEBMOD')
-    run('TimoSRINT')
+    os.chdir(DataDir)
+    if os.system(PY + ' run-patch.py ' + STAP):
+        quit(2)
 
 
 def main():
