@@ -49,7 +49,7 @@ void PostOutputter::OutputElementStress()
         {
         case ElementTypes::Bar: // Bar element
         {
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << ",E=" << NUME
+            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << ", E=" << NUME
                   << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stress;
@@ -65,16 +65,17 @@ void PostOutputter::OutputElementStress()
                 CBarMaterial& material = *dynamic_cast<CBarMaterial*>(Element.GetElementMaterial());
 
                 for (unsigned _ = 0; _ < 2; _++)
-                    *this << Positions[3 * _ + 0] << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 1]
-                          << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 2]
-                          << setw(POINTS_DATA_WIDTH) << endl;
+                    *this << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 0]
+                          << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 1]
+                          << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 2] << endl;
 
                 ELENUM[Ele * 2] = (unsigned int)Positions[6];
                 ELENUM[Ele * 2 + 1] = (unsigned int)Positions[7];
             }
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
-                *this << ELENUM[Ele * 2] << setw(POINTS_DATA_WIDTH) << ELENUM[Ele * 2 + 1] << endl;
+                *this << setw(POINTS_DATA_WIDTH) << ELENUM[Ele * 2]
+                      << setw(POINTS_DATA_WIDTH) << ELENUM[Ele * 2 + 1] << endl;
             }
 
             //*this << endl;
@@ -91,17 +92,15 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
 
-                dynamic_cast<CQuadrilateral&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stresses, Displacement, Position4Q);
+                dynamic_cast<CQuadrilateral&>(
+                    EleGrp.GetElement(Ele)).ElementStress2(stresses, Displacement, Position4Q);
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
 
-                    *this << Position4Q[i * 3] << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 1]
-                          << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 2]
-                          << setw(POINTS_DATA_WIDTH);
-
-                    *this << std::endl;
+                    *this << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3]
+                          << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 1]
+                          << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 2] << std::endl;
                 }
             }
             *this << endl;
@@ -124,9 +123,9 @@ void PostOutputter::OutputElementStress()
                     *dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
 
                 for (unsigned _ = 0; _ < 8; _++)
-                    *this << PositionBeam[3 * _ + 0] << setw(POINTS_DATA_WIDTH)
-                          << PositionBeam[3 * _ + 1] << setw(POINTS_DATA_WIDTH)
-                          << PositionBeam[3 * _ + 2] << setw(POINTS_DATA_WIDTH) << endl;
+                    *this << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 0]
+                          << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 1]
+                          << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 2]  << endl;
             }
 
             *this << endl;

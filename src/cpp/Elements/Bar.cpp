@@ -161,63 +161,57 @@ void CBar::ElementStress(double* stress, double* Displacement)
 		if (LocationMatrix[i])
 			*stress += S[i] * Displacement[LocationMatrix[i]-1];
 	}
-
-
-	
-
 }
 
 void CBar::ElementStress2(double* stress, double* Displacement, double* Positions)
 {
-	CBarMaterial* material = dynamic_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
+    CBarMaterial* material =
+        dynamic_cast<CBarMaterial*>(ElementMaterial); // Pointer to material of the element
 
-	double DX[3];	//	dx = x2-x1, dy = y2-y1, dz = z2-z1
-	double L2 = 0;	//	Square of bar length (L^2)
+    double DX[3];  //	dx = x2-x1, dy = y2-y1, dz = z2-z1
+    double L2 = 0; //	Square of bar length (L^2)
 
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-		L2 = L2 + DX[i]*DX[i];
-	}
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
+        L2 = L2 + DX[i] * DX[i];
+    }
 
-	double S[6];
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		S[i] = -DX[i] * material->E / L2;
-		S[i+3] = -S[i];
-	}
-	
-	*stress = 0.0;
-	for (unsigned int i = 0; i < 6; i++)
-	{
-		if (LocationMatrix[i])
-			*stress += S[i] * Displacement[LocationMatrix[i]-1];
-	}
-	
-	for (unsigned int i =0 ; i<3; i++)
-	{
-		
+    double S[6];
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        S[i] = -DX[i] * material->E / L2;
+        S[i + 3] = -S[i];
+    }
 
-		if (LocationMatrix[i])
-		{
-		  Positions[i] = Displacement[LocationMatrix[i]-1]+nodes[0]->XYZ[i];
-		 }
-		else 
-		{
-		  Positions[i] = nodes[0]->XYZ[i];	 
-		}
+    *stress = 0.0;
+    for (unsigned int i = 0; i < 6; i++)
+    {
+        if (LocationMatrix[i])
+            *stress += S[i] * Displacement[LocationMatrix[i] - 1];
+    }
 
-		if (LocationMatrix[i+3])
-		{
-		  Positions[i+3] = Displacement[LocationMatrix[i+3]-1]+nodes[1]->XYZ[i];
-		}
-		else 
-		{		 
-		  Positions[i+3] = nodes[1]->XYZ[i];
-		}
-	}
-	
-	Positions[6] = nodes[0]->NodeNumber;
-	Positions[7] = nodes[1]->NodeNumber;
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        if (LocationMatrix[i])
+        {
+            Positions[i] = Displacement[LocationMatrix[i] - 1] + nodes[0]->XYZ[i];
+        }
+        else
+        {
+            Positions[i] = nodes[0]->XYZ[i];
+        }
 
+        if (LocationMatrix[i + 3])
+        {
+            Positions[i + 3] = Displacement[LocationMatrix[i + 3] - 1] + nodes[1]->XYZ[i];
+        }
+        else
+        {
+            Positions[i + 3] = nodes[1]->XYZ[i];
+        }
+    }
+
+    Positions[6] = nodes[0]->NodeNumber;
+    Positions[7] = nodes[1]->NodeNumber;
 }
