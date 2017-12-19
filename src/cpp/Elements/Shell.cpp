@@ -896,7 +896,7 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
                          truedisp[6 * i + 5] * ydir[2];
         dis_inner[2 * i] = truedisp[6 * i] * xdir[0] + truedisp[6 * i + 1] * xdir[1] +
                            truedisp[6 * i + 2] * xdir[2];
-        dis_inner[2 * i] = truedisp[6 * i] * ydir[0] + truedisp[6 * i + 1] * ydir[1] +
+        dis_inner[2 * i + 1] = truedisp[6 * i] * ydir[0] + truedisp[6 * i + 1] * ydir[1] +
                            truedisp[6 * i + 2] * ydir[2];
     }
 
