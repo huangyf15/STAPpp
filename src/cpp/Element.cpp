@@ -71,6 +71,9 @@ void CElement::assembly(double* Matrix,
 			if (!Li)
 				continue;
 
+			//  the reason not to merge two stiffness matrix into one by using virtual operator()
+			// is that virtual operator may slow down this process, which may happen thousands of
+			// millions of times here.
 			#ifdef MKL
 			(*CSRStiffnessMatrixPtr)(Li, Lj) += Matrix[DiagjElement + j - i - 1];
             #else
