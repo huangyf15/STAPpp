@@ -25,7 +25,7 @@ PostOutputter* PostOutputter::Instance(string FileName)
     return _instance;
 }
 
-// postprocess
+// Postprocess
 void PostOutputter::OutputElementStress()
 {
     CDomain* FEMData = CDomain::Instance();
@@ -34,53 +34,66 @@ void PostOutputter::OutputElementStress()
 
     const unsigned int NUMEG = FEMData->GetNUMEG(); // number of element group
 
+	// loop for each element group
     for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
     {
-        *this << "TITLE = \" 3DFEA \" " << endl
-              << "VARIABLES = VARIABLES = \"X\",\"Y\",\"Z\", \"STRESS\"  " << endl;
+        *this << "TITLE = \" STAPpp FEM \" " << endl
+              << "VARIABLES = VARIABLES = \"X_PRE\",\"Y_PRE\",\"Z_PRE\", \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
 
+		// Get the ElementGroup and related infos
         CElementGroup& EleGrp = FEMData->GetEleGrpList()[EleGrpIndex];
-        unsigned int NUME = EleGrp.GetNUME();     // NUMBER OF ELEMENT
-        unsigned int NUMNP = FEMData->GetNUMNP(); // NUMBER OF NODE POINTS
-
-        ElementTypes ElementType = EleGrp.GetElementType();
+		ElementTypes ElementType = EleGrp.GetElementType();	// ElementType
+		unsigned int NUME = EleGrp.GetNUME();				// Number of elements
+        unsigned int NUMNP = FEMData->GetNUMNP();			// Number of node points
 
         switch (ElementType)
         {
         case ElementTypes::Bar: // Bar element
-        {
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << ", E=" << NUME
-                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
-            double stress;
-            double Positions[8];
-            unsigned int* ELENUM = new unsigned int[NUME * 2];
-            //********************88double Positions[6];
-            // loop for every element
+            *this << "ZONE T = \"SCENE1\", N = " << NUMNP << ", E = " << NUME
+                  << ", F = FEPOINT , ET = BRICK, C = RED" << endl;
+
+			//double PrePositions[24];
+            
+            // Loop for each element
+			// Node infos in the present ZONE
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
+				double PostPositions[24];
+				double stress[48];
+
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(&stress, Displacement, Positions);
+                Element.ElementStress2(stress, Displacement, PostPositions);
 
-                CBarMaterial& material = *dynamic_cast<CBarMaterial*>(Element.GetElementMaterial());
-
-                for (unsigned _ = 0; _ < 2; _++)
-                    *this << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 0]
-                          << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 1]
-                          << setw(POINTS_DATA_WIDTH) << Positions[3 * _ + 2] << endl;
-
-                ELENUM[Ele * 2] = (unsigned int)Positions[6];
-                ELENUM[Ele * 2 + 1] = (unsigned int)Positions[7];
+				for (unsigned _ = 0; _ < 8; _++)
+				{
+					/*
+					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
+					{
+						*this << setw(POINTS_DATA_WIDTH) << PrePositions[3 * _ + DegOF];
+					}
+					*/
+					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
+					{
+						*this << setw(POINTS_DATA_WIDTH) << PostPositions[3 * _ + DegOF];
+					}
+					for (unsigned DegOF = 0; DegOF < 6; DegOF++)
+					{
+						*this << setw(POINTS_DATA_WIDTH) << stress[6 * _ + DegOF];
+					}
+					*this << endl;
+				}
             }
-            for (unsigned int Ele = 0; Ele < NUME; Ele++)
-            {
-                *this << setw(POINTS_DATA_WIDTH) << ELENUM[Ele * 2]
-                      << setw(POINTS_DATA_WIDTH) << ELENUM[Ele * 2 + 1] << endl;
-            }
-
-            //*this << endl;
+			// Node numbers corresponding to each element
+			for (unsigned int Ele = 0; Ele < NUME; Ele++)
+			{
+				for (unsigned NumEleNode = 0; NumEleNode < 8; NumEleNode++)
+				{
+					*this << setw(POINTS_DATA_WIDTH) << Ele * 8 + NumEleNode;
+				}
+				*this << endl;
+			}
             break;
-        }
 
         case ElementTypes::Quadrilateral: // Quadrilateral element
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
@@ -129,6 +142,7 @@ void PostOutputter::OutputElementStress()
             }
 
             *this << endl;
+
             break;
 
         case ElementTypes::Triangle: // 3T element
@@ -150,6 +164,7 @@ void PostOutputter::OutputElementStress()
             }
 
             *this << endl;
+
             break;
 
         case ElementTypes::Hexahedron: // 8H element
@@ -172,6 +187,7 @@ void PostOutputter::OutputElementStress()
             }
 
             *this << endl;
+
             break;
 
         case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
@@ -191,6 +207,7 @@ void PostOutputter::OutputElementStress()
                           << PositionTB[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
                 *this << std::endl;
             }
+
             break;
 
         case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
@@ -213,6 +230,7 @@ void PostOutputter::OutputElementStress()
 
                 *this << std::endl;
             }
+
             break;
 
         case ElementTypes::Plate:
@@ -281,6 +299,7 @@ void PostOutputter::OutputElementStress()
                     *this << std::endl;
                 }
             }
+
             break;
 
         default: // Invalid element type

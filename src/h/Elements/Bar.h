@@ -42,7 +42,7 @@ public:
 	virtual void ElementStress(double* stress, double* Displacement);
 
 //!	Calculate element stress for postprocess
-	virtual void ElementStress2(double* stress, double* Displacement, double* Positions);
+	virtual void ElementStress2(double* stress, double* Displacement, double* PostPositions);
 
 //!	Return the size of the element stiffness matrix (stored as an array column by column)
 	virtual unsigned int SizeOfStiffnessMatrix();
