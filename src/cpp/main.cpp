@@ -95,15 +95,14 @@ int main(int argc, char *argv[])
 
     double time_solution = timer.ElapsedTime();
 
-//  Calculate and output stresses of all elements
-
 #ifndef _RUN_
+//  Calculate and output stresses of all elements
 	Output->OutputElementStress();
 #endif    
 
 #define _POST_
 #ifdef _POST_
-	// post processs 
+//	Calculate and output infos for post process 
     PostOutput->OutputElementStress();
 #endif
 
