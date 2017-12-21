@@ -17,6 +17,7 @@
 #include <fstream>
 #include <climits>
 #include <cmath>
+#include <cfloat>
 
 #include "Node.h"
 #include "Material.h"
