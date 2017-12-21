@@ -132,21 +132,31 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Triangle: // 3T element
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= TRIANGLE, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << " E=" << NUME
+                  << " F=FEPOINT, ET= TRIANGLE, C= RED" << endl;
             double stress3T[3];
             double Position3T[9];
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
                 Element.ElementStress2(stress3T, Displacement, Position3T);
-                CTriangleMaterial material =
+                CTriangleMaterial& material =
                     *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
 
                 for (unsigned _ = 0; _ < 3; _++)
-                    *this << Position3T[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
-                          << Position3T[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
-                          << Position3T[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
+                    *this << setw(POINTS_DATA_WIDTH) << Position3T[_ * 3 + 0] 
+                          << setw(POINTS_DATA_WIDTH) << Position3T[_ * 3 + 1] 
+                          << setw(POINTS_DATA_WIDTH) << Position3T[_ * 3 + 2]
+                          << setw(POINTS_DATA_WIDTH) << stress3T[0]
+                          << setw(POINTS_DATA_WIDTH) << stress3T[1]
+                          << setw(POINTS_DATA_WIDTH) << stress3T[2]
+                          << endl;
+            }
+            for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            {
+                for (unsigned _ = 0; _ < 3; _++)
+                    *this << setw(POINTS_DATA_WIDTH) << Ele * 3 + _ + 1;
+                *this << std::endl;
             }
 
             *this << endl;

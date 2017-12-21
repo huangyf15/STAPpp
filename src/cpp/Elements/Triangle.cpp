@@ -303,6 +303,15 @@ void CTriangle::ElementStress(double stress[3], double* Displacement, double Gau
 #endif
 }
 
-void CTriangle::ElementStress2(double* stress, double* Displacement, double*  Position3T)
+void CTriangle::ElementStress2(double stress[3], double* Displacement, double Position3T[9])
 {
+    ElementStress(stress, Displacement, nullptr, nullptr, nullptr);
+    for (unsigned index = 0; index < 9; ++index)
+    {
+        if (LocationMatrix[index])
+            Position3T[index] =
+                nodes[index / 3]->XYZ[index % 3] + Displacement[LocationMatrix[index] - 1];
+        else
+            Position3T[index] = nodes[index / 3]->XYZ[index % 3];
+    }
 }
