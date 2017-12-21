@@ -2,7 +2,7 @@
 #include "PostOutputter.h"
 #include "Domain.h"
 
-#define POINTS_DATA_WIDTH 15
+#define POINTS_DATA_WIDTH 14
 
 PostOutputter* PostOutputter::_instance = nullptr;
 
@@ -62,7 +62,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stressBar, Displacement, PrePositionBar, PostPositionBar);
+                Element.ElementPostInfo(stressBar, Displacement, PrePositionBar, PostPositionBar);
 
 				for (unsigned _ = 0; _ < 8; _++)
 				{
@@ -104,7 +104,7 @@ void PostOutputter::OutputElementStress()
             {
 
                 dynamic_cast<CQuadrilateral&>(
-                    EleGrp.GetElement(Ele)).ElementStress2(stress4Q, Displacement, PrePosition4Q, Position4Q);
+                    EleGrp.GetElement(Ele)).ElementPostInfo(stress4Q, Displacement, PrePosition4Q, Position4Q);
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
@@ -129,7 +129,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stressBeam, Displacement, PrePositionBeam, PositionBeam);
+                Element.ElementPostInfo(stressBeam, Displacement, PrePositionBeam, PositionBeam);
 
                 CBeamMaterial& material =
                     *dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
@@ -154,7 +154,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stress3T, Displacement, PrePosition3T, Position3T);
+                Element.ElementPostInfo(stress3T, Displacement, PrePosition3T, Position3T);
                 CTriangleMaterial material =
                     *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
 
@@ -179,7 +179,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stressHex, Displacement, PrePosition8H, Position8H);
+                Element.ElementPostInfo(stressHex, Displacement, PrePosition8H, Position8H);
 
                 CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
                 for (unsigned _ = 0; _ < 8; _++)
@@ -203,7 +203,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CTimoshenkoSRINT&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stressTimoSRINT, Displacement, PrePositionTimoSRINT, PositionTimoSRINT);
+                    .ElementPostInfo(stressTimoSRINT, Displacement, PrePositionTimoSRINT, PositionTimoSRINT);
 
                 for (unsigned _ = 0; _ < 8; _++)
                     *this << PositionTimoSRINT[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
@@ -225,7 +225,7 @@ void PostOutputter::OutputElementStress()
 			for (unsigned int Ele = 0; Ele < NUME; Ele++)
 			{
 				dynamic_cast<CTimoshenkoEBMOD&>(EleGrp.GetElement(Ele))
-					.ElementStress2(stressTimoEBMOD, Displacement, PrePositionTimoEBMOD, PositionTimoEBMOD);
+					.ElementPostInfo(stressTimoEBMOD, Displacement, PrePositionTimoEBMOD, PositionTimoEBMOD);
 
 				for (unsigned _ = 0; _ < 8; _++)
 					*this << PositionTimoEBMOD[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
@@ -247,7 +247,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CPlate&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stresses4PE, Displacement, PrePositions4PE, Positions4PE);
+                    .ElementPostInfo(stresses4PE, Displacement, PrePositions4PE, Positions4PE);
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
@@ -282,7 +282,7 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stresses4SE, Displacement, PrePostions4SE, Positions4SE);
+                    .ElementPostInfo(stresses4SE, Displacement, PrePostions4SE, Positions4SE);
 
                 for (unsigned i = 0; i < 5; ++i)
                 {

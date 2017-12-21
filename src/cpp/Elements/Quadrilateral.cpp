@@ -477,6 +477,6 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
 #endif
 }
 
-void CQuadrilateral::ElementStress2(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
 {
 }

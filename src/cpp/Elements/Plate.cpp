@@ -889,3 +889,7 @@ void CPlate::ElementStress(double* stress, double* Displacement, double* positio
     position[10] = ymid + sqrt(1.0 / 3) * (yeta);
     position[11] = zmid;
 }
+
+void CPlate::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+{
+}
