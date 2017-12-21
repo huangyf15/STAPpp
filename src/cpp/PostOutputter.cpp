@@ -53,33 +53,30 @@ void PostOutputter::OutputElementStress()
             *this << "ZONE T = \"SCENE1\", N = " << NUMNP << ", E = " << NUME
                   << ", F = FEPOINT , ET = BRICK, C = RED" << endl;
 
-			//double PrePositions[24];
+			double PrePositionBar[24];
+			double PostPositionBar[24];
+			double stressBar[48];
             
             // Loop for each element
 			// Node infos in the present ZONE
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
-				double PostPositions[24];
-				double stress[48];
-
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stress, Displacement, PostPositions);
+                Element.ElementStress2(stressBar, Displacement, PrePositionBar, PostPositionBar);
 
 				for (unsigned _ = 0; _ < 8; _++)
 				{
-					/*
 					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
 					{
-						*this << setw(POINTS_DATA_WIDTH) << PrePositions[3 * _ + DegOF];
+						*this << setw(POINTS_DATA_WIDTH) << PrePositionBar[3 * _ + DegOF];
 					}
-					*/
 					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
 					{
-						*this << setw(POINTS_DATA_WIDTH) << PostPositions[3 * _ + DegOF];
+						*this << setw(POINTS_DATA_WIDTH) << PostPositionBar[3 * _ + DegOF];
 					}
 					for (unsigned DegOF = 0; DegOF < 6; DegOF++)
 					{
-						*this << setw(POINTS_DATA_WIDTH) << stress[6 * _ + DegOF];
+						*this << setw(POINTS_DATA_WIDTH) << stressBar[6 * _ + DegOF];
 					}
 					*this << endl;
 				}
@@ -99,14 +96,15 @@ void PostOutputter::OutputElementStress()
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
                   << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
-            double stresses[12];
+            double stress4Q[12];
+			double PrePosition4Q[12];
             double Position4Q[12];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
 
                 dynamic_cast<CQuadrilateral&>(
-                    EleGrp.GetElement(Ele)).ElementStress2(stresses, Displacement, Position4Q);
+                    EleGrp.GetElement(Ele)).ElementStress2(stress4Q, Displacement, PrePosition4Q, Position4Q);
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
@@ -124,13 +122,14 @@ void PostOutputter::OutputElementStress()
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
                   << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
-            double beamstress[3];
+            double stressBeam[3];
+			double PrePositionBeam[24];
             double PositionBeam[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(beamstress, Displacement, PositionBeam);
+                Element.ElementStress2(stressBeam, Displacement, PrePositionBeam, PositionBeam);
 
                 CBeamMaterial& material =
                     *dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
@@ -149,11 +148,13 @@ void PostOutputter::OutputElementStress()
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
                   << " F=FEPOINT , ET= TRIANGLE, C= RED" << endl;
             double stress3T[3];
-            double Position3T[9];
+            double PrePosition3T[9];
+			double Position3T[9];
+
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stress3T, Displacement, Position3T);
+                Element.ElementStress2(stress3T, Displacement, PrePosition3T, Position3T);
                 CTriangleMaterial material =
                     *dynamic_cast<CTriangleMaterial*>(Element.GetElementMaterial());
 
@@ -172,12 +173,13 @@ void PostOutputter::OutputElementStress()
                   << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stressHex[48];
+			double PrePosition8H[24];
             double Position8H[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementStress2(stressHex, Displacement, Position8H);
+                Element.ElementStress2(stressHex, Displacement, PrePosition8H, Position8H);
 
                 CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
                 for (unsigned _ = 0; _ < 8; _++)
@@ -191,59 +193,61 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
-            double TimoshenkoStresses[3];
-            double TimoshenkoForces[12];
-            double PositionTB[24];
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
+			*this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
+				<< " F=FEPOINT , ET= BRICK, C= RED" << endl;
+
+            double stressTimoSRINT[3];
+			double PrePositionTimoSRINT[24];
+            double PositionTimoSRINT[24];
+            
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CTimoshenkoSRINT&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(TimoshenkoStresses, TimoshenkoForces, Displacement, PositionTB);
+                    .ElementStress2(stressTimoSRINT, Displacement, PrePositionTimoSRINT, PositionTimoSRINT);
 
                 for (unsigned _ = 0; _ < 8; _++)
-                    *this << PositionTB[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
-                          << PositionTB[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
-                          << PositionTB[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
+                    *this << PositionTimoSRINT[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
+                          << PositionTimoSRINT[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
+                          << PositionTimoSRINT[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
                 *this << std::endl;
             }
 
             break;
 
         case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
-            double TimoshenkoEBStresses[3];
-            double TimoshenkoEBForces[12];
-            double PositionTEB[24];
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
+			*this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
+				<< " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
-            for (unsigned int Ele = 0; Ele < NUME; Ele++)
-            {
-                dynamic_cast<CTimoshenkoEBMOD&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(TimoshenkoEBStresses, TimoshenkoEBForces, Displacement,
-                                    PositionTEB);
+			double stressTimoEBMOD[3];
+			double PrePositionTimoEBMOD[24];
+			double PositionTimoEBMOD[24];
 
-                for (unsigned _ = 0; _ < 8; _++)
-                    *this << PositionTEB[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
-                          << PositionTEB[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
-                          << PositionTEB[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
+			for (unsigned int Ele = 0; Ele < NUME; Ele++)
+			{
+				dynamic_cast<CTimoshenkoEBMOD&>(EleGrp.GetElement(Ele))
+					.ElementStress2(stressTimoEBMOD, Displacement, PrePositionTimoEBMOD, PositionTimoEBMOD);
 
-                *this << std::endl;
-            }
+				for (unsigned _ = 0; _ < 8; _++)
+					*this << PositionTimoEBMOD[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
+					<< PositionTimoEBMOD[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
+					<< PositionTimoEBMOD[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
+				*this << std::endl;
+			}
 
-            break;
+			break;
 
         case ElementTypes::Plate:
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
                   << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stresses4PE[12];
+			double PrePositions4PE[12];
             double Positions4PE[12];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CPlate&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stresses4PE, Displacement, Positions4PE);
+                    .ElementStress2(stresses4PE, Displacement, PrePositions4PE, Positions4PE);
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
@@ -270,13 +274,15 @@ void PostOutputter::OutputElementStress()
         case ElementTypes::Shell:
             *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
                   << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+
             double stresses4SE[15];
+			double PrePostions4SE[15];
             double Positions4SE[15];
+
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
-
                 dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
-                    .ElementStress2(stresses4SE, Displacement, Positions4SE);
+                    .ElementStress2(stresses4SE, Displacement, PrePostions4SE, Positions4SE);
 
                 for (unsigned i = 0; i < 5; ++i)
                 {

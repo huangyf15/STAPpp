@@ -89,7 +89,7 @@ public:
 	virtual void ElementStress(double* stress, double* Displacement){};
 
 //!	Calculate the values required in the POSTPROCESS 
-	virtual void ElementStress2(double* stress, double* Displacement, double* PostPositions){};
+	virtual void ElementStress2(double* stress, double* Displacement, double* PrePositions, double* PostPositions){};
 
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }
