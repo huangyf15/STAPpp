@@ -29,7 +29,7 @@ PostOutputter* PostOutputter::Instance(string FileName)
 void PostOutputter::OutputElementStress()
 {
 	// the amplification factor 
-	double coeff = 1000;
+	double coeff = 1E4;
 
 	CDomain* FEMData = CDomain::Instance();
 
@@ -72,11 +72,7 @@ void PostOutputter::OutputElementStress()
 				{
 					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
 					{
-						*this << setw(POINTS_DATA_WIDTH) << PrePositionBar[3 * nodeIndex + DegOF];
-					}
-					for (unsigned DegOF = 0; DegOF < 3; DegOF++)
-					{
-						*this << setw(POINTS_DATA_WIDTH) << PostPositionBar[3 * nodeIndex + DegOF];
+						*this << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositionBar[3 * nodeIndex + DegOF] + coeff * PostPositionBar[3 * nodeIndex + DegOF];
 					}
 					for (unsigned DegOF = 0; DegOF < 6; DegOF++)
 					{
@@ -114,8 +110,6 @@ void PostOutputter::OutputElementStress()
 
                 for (unsigned ni = 0; ni < 4; ++ni)
                 {
-                    for (unsigned dof = 0; dof < 3; ++dof)
-                        *this << setw(POINTS_DATA_WIDTH) << PrePosition4Q[ni * 3 + dof];
                     for (unsigned dof = 0; dof < 3; ++dof)
                         *this << setw(POINTS_DATA_WIDTH) << PostPosition4Q[ni * 3 + dof];
                     for (unsigned dof = 0; dof < 6; ++dof)
@@ -179,9 +173,7 @@ void PostOutputter::OutputElementStress()
 
                 for (unsigned nodeIndex = 0; nodeIndex < 3; nodeIndex++)
                 {
-                    for (unsigned dof = 0; dof < 3; dof++)
-                        *this << setw(POINTS_DATA_WIDTH) << PrePosition3T[nodeIndex * 3 + dof];
-                    for (unsigned dof = 0; dof < 3; dof++)
+					for (unsigned dof = 0; dof < 3; dof++)
                         *this << setw(POINTS_DATA_WIDTH) << PostPosition3T[nodeIndex * 3 + dof];
                     *this << setw(POINTS_DATA_WIDTH) << stress3T[0]
                           << setw(POINTS_DATA_WIDTH) << stress3T[1]
