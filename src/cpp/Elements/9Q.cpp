@@ -175,7 +175,7 @@ void Convert2d23d9Q(Matrix<double>& k, double* matrix, const double i[3], const 
 }
 
 // calculate n, i, j and xe, ye
-inline void Convert3d22d(CNode* const nodes[9], double n[3], double i[3], double j[3], double xe[9],
+void Convert3d22d9Q(CNode* const nodes[9], double n[3], double i[3], double j[3], double xe[9],
                          double ye[9])
 {
     const CNode& n1 = *nodes[0];
@@ -222,7 +222,7 @@ void C9Q::ElementStiffness(double* matrix)
 
     // =========================== 3d to 2d ============================
     double n[3], i[3], j[3], xe[9], ye[9];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d9Q(nodes, n, i, j, xe, ye);
 
     // =========================== assembly Ke' =========================
     // generate GN4Q for eta, psi
@@ -331,7 +331,7 @@ void C9Q::ElementStress(double stress[12], double* Displacement, double Position
 {
     // =========================== 3d to 2d ============================
     double n[3], i[3], j[3], xe[4], ye[4];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d9Q(nodes, n, i, j, xe, ye);
 
     // form d first.
     // d represent 3d displacements at boundary nodes.
