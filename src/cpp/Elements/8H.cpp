@@ -774,5 +774,5 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 
 void  CHex::ElementPostInfoSPR(double* stress, double* Displacement , double* PrePositions, double* PostPositions)
 {
-
+	
 }

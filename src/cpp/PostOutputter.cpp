@@ -197,11 +197,18 @@ void PostOutputter::OutputElementStress()
 			double PrePosition8H[24];
             double Position8H[24];
 			// for SPR
-			//unsigned int* glo2ET= new unsigned int[NUMNP]; 
+			unsigned int* glo2ET= new unsigned int[NUMNP]; 
 
 			//call the SPR function 
-			//dynamic_cast<CHex&>(EleGrp.GetElement(Ele)).ElementPostinfoSPR(stressHex, Displacement, PrePosition8H, Position8H);
 
+			// for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            //{
+			//dynamic_cast<CHex&>(EleGrp.GetElement(Ele)).ElementPostInfoSPR(stressHex, Displacement, PrePosition8H, Position8H);
+			//			}
+
+
+			// normal output way 
+			
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
@@ -226,7 +233,7 @@ void PostOutputter::OutputElementStress()
 
 						*this<<endl;
 				}
-
+			
 
             *this << endl;
 
