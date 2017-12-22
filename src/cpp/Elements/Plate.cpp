@@ -965,156 +965,192 @@ void CPlate::ElementPostInfo(double* stress2, double* Displacement, double* Posi
     /*well it's just too complex a set of formulas...*/
     stress[0] =
         dis[0] * (psix * psix * 0.6830127018922193 + nu * etay * etay * 0.6830127018922193) +
-        dis[1] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 1.0773502691896257) +
-        dis[2] * (psix * psix * -1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
+        dis[1] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 1.0773502691896257) +
+        dis[2] * xpsi *
+            (psix * psix * -1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
         dis[3] * (psix * psix * -0.6830127018922193 + nu * etay * etay * 0.1830127018922193) +
-        dis[4] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
-        dis[5] * (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[4] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
+        dis[5] * xpsi *
+            (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[6] * (psix * psix * -0.1830127018922193 + nu * etay * etay * -0.1830127018922193) +
-        dis[7] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.0773502691896258) +
-        dis[8] * (psix * psix * -0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
+        dis[7] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.0773502691896258) +
+        dis[8] * xpsi *
+            (psix * psix * -0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
         dis[9] * (psix * psix * 0.1830127018922193 + nu * etay * etay * -0.6830127018922193) +
-        dis[10] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
-        dis[11] * (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
+        dis[11] * xpsi *
+            (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000);
     stress[1] =
         dis[0] * (nu * psix * psix * 0.6830127018922193 + etay * etay * 0.6830127018922193) +
-        dis[1] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 1.0773502691896257) +
-        dis[2] * (nu * psix * psix * -1.0773502691896257 + etay * etay * 0.0000000000000000) +
+        dis[1] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 1.0773502691896257) +
+        dis[2] * xpsi *
+            (nu * psix * psix * -1.0773502691896257 + etay * etay * 0.0000000000000000) +
         dis[3] * (nu * psix * psix * -0.6830127018922193 + etay * etay * 0.1830127018922193) +
-        dis[4] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
-        dis[5] * (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[4] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
+        dis[5] * xpsi *
+            (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[6] * (nu * psix * psix * -0.1830127018922193 + etay * etay * -0.1830127018922193) +
-        dis[7] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.0773502691896258) +
-        dis[8] * (nu * psix * psix * -0.0773502691896258 + etay * etay * 0.0000000000000000) +
+        dis[7] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.0773502691896258) +
+        dis[8] * xpsi *
+            (nu * psix * psix * -0.0773502691896258 + etay * etay * 0.0000000000000000) +
         dis[9] * (nu * psix * psix * 0.1830127018922193 + etay * etay * -0.6830127018922193) +
-        dis[10] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
-        dis[11] * (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
+        dis[11] * xpsi *
+            (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000);
     stress[2] = dis[0] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[1] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[2] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[1] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[2] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                 dis[3] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[4] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[5] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[4] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[5] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                 dis[6] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[7] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[8] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[7] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[8] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                 dis[9] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[10] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[11] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129);
+                dis[10] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[11] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129);
     stress[3] =
         dis[0] * (psix * psix * -0.6830127018922193 + nu * etay * etay * 0.1830127018922193) +
-        dis[1] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
-        dis[2] * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[1] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
+        dis[2] * xpsi * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[3] * (psix * psix * 0.6830127018922193 + nu * etay * etay * 0.6830127018922193) +
-        dis[4] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 1.0773502691896257) +
-        dis[5] * (psix * psix * 1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
+        dis[4] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 1.0773502691896257) +
+        dis[5] * xpsi * (psix * psix * 1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
         dis[6] * (psix * psix * 0.1830127018922193 + nu * etay * etay * -0.6830127018922193) +
-        dis[7] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
-        dis[8] * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[7] * yeta * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.2886751345948129) +
+        dis[8] * xpsi * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[9] * (psix * psix * -0.1830127018922193 + nu * etay * etay * -0.1830127018922193) +
-        dis[10] * (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.0773502691896258) +
-        dis[11] * (psix * psix * 0.0773502691896258 + nu * etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * 0.0773502691896258) +
+        dis[11] * xpsi * (psix * psix * 0.0773502691896258 + nu * etay * etay * 0.0000000000000000);
     stress[4] =
         dis[0] * (nu * psix * psix * -0.6830127018922193 + etay * etay * 0.1830127018922193) +
-        dis[1] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
-        dis[2] * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[1] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
+        dis[2] * xpsi * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[3] * (nu * psix * psix * 0.6830127018922193 + etay * etay * 0.6830127018922193) +
-        dis[4] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 1.0773502691896257) +
-        dis[5] * (nu * psix * psix * 1.0773502691896257 + etay * etay * 0.0000000000000000) +
+        dis[4] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 1.0773502691896257) +
+        dis[5] * xpsi * (nu * psix * psix * 1.0773502691896257 + etay * etay * 0.0000000000000000) +
         dis[6] * (nu * psix * psix * 0.1830127018922193 + etay * etay * -0.6830127018922193) +
-        dis[7] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
-        dis[8] * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[7] * yeta * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.2886751345948129) +
+        dis[8] * xpsi * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[9] * (nu * psix * psix * -0.1830127018922193 + etay * etay * -0.1830127018922193) +
-        dis[10] * (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.0773502691896258) +
-        dis[11] * (nu * psix * psix * 0.0773502691896258 + etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * 0.0773502691896258) +
+        dis[11] * xpsi * (nu * psix * psix * 0.0773502691896258 + etay * etay * 0.0000000000000000);
     stress[5] = dis[0] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[1] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[2] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[1] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[2] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                 dis[3] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[4] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[5] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[4] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[5] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                 dis[6] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[7] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[8] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[7] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[8] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                 dis[9] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[10] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[11] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129);
+                dis[10] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[11] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129);
     stress[6] =
         dis[0] * (psix * psix * -0.1830127018922193 + nu * etay * etay * -0.1830127018922193) +
-        dis[1] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.0773502691896258) +
-        dis[2] * (psix * psix * 0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
+        dis[1] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.0773502691896258) +
+        dis[2] * xpsi * (psix * psix * 0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
         dis[3] * (psix * psix * 0.1830127018922193 + nu * etay * etay * -0.6830127018922193) +
-        dis[4] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
-        dis[5] * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[4] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
+        dis[5] * xpsi * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[6] * (psix * psix * 0.6830127018922193 + nu * etay * etay * 0.6830127018922193) +
-        dis[7] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -1.0773502691896257) +
-        dis[8] * (psix * psix * 1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
+        dis[7] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -1.0773502691896257) +
+        dis[8] * xpsi * (psix * psix * 1.0773502691896257 + nu * etay * etay * 0.0000000000000000) +
         dis[9] * (psix * psix * -0.6830127018922193 + nu * etay * etay * 0.1830127018922193) +
-        dis[10] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
-        dis[11] * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
+        dis[11] * xpsi * (psix * psix * 0.2886751345948129 + nu * etay * etay * 0.0000000000000000);
     stress[7] =
         dis[0] * (nu * psix * psix * -0.1830127018922193 + etay * etay * -0.1830127018922193) +
-        dis[1] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.0773502691896258) +
-        dis[2] * (nu * psix * psix * 0.0773502691896258 + etay * etay * 0.0000000000000000) +
+        dis[1] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.0773502691896258) +
+        dis[2] * xpsi * (nu * psix * psix * 0.0773502691896258 + etay * etay * 0.0000000000000000) +
         dis[3] * (nu * psix * psix * 0.1830127018922193 + etay * etay * -0.6830127018922193) +
-        dis[4] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
-        dis[5] * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[4] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
+        dis[5] * xpsi * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[6] * (nu * psix * psix * 0.6830127018922193 + etay * etay * 0.6830127018922193) +
-        dis[7] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -1.0773502691896257) +
-        dis[8] * (nu * psix * psix * 1.0773502691896257 + etay * etay * 0.0000000000000000) +
+        dis[7] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -1.0773502691896257) +
+        dis[8] * xpsi * (nu * psix * psix * 1.0773502691896257 + etay * etay * 0.0000000000000000) +
         dis[9] * (nu * psix * psix * -0.6830127018922193 + etay * etay * 0.1830127018922193) +
-        dis[10] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
-        dis[11] * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
+        dis[11] * xpsi * (nu * psix * psix * 0.2886751345948129 + etay * etay * 0.0000000000000000);
     stress[8] = dis[0] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[1] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[2] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[1] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[2] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                 dis[3] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[4] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[5] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[4] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[5] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                 dis[6] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                dis[7] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                dis[8] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[7] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                dis[8] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                 dis[9] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                dis[10] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                dis[11] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129);
+                dis[10] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                dis[11] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129);
     stress[9] =
         dis[0] * (psix * psix * 0.1830127018922193 + nu * etay * etay * -0.6830127018922193) +
-        dis[1] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
-        dis[2] * (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[1] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
+        dis[2] * xpsi *
+            (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[3] * (psix * psix * -0.1830127018922193 + nu * etay * etay * -0.1830127018922193) +
-        dis[4] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.0773502691896258) +
-        dis[5] * (psix * psix * -0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
+        dis[4] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.0773502691896258) +
+        dis[5] * xpsi *
+            (psix * psix * -0.0773502691896258 + nu * etay * etay * 0.0000000000000000) +
         dis[6] * (psix * psix * -0.6830127018922193 + nu * etay * etay * 0.1830127018922193) +
-        dis[7] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
-        dis[8] * (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
+        dis[7] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -0.2886751345948129) +
+        dis[8] * xpsi *
+            (psix * psix * -0.2886751345948129 + nu * etay * etay * 0.0000000000000000) +
         dis[9] * (psix * psix * 0.6830127018922193 + nu * etay * etay * 0.6830127018922193) +
-        dis[10] * (psix * psix * 0.0000000000000000 + nu * etay * etay * -1.0773502691896257) +
-        dis[11] * (psix * psix * -1.0773502691896257 + nu * etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (psix * psix * 0.0000000000000000 + nu * etay * etay * -1.0773502691896257) +
+        dis[11] * xpsi *
+            (psix * psix * -1.0773502691896257 + nu * etay * etay * 0.0000000000000000);
     stress[10] =
         dis[0] * (nu * psix * psix * 0.1830127018922193 + etay * etay * -0.6830127018922193) +
-        dis[1] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
-        dis[2] * (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[1] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
+        dis[2] * xpsi *
+            (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[3] * (nu * psix * psix * -0.1830127018922193 + etay * etay * -0.1830127018922193) +
-        dis[4] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.0773502691896258) +
-        dis[5] * (nu * psix * psix * -0.0773502691896258 + etay * etay * 0.0000000000000000) +
+        dis[4] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.0773502691896258) +
+        dis[5] * xpsi *
+            (nu * psix * psix * -0.0773502691896258 + etay * etay * 0.0000000000000000) +
         dis[6] * (nu * psix * psix * -0.6830127018922193 + etay * etay * 0.1830127018922193) +
-        dis[7] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
-        dis[8] * (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
+        dis[7] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -0.2886751345948129) +
+        dis[8] * xpsi *
+            (nu * psix * psix * -0.2886751345948129 + etay * etay * 0.0000000000000000) +
         dis[9] * (nu * psix * psix * 0.6830127018922193 + etay * etay * 0.6830127018922193) +
-        dis[10] * (nu * psix * psix * 0.0000000000000000 + etay * etay * -1.0773502691896257) +
-        dis[11] * (nu * psix * psix * -1.0773502691896257 + etay * etay * 0.0000000000000000);
+        dis[10] * yeta *
+            (nu * psix * psix * 0.0000000000000000 + etay * etay * -1.0773502691896257) +
+        dis[11] * xpsi *
+            (nu * psix * psix * -1.0773502691896257 + etay * etay * 0.0000000000000000);
     stress[11] = dis[0] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                 dis[1] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                 dis[2] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                 dis[1] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                 dis[2] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                  dis[3] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                 dis[4] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                 dis[5] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                 dis[4] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                 dis[5] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
                  dis[6] * (+psix * etay * (1 - nu) * 0.5 * -0.5000000000000000) +
-                 dis[7] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
-                 dis[8] * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                 dis[7] * yeta * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
+                 dis[8] * xpsi * (+psix * etay * (1 - nu) * 0.5 * -0.2886751345948129) +
                  dis[9] * (+psix * etay * (1 - nu) * 0.5 * 0.5000000000000000) +
-                 dis[10] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
-                 dis[11] * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129);
+                 dis[10] * yeta * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129) +
+                 dis[11] * xpsi * (+psix * etay * (1 - nu) * 0.5 * 0.2886751345948129);
     for (unsigned int i = 0; i < 11; ++i)
     {
         stress[i] = stress[i] * k2;
@@ -1129,7 +1165,7 @@ void CPlate::ElementPostInfo(double* stress2, double* Displacement, double* Posi
     double mq=1.0-0.5*sqrt(3.0);
     for (unsigned int i = 0; i < 3; ++i){
         stress_rates[i] = (pq * stress[i] - 0.5 * stress[3 + i] + mq * stress[6 + i] -0.5 * stress[9 + i]);
-        stress_rates[i + 3] = (-0.5 * stress[i] + pq * stress[3 + i] - 0.5 * stress[6 + i]  -0.5 * stress[9 + i]);
+        stress_rates[i + 3] = (-0.5 * stress[i] + pq * stress[3 + i] - 0.5 * stress[6 + i]  +mq * stress[9 + i]);
         stress_rates[i + 6] = (mq * stress[i] - 0.5 * stress[3 + i] + pq * stress[6 + i] - 0.5 * stress[9 + i]);
         stress_rates[i + 9] = (-0.5 * stress[i] + mq * stress[3 + i] - 0.5 * stress[6 + i] + pq * stress[9 + i]);
     }
