@@ -342,11 +342,11 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
 		}
 
 		if (LocationMatrix[i+6]){
-	        d[1][i] = Displacement[LocationMatrix[i+3]-1];
+	        d[1][i] = Displacement[LocationMatrix[i+6]-1];
             Loc[1][i] = nodes[1]->XYZ[i];
 		}
 		else{
-            d[1][i] = 0.0;		 
+            d[1][i] = 0.0;
 		    Loc[1][i] = nodes[1]->XYZ[i];
 		}
 	}
