@@ -22,6 +22,7 @@
 #include "Elements/TimoshenkoEBMOD.h"
 #include "Elements/Plate.h"
 #include "Elements/Shell.h"
+#include "Elements/9Q.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -38,7 +39,8 @@ enum ElementTypes
     Plate,
     Shell,
     TimoshenkoSRINT,
-    TimoshenkoEBMOD
+    TimoshenkoEBMOD,
+    T9Q
 };
 
 //! Element group class
