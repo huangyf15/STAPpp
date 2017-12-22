@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     }
 	string InFile = filename + ".dat";
 	string OutFile = filename + ".out";
-	string PostFile = filename + "_post.out";
+	string PostFile = filename + "_post.dat";
 
 	CDomain* FEMData = CDomain::Instance();
 
