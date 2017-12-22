@@ -95,7 +95,7 @@ inline CSkylineMatrix<T_>::CSkylineMatrix(unsigned int N) : NWK_(0), SparseMatri
 
 //! destructor function
 template <class T_>
-inline CSkylineMatrix<T_>::~CSkylineMatrix<T_>()
+inline CSkylineMatrix<T_>::~CSkylineMatrix()
 {
     if (ColumnHeights_)
         delete[] ColumnHeights_;

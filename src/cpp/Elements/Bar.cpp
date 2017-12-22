@@ -184,7 +184,8 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 		Thetaz[1] = DX[0] * DX[1];
 		Thetaz[2] = DX[0] * DX[2];
 	}
-	else {
+	else
+	{
 		Thetay[0] = DX[2];
 		Thetay[1] = 0.0;
 		Thetay[2] = -DX[0];
