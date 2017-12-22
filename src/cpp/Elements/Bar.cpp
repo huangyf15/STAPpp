@@ -169,7 +169,7 @@ void CBar::ElementStress(double* stress, double* Displacement)
 // PostPositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
 void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
 {
-	// Calculate the axis of codimension
+	// Calculate the axis of co-dimension
 	// DX[3] = [x2-x1, y2-y1, z2-z1]
 	double DX[3], Thetay[3], Thetaz[3];
 	for (unsigned int i = 0; i < 3; i++)
@@ -205,7 +205,7 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 
 	// Determine the quasi-prepositions for POSTPROCESS
 	// PrePositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
-	// Define the scale of codimension
+	// Define the scale of co-dimension
 	double magCodim = 1.0E-5;
 	for (unsigned i = 0; i < 2; i++)
 	{
