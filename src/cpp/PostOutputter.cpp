@@ -285,12 +285,12 @@ void PostOutputter::OutputElementStress()
 			break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME * 4 << ",E=" << NUME
-                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << " E=" << NUME
+                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
-            double stresses4PE[12];
-            double PrePositions4PE[12];
-            double Positions4PE[12];
+            double stresses4PE[48];
+			double PrePositions4PE[24];
+            double Positions4PE[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -299,59 +299,60 @@ void PostOutputter::OutputElementStress()
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
-                    *this << Positions4PE[0] << setw(POINTS_DATA_WIDTH) << Positions4PE[1]
-                          << setw(POINTS_DATA_WIDTH) << Positions4PE[2] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4PE[3] << setw(POINTS_DATA_WIDTH) << Positions4PE[4]
-                          << setw(POINTS_DATA_WIDTH) << Positions4PE[5] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4PE[6] << setw(POINTS_DATA_WIDTH) << Positions4PE[7]
-                          << setw(POINTS_DATA_WIDTH) << Positions4PE[8] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4PE[9] << setw(POINTS_DATA_WIDTH) << Positions4PE[10]
-                          << setw(POINTS_DATA_WIDTH) << Positions4PE[11] << setw(POINTS_DATA_WIDTH)
+                    *this << setw(POINTS_DATA_WIDTH) << Positions4PE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
+                          << stresses4PE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
+                          << stresses4PE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 4]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 5]
                           << endl;
 
-                    *this << std::endl;
                 }
             }
             *this << endl;
-
+            for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            {
+                for (unsigned int i = 0; i < 8; ++i){
+                    *this << setw(10) << 8 * Ele + i + 1;
+                }
+                *this << std::endl;
+            }
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME * 4<< ",E=" << NUME
-                << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << " E=" << NUME
+                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
-            double stresses4SE[15];
-            double PrePostions4SE[15];
-            double Positions4SE[15];
+            double stresses4SE[48];
+			double PrePostions4SE[24];
+            double Positions4SE[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
                     .ElementPostInfo(stresses4SE, Displacement, PrePostions4SE, Positions4SE);
 
-                for (unsigned i = 0; i < 5; ++i)
+                for (unsigned i = 0; i < 8; ++i)
                 {
                     // four gauss points;
-                    // THE FIFTH POINT IS THE CENTRE POINT FOR IN-PLANE STRESSES
-                    *this << Positions4SE[0] << setw(POINTS_DATA_WIDTH) << Positions4SE[1]
-                          << setw(POINTS_DATA_WIDTH) << Positions4SE[2] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4SE[3] << setw(POINTS_DATA_WIDTH) << Positions4SE[4]
-                          << setw(POINTS_DATA_WIDTH) << Positions4SE[5] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4SE[6] << setw(POINTS_DATA_WIDTH) << Positions4SE[7]
-                          << setw(POINTS_DATA_WIDTH) << Positions4SE[8] << setw(POINTS_DATA_WIDTH)
-                          << endl
-                          << Positions4SE[9] << setw(POINTS_DATA_WIDTH) << Positions4SE[10]
-                          << setw(POINTS_DATA_WIDTH) << Positions4SE[11] << setw(POINTS_DATA_WIDTH)
+                    *this << setw(POINTS_DATA_WIDTH) << Positions4SE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
+                          << stresses4SE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
+                          << stresses4SE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 4]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 5]
                           << endl;
 
-                    *this << std::endl;
                 }
             }
+                        for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            {
+            for (unsigned int i = 0; i < 8; ++i){
+                    *this << setw(10) << 8 * Ele + i + 1;
+                }
+                *this << std::endl;
+            }
+
 
             break;
 
