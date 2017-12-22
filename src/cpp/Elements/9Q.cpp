@@ -153,9 +153,9 @@ void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weig
 void Convert2d23d9Q(Matrix<double>& k, double* matrix, const double i[3], const double j[3])
 {
     auto f = [i, j](Matrix<double>::Pos_t row, Matrix<double>::Pos_t column) -> double {
-        if (row / 2 == column / 3)
+        if ((row - 1) / 2 == (column - 1) / 3)
         {
-            return (row % 2 ? j : i)[column % 3];
+            return ((row - 1) % 2 ? j : i)[(column - 1) % 3];
         }
         else
         {
