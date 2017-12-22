@@ -99,7 +99,7 @@ void PostOutputter::OutputElementStress()
                   << ", E=" << NUME
                   << ", F=FEPOINT, ET= QUADRILATERAL, C= RED" << endl;
 
-            double stress4Q[12];
+            double stress4Q[24];
 			double PrePosition4Q[12];
             double PostPosition4Q[12];
 
@@ -116,7 +116,7 @@ void PostOutputter::OutputElementStress()
                     for (unsigned dof = 0; dof < 3; ++dof)
                         *this << setw(POINTS_DATA_WIDTH) << PostPosition4Q[ni * 3 + dof];
                     for (unsigned dof = 0; dof < 6; ++dof)
-                        *this << setw(POINTS_DATA_WIDTH) << stress4Q[ni * 3 + dof];
+                        *this << setw(POINTS_DATA_WIDTH) << stress4Q[ni * 6 + dof];
                     *this << std::endl;
                 }
             }

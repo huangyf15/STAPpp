@@ -518,9 +518,9 @@ void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, doubl
 
     // calculate stresses
     CalculateStressAt(etas[0], psis[0], xe, ye, E, v, de, tempStress + 0);
-    CalculateStressAt(etas[0], psis[1], xe, ye, E, v, de, tempStress + 3);
-    CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, tempStress + 6);
-    CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, tempStress + 9);
+    CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, tempStress + 3);
+    CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, tempStress + 6);
+    CalculateStressAt(etas[0], psis[1], xe, ye, E, v, de, tempStress + 9);
 
     // calc stress at nodes
     for (unsigned nodeIndex = 0; nodeIndex < 4; nodeIndex++)
