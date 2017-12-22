@@ -38,7 +38,7 @@ void PostOutputter::OutputElementStress()
     for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
     {
         *this << "TITLE = \" STAPpp FEM \" " << endl
-              << "VARIABLES = VARIABLES = \"X_PRE\",\"Y_PRE\",\"Z_PRE\", \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
+              << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
 
 		// Get the ElementGroup and related infos
         CElementGroup& EleGrp = FEMData->GetEleGrpList()[EleGrpIndex];
