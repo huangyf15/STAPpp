@@ -31,9 +31,6 @@ public:
     //!	Calculate element stress
     virtual void ElementStress(double* stress, double* Displacement, double* position);
     
-    //!	Calculate element stress
-    virtual void ElementStress2(double* stress, double* Displacement, double* Positions4PE);
-
 	//!	Calculate the values required in the POSTPROCESS 
 	virtual void ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions);
 

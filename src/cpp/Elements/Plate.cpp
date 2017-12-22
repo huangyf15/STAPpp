@@ -890,11 +890,12 @@ void CPlate::ElementStress(double* stress, double* Displacement, double* positio
     position[11] = zmid;
 }
 
-void CPlate::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+void CPlate::ElementPostInfo(double* stress2, double* Displacement, double* Positions4PE, double* PostPositions)
 {
     CPlateMaterial* material =
         static_cast<CPlateMaterial*>(ElementMaterial); // Pointer to material of the element
     
+    clear(stress2,48);
     double xdir[3];
     double ydir[3];
     double zdir[3];
@@ -944,12 +945,12 @@ void CPlate::ElementPostInfo(double* stress, double* Displacement, double* PrePo
                          truedisp[6 * i + 5] * xdir[2];
         dis[3 * i + 2] = truedisp[6 * i + 3] * ydir[0] + truedisp[6 * i + 4] * ydir[1] +
                          truedisp[6 * i + 5] * ydir[2];
-        Positions4SE[3 * i] = nodes[i] -> XYZ[0] - zdir[0] * material->h * 0.5;
-        Positions4SE[3 * i + 1] = nodes[i] -> XYZ[1] - zdir[1] * material->h * 0.5;
-        Positions4SE[3 * i + 2] = nodes[i] -> XYZ[2] - zdir[2] * material->h * 0.5;
-        Positions4SE[3 * i + 12] = nodes[i] -> XYZ[0] + zdir[0] * material->h * 0.5;
-        Positions4SE[3 * i + 13] = nodes[i] -> XYZ[1] + zdir[1] * material->h * 0.5;
-        Positions4SE[3 * i + 14] = nodes[i] -> XYZ[2] + zdir[2] * material->h * 0.5;
+        Positions4PE[3 * i] = nodes[i] -> XYZ[0] - zdir[0] * material->h * 0.5;
+        Positions4PE[3 * i + 1] = nodes[i] -> XYZ[1] - zdir[1] * material->h * 0.5;
+        Positions4PE[3 * i + 2] = nodes[i] -> XYZ[2] - zdir[2] * material->h * 0.5;
+        Positions4PE[3 * i + 12] = nodes[i] -> XYZ[0] + zdir[0] * material->h * 0.5;
+        Positions4PE[3 * i + 13] = nodes[i] -> XYZ[1] + zdir[1] * material->h * 0.5;
+        Positions4PE[3 * i + 14] = nodes[i] -> XYZ[2] + zdir[2] * material->h * 0.5;
 
     }
 
@@ -1154,4 +1155,9 @@ void CPlate::ElementPostInfo(double* stress, double* Displacement, double* PrePo
             stress2[6 * i + 4] = stress_nodes[6 * i] * xdir[2] * xdir[1] + stress_nodes[6 * i + 1] * ydir[2] * ydir[1] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[1] + xdir[1] * ydir[2]);
             stress2[6 * i + 5] = stress_nodes[6 * i] * xdir[2] * xdir[0] + stress_nodes[6 * i + 1] * ydir[2] * ydir[0] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[0] + xdir[0] * ydir[2]);
     }
+    for (unsigned int i=0; i<24; ++i){
+        PostPositions[i] = Positions4PE[i] + Displacement[i];
+        PostPositions[i+24] = Positions4PE[i + 24] + Displacement[i];
+    }
+
 }

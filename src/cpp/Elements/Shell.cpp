@@ -1099,11 +1099,12 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     position[14] = zmid;
 }
 
-void CShell::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+void CShell::ElementPostInfo(double* stress2, double* Displacement, double* Positions4SE, double* PostPositions)
 {
         CShellMaterial* material =
         static_cast<CShellMaterial*>(ElementMaterial); // Pointer to material of the element
     
+    clear(stress2,48);
     double xdir[3];
     double ydir[3];
     double zdir[3];
@@ -1377,5 +1378,9 @@ void CShell::ElementPostInfo(double* stress, double* Displacement, double* PrePo
             stress2[6 * i + 2] = stress_nodes[6 * i] * xdir[2] * xdir[2] + stress_nodes[6 * i + 1] * ydir[2] * ydir[2] + stress_nodes[6 * i + 2] * xdir[2] * ydir[2] *2;
             stress2[6 * i + 4] = stress_nodes[6 * i] * xdir[2] * xdir[1] + stress_nodes[6 * i + 1] * ydir[2] * ydir[1] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[1] + xdir[1] * ydir[2]);
             stress2[6 * i + 5] = stress_nodes[6 * i] * xdir[2] * xdir[0] + stress_nodes[6 * i + 1] * ydir[2] * ydir[0] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[0] + xdir[0] * ydir[2]);
+    }
+    for (unsigned int i=0; i<24; ++i){
+        PostPositions[i] = Positions4SE[i] + Displacement[i];
+        PostPositions[i+24] = Positions4SE[i + 24] + Displacement[i];
     }
 }
