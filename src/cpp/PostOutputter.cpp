@@ -132,22 +132,40 @@ void PostOutputter::OutputElementStress()
             *this << "ZONE T = \"SCENE1\", N=" <<NUME * 8 << ",E =" << NUME
                   << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
-            double stressBeam[3];
-            double PrePositionBeam[24];
-            double PositionBeam[24];
+            double beamstress[48];
+            double prePositionBeam[24];
+            double postPositionBeam[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
-                Element.ElementPostInfo(stressBeam, Displacement, PrePositionBeam, PositionBeam);
+                Element.ElementPostInfo(beamstress, Displacement, prePositionBeam, postPositionBeam);
 
                 CBeamMaterial& material =
                     *dynamic_cast<CBeamMaterial*>(Element.GetElementMaterial());
 
-                for (unsigned _ = 0; _ < 8; _++)
-                    *this << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 0]
-                          << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 1]
-                          << setw(POINTS_DATA_WIDTH) << PositionBeam[3 * _ + 2]  << endl;
+                for (unsigned i = 0; i < 8; i++){
+
+					for (unsigned DegOF = 0; DegOF < 3; DegOF++){
+						*this << setw(POINTS_DATA_WIDTH) << postPositionBeam[3 * i + DegOF];
+					}
+
+					for (unsigned DegOF = 0; DegOF < 6; DegOF++){
+						*this << setw(POINTS_DATA_WIDTH) << beamstress[6 * i + DegOF];
+					}
+                    
+					*this << endl;
+				}
+            }
+
+            // Node numbers corresponding to each element
+            for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            {
+                for (unsigned NumEleNode = 0; NumEleNode < 8; NumEleNode++)
+                {
+                    *this << setw(POINTS_DATA_WIDTH) << Ele * 8 + NumEleNode + 1;
+                }
+                *this << endl;
             }
             *this << endl;
 
