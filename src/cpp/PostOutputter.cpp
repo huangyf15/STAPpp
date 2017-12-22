@@ -28,7 +28,10 @@ PostOutputter* PostOutputter::Instance(string FileName)
 // Postprocess
 void PostOutputter::OutputElementStress()
 {
-    CDomain* FEMData = CDomain::Instance();
+    // the amplification factor 
+	double coeff = 1000;
+
+	CDomain* FEMData = CDomain::Instance();
 
     double* Displacement = FEMData->GetDisplacement();
 
@@ -37,10 +40,9 @@ void PostOutputter::OutputElementStress()
 	// loop for each element group
     for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
     {
-        *this << "TITLE = \"STAPpp FEM\"" << endl
-              << "VARIABLES = \"X_PRE\",\"Y_PRE\",\"Z_PRE\","
-              << "\"X_POST\",\"Y_POST\",\"Z_POST\","
-              << "\"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\"" << endl;
+
+        *this << "TITLE = \" STAPpp FEM \" " << endl
+              << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
 
 		// Get the ElementGroup and related infos
         CElementGroup& EleGrp = FEMData->GetEleGrpList()[EleGrpIndex];
@@ -52,7 +54,7 @@ void PostOutputter::OutputElementStress()
         {
         case ElementTypes::Bar: // Bar element
 
-            *this << "ZONE T = \"SCENE1\", N = " << NUMNP << ", E = " << NUME
+            *this << "ZONE T = \"SCENE1\", N = " << NUME*8<< ", E = " << NUME
                   << ", F = FEPOINT , ET = BRICK, C = RED" << endl;
 
 			double PrePositionBar[24];
@@ -95,9 +97,9 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Quadrilateral: // Quadrilateral element
-            *this << "ZONE T=\"SCENE1\", N=" << 4 * NUME// NUMNP 
-                  << ", E=" << NUME
-                  << ", F=FEPOINT, ET= QUADRILATERAL, C= RED" << endl;
+
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*4 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stress4Q[24];
 			double PrePosition4Q[12];
@@ -133,8 +135,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Beam: // Beam element
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" <<NUME*8 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stressBeam[3];
 			double PrePositionBeam[24];
@@ -159,8 +161,10 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Triangle: // 3T element
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << " E=" << NUME
-                  << " F=FEPOINT, ET= TRIANGLE, C= RED" << endl;
+
+            *this << "ZONE T=\"SCENE1\", N=" <<NUME*3 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= TRIANGLE, C= RED" << endl;
+
             double stress3T[3];
             double PrePosition3T[9];
 			double PostPosition3T[9];
@@ -198,32 +202,62 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Hexahedron: // 8H element
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
+		{
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*8 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stressHex[48];
 			double PrePosition8H[24];
             double Position8H[24];
+			// for SPR
+			unsigned int* glo2ET= new unsigned int[NUMNP]; 
 
+			//call the SPR function 
+
+			// for (unsigned int Ele = 0; Ele < NUME; Ele++)
+            //{
+			//dynamic_cast<CHex&>(EleGrp.GetElement(Ele)).ElementPostInfoSPR(stressHex, Displacement, PrePosition8H, Position8H);
+			//			}
+
+
+			// normal output way 
+			
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 CElement& Element = EleGrp.GetElement(Ele);
                 Element.ElementPostInfo(stressHex, Displacement, PrePosition8H, Position8H);
 
+				
+
                 CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
                 for (unsigned _ = 0; _ < 8; _++)
-                    *this << Position8H[_ * 3 + 0] << setw(POINTS_DATA_WIDTH)
-                          << Position8H[_ * 3 + 1] << setw(POINTS_DATA_WIDTH)
-                          << Position8H[_ * 3 + 2] << setw(POINTS_DATA_WIDTH) << endl;
+				{
+                    *this << PrePosition8H[_*3 + 0]+coeff*(Position8H[_ * 3 + 0]-PrePosition8H[_*3 + 0]) << setw(POINTS_DATA_WIDTH)
+                          << PrePosition8H[_*3 + 1]+coeff*(Position8H[_ * 3 + 1]-PrePosition8H[_*3 + 1]) << setw(POINTS_DATA_WIDTH)
+                          << PrePosition8H[_*3 + 2]+coeff*(Position8H[_ * 3 + 2]-PrePosition8H[_*3 + 2])<< setw(POINTS_DATA_WIDTH) 
+						  << stressHex[_*6 + 0] << setw(16)<< stressHex[_*6 + 1] << setw(16)<< stressHex[_*6 +2]<< setw(16)<< stressHex[_*6 +3]<< setw(16)<< stressHex[_*6 +4]<< setw(16)<< stressHex[_*6 +5]
+						  << endl;
+				}
             }
+			for (unsigned int Ele= 0; Ele < NUME; Ele++) 
+					{
+						for (unsigned int i=1;i<9;i++)
+						*this << Ele*8+i<<setw(16);
+
+						*this<<endl;
+				}
+			
 
             *this << endl;
 
+
             break;
 
+		}
+
         case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
-			*this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-				<< " F=FEPOINT , ET= BRICK, C= RED" << endl;
+			*this << "ZONE T=\"SCENE1\", N=" <<NUME*8 << ",E=" << NUME
+				<< " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stressTimoSRINT[3];
 			double PrePositionTimoSRINT[24];
@@ -244,8 +278,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
-			*this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-				<< " F=FEPOINT , ET= BRICK, C= RED" << endl;
+			*this << "ZONE T=\"SCENE1\", N=" << NUME*8 << ",E=" << NUME
+				<< " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
 			double stressTimoEBMOD[3];
 			double PrePositionTimoEBMOD[24];
@@ -266,8 +300,8 @@ void PostOutputter::OutputElementStress()
 			break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*4 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stresses4PE[12];
 			double PrePositions4PE[12];
@@ -301,8 +335,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T=\"SCENE1\", N=" << NUMNP << "E=" << NUME
-                  << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*4<< ",E=" << NUME
+                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stresses4SE[15];
 			double PrePostions4SE[15];
