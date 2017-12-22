@@ -186,9 +186,11 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Shell:
 				PrintShellElementData(EleGrp);
 				break;
-
+			case ElementTypes::T9Q:
+				Print9QElementData(EleGrp);
+				break;
 			default:
-				std::cerr << "unknown ElementType " << ElementType << std::endl;
+				std::cerr << "OutputElementInfo: unknown ElementType " << ElementType << std::endl;
 				exit(2);
 				break;
 		}
@@ -265,6 +267,44 @@ void COutputter::PrintQuadrilateralElementData(unsigned int EleGrp)
 		  << " E L E M E N T   I N F O R M A T I O N" << endl;
 	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
 		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
+//	Output quadrilateral element data (9Q)
+void COutputter::Print9QElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL CONSTANTS . . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE     NODE     NODE     NODE     NODE     NODE   MATERIAL" << endl
+		  << " NUMBER-N      1        2        3        4        5        6       7         8       9    SET NUMBER" << endl;
 
 	//	Loop over for all elements in group EleGrp
 	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
