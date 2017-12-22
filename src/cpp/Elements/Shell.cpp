@@ -1098,6 +1098,6 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     position[14] = zmid;
 }
 
-void CShell::ElementStress2(double* stress, double* Displacement, double* Positions4SE)
+void CShell::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
 {
 }

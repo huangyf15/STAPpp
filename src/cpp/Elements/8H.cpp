@@ -635,6 +635,6 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		}
 	}
 }
-void  CHex::ElementStress2(double* stress, double* Displacement ,double* Positions)
+void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePositions, double* PostPositions)
 {
 }

@@ -87,12 +87,6 @@ public:
     //! Read element data from the input data file
     bool ReadElementData(ifstream& Input);
 
-    //! Read quadrilateral element data from the input data file
-    bool ReadQuadrilateralElementData(ifstream& Input);
-
-    //! Read plate element data from the input data file
-    bool ReadPlateElementData(ifstream& Input);
-
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }
 
