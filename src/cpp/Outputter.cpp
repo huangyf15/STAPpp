@@ -1021,10 +1021,10 @@ void COutputter::PrintStiffnessMatrix()
 	{
 		for (unsigned J = 1; J <= NEQ; J++)
 		{
-            unsigned i, j;
+            int i, j;
             i = std::min(I, J);
             j = std::max(I, J);
-			unsigned H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
 			if (j - i - H >= 0)
 			{
 				*this << setw(14) << 0.0;

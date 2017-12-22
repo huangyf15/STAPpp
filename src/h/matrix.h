@@ -58,7 +58,7 @@ public:
         }
     }
 
-    std::string c_str(const char* singleElementFormat = " %8.3lf") const
+    std::string c_str(const char* singleElementFormat = " %10.3g") const
     {
         if (!_elements)
         {

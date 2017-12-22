@@ -142,7 +142,7 @@ void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weig
 
     double DData[9] = {1, v, 0, v, 1, 0, 0, 0, (1 - v) / 2};
     Matrix<double> D(3, 3, DData);
-    double cof = E / (1 - v * v) * DetJe;
+    double cof = E / (1 - v * v) * std::abs(DetJe);
     D = D * cof;
 
     // see 4Q.nb and 4Q-form-key.py
