@@ -5,12 +5,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <functional>
+
 
 using std::size_t;
 
@@ -64,7 +65,6 @@ public:
             return std::string("(NULL)");
         }
         std::string res = "";
-        char temp[64]{0};
 
         for (Pos_t i = 1; i <= _rows; ++i)
         {
@@ -76,12 +76,12 @@ public:
                 endCode = ')';
             }
             else if (1 == i)
-            { // 第一行
+            { // first row
                 startCode = '/';
                 endCode = '\\';
             }
             else if (i == _rows)
-            { // 最后一行
+            { // last row
                 startCode = '\\';
                 endCode = '/';
             }
@@ -94,6 +94,7 @@ public:
 
             for (Pos_t j = 1; j <= _columns; ++j)
             {
+                char temp[128]{0};
                 sprintf(temp, singleElementFormat, c_at(i, j));
                 thisLineStr += temp;
             }
@@ -155,7 +156,7 @@ public:
         if (_rows != _columns)
             throw std::logic_error("applying inverse to a non-square matrix.");
 
-        //复制自身并生成单位阵
+        // copy self
         Pos_t n = _rows;
         Matrix<T> ori(*this);
         Matrix<T> res(n, n);
@@ -163,11 +164,11 @@ public:
             res.at(i, i) = T(1);
 
         for (Pos_t i = 1; i <= n; ++i)
-        { //第i行消元
+        {
             Pos_t mark = i;
             T mval = std::abs(ori.c_at(i, i));
             for (Pos_t j = i + 1; j <= n; ++j)
-            { //找到这列往下最大的元素
+            { // find max element in column
                 if (std::abs(ori.c_at(j, i)) > mval)
                 {
                     mval = std::abs(ori.c_at(j, i));
@@ -181,10 +182,10 @@ public:
                 res.swapRow(i, mark);
             }
             res.rowTimes(i, T(1) / ori.c_at(i, i));
-            ori.rowTimes(i, T(1) / ori.c_at(i, i)); //左边主对角线消为1
+            ori.rowTimes(i, T(1) / ori.c_at(i, i));
 
             for (Pos_t j = 1; j <= n; ++j)
-            { //消去这列其他元素
+            {
                 if (j != i)
                 {
                     res.addRowTo(j, i, -ori.c_at(j, i));
@@ -198,7 +199,6 @@ public:
 
     Matrix<T>& swapRow(Pos_t i, Pos_t j)
     {
-        // 交换 i 和 j 行
         T buff;
         for (Pos_t n = 1; n <= _columns; ++n)
         {
@@ -232,7 +232,6 @@ public:
         if (_rows != _columns)
             throw std::logic_error("applying inverse to a non-square matrix.");
 
-        //复制自身并生成单位阵
         Pos_t n = _rows;
         Matrix<T> ori(*this);
         Matrix<T> res(n, n);
@@ -240,11 +239,11 @@ public:
             res.at(i, i) = T(1);
 
         for (Pos_t i = 1; i <= n; ++i)
-        { // 第i列消元
+        {
             Pos_t mark = i;
             T mval = std::abs(ori.c_at(i, i));
             for (Pos_t j = i + 1; j <= n; ++j)
-            { // 找到这行往右最大的元素
+            {
                 if (std::abs(ori.c_at(i, j)) > mval)
                 {
                     mval = std::abs(ori.c_at(i, j));
@@ -258,10 +257,10 @@ public:
                 res.swapColumn(i, mark);
             }
             res.columnTimes(i, T(1) / ori.c_at(i, i));
-            ori.columnTimes(i, T(1) / ori.c_at(i, i)); // 主对角线消为1
+            ori.columnTimes(i, T(1) / ori.c_at(i, i));
 
             for (Pos_t j = 1; j <= n; ++j)
-            { // 消去这行其他元素
+            {
                 if (j != i)
                 {
                     res.addColumnTo(j, i, -ori.c_at(i, j));
@@ -274,11 +273,12 @@ public:
 
     Matrix<T>& swapColumn(Pos_t i, Pos_t j)
     {
-        // 交换 i 和 j 行
-        T buff[_rows];
+        // swap row i and row j
+        T* buff = new T[_rows];
         std::memcpy(buff, _elements + (i - 1) * _rows, _rows * sizeof(T));
         std::memcpy(_elements + (i - 1) * _rows, _elements + (j - 1) * _rows, _rows * sizeof(T));
         std::memcpy(_elements + (j - 1) * _rows, buff, _rows * sizeof(T));
+        delete[] buff;
         return *this;
     }
 
@@ -443,11 +443,7 @@ private:
             free();
         }
         else
-        { // need allocate
-            if (_elements && sizeof(_elements) / sizeof(T) == _rows * _columns)
-            {
-                return;
-            }
+        {
             if (_elements)
                 free();
             _elements = new T[_rows * _columns]{T(0)};

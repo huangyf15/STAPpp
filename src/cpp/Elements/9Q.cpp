@@ -81,7 +81,7 @@ unsigned int C9Q::SizeOfStiffnessMatrix() { return ND * (ND + 1) / 2; }
 // returns |Je|
 // generate B
 double GenerateB9Q(Matrix<double>& BB, const double xi, const double eta, const double xe[9],
-                 const double ye[9])
+                   const double ye[9])
 {
     double GNData[18] = {((-1 + eta) * eta * (-1 + 2 * xi)) / 4.,
                          ((-1 + 2 * eta) * (-1 + xi) * xi) / 4.,
@@ -117,18 +117,14 @@ double GenerateB9Q(Matrix<double>& BB, const double xi, const double eta, const 
 
     BB = Je.inverse() * GN;
 
-    double JeDet = -Je.c_at(1, 3) * Je.c_at(2, 2) * Je.c_at(3, 1) +
-                   Je.c_at(1, 2) * Je.c_at(2, 3) * Je.c_at(3, 1) +
-                   Je.c_at(1, 3) * Je.c_at(2, 1) * Je.c_at(3, 2) -
-                   Je.c_at(1, 1) * Je.c_at(2, 3) * Je.c_at(3, 2) -
-                   Je.c_at(1, 2) * Je.c_at(2, 1) * Je.c_at(3, 3) +
-                   Je.c_at(1, 1) * Je.c_at(2, 2) * Je.c_at(3, 3);
+    double JeDet = Je.c_at(1, 1) * Je.c_at(2, 2) - Je.c_at(1, 2) * Je.c_at(2, 1);
 
     return JeDet;
 }
 
-void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weight, const double* xe,
-                      const double* ye, Matrix<double>& ke, const double E, const double v)
+void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weight,
+                        const double* xe, const double* ye, Matrix<double>& ke, const double E,
+                        const double v)
 {
     Matrix<double> BB(2, 9);
     double DetJe = GenerateB9Q(BB, eta, psi, xe, ye);
@@ -146,10 +142,11 @@ void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weig
 
     double DData[9] = {1, v, 0, v, 1, 0, 0, 0, (1 - v) / 2};
     Matrix<double> D(3, 3, DData);
-    D = D * (E / (1 - v * v) * DetJe);
+    double cof = E / (1 - v * v) * DetJe;
+    D = D * cof;
 
     // see 4Q.nb and 4Q-form-key.py
-    ke = B * D * B;
+    ke = B.transpose() * D * B;
 }
 
 // convert ke' to ke with R (input as i and j)
@@ -239,7 +236,7 @@ void C9Q::ElementStiffness(double* matrix)
         static_cast<C9QMaterial*>(ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
-    
+
     Matrix<double> ke(18, 18);
     AccumulateEtaPsi9Q(etas[0], psis[0], weights[0][0], xe, ye, ke, E, v);
     AccumulateEtaPsi9Q(etas[0], psis[1], weights[0][1], xe, ye, ke, E, v);
@@ -253,7 +250,7 @@ void C9Q::ElementStiffness(double* matrix)
 }
 
 void CalculateStressAt9Q(double xi, double eta, double xe[9], double ye[9], double E, double v,
-                       const double de[18], double* stress)
+                         const double de[18], double* stress)
 {
     // generate B first
     // double B[8];
@@ -281,7 +278,7 @@ void CalculateN9Q(double eta, double psi, double N[4])
 
 // generate 3d position and return weight
 void CalculatePositionAt9Q(double eta, double psi, double xe[4], double ye[4], double i[3],
-                         double j[3], double Positions[3])
+                           double j[3], double Positions[3])
 {
     double N[4];
     CalculateN9Q(eta, psi, N);
@@ -296,7 +293,7 @@ void CalculatePositionAt9Q(double eta, double psi, double xe[4], double ye[4], d
 }
 
 void CalculateDisplacementAt9Q(double eta, double psi, double de[8], double i[3], double j[3],
-                             double Displacements[3])
+                               double Displacements[3])
 {
     double N[4];
     CalculateN9Q(eta, psi, N);
