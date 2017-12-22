@@ -40,6 +40,7 @@ void PostOutputter::OutputElementStress()
 	// loop for each element group
     for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
     {
+
         *this << "TITLE = \" STAPpp FEM \" " << endl
               << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
 
@@ -96,27 +97,39 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Quadrilateral: // Quadrilateral element
+
             *this << "ZONE T=\"SCENE1\", N=" << NUME*4 << ",E=" << NUME
                   << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
-            double stress4Q[12];
+            double stress4Q[24];
 			double PrePosition4Q[12];
-            double Position4Q[12];
+            double PostPosition4Q[12];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
 
                 dynamic_cast<CQuadrilateral&>(
-                    EleGrp.GetElement(Ele)).ElementPostInfo(stress4Q, Displacement, PrePosition4Q, Position4Q);
+                    EleGrp.GetElement(Ele)).ElementPostInfo(stress4Q, Displacement, PrePosition4Q, PostPosition4Q);
 
-                for (unsigned i = 0; i < 4; ++i)
-                { // four gauss points
-
-                    *this << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3]
-                          << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 1]
-                          << setw(POINTS_DATA_WIDTH) << Position4Q[i * 3 + 2] << std::endl;
+                for (unsigned ni = 0; ni < 4; ++ni)
+                {
+                    for (unsigned dof = 0; dof < 3; ++dof)
+                        *this << setw(POINTS_DATA_WIDTH) << PrePosition4Q[ni * 3 + dof];
+                    for (unsigned dof = 0; dof < 3; ++dof)
+                        *this << setw(POINTS_DATA_WIDTH) << PostPosition4Q[ni * 3 + dof];
+                    for (unsigned dof = 0; dof < 6; ++dof)
+                        *this << setw(POINTS_DATA_WIDTH) << stress4Q[ni * 6 + dof];
+                    *this << std::endl;
                 }
             }
+            for (unsigned int Ele = 0; Ele < NUME; Ele++)
+			{
+				for (unsigned NumEleNode = 0; NumEleNode < 4; NumEleNode++)
+				{
+					*this << setw(POINTS_DATA_WIDTH) << Ele * 4 + NumEleNode + 1;
+				}
+				*this << endl;
+			}
             *this << endl;
 
             break;

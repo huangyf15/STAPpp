@@ -321,8 +321,8 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
     const double psis[2] = {-pos, pos};
     const double weights[2][2] = {{1.0, 1.0}, {1.0, 1.0}};
 
-    const CQuadrilateralMaterial* material = static_cast<CQuadrilateralMaterial*>(
-        ElementMaterial); // Pointer to material of the element
+    const CQuadrilateralMaterial* material =
+        static_cast<CQuadrilateralMaterial*>(ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
     AccumulateEtaPsi(etas[0], psis[0], weights[0][0], xe, ye, ke, E, v);
@@ -443,8 +443,8 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
         d[9] * i[0] + d[10] * i[1] + d[11] * i[2], d[9] * j[0] + d[10] * j[1] + d[11] * j[2]};
 
     // ======================= calculate stress ========================
-    CQuadrilateralMaterial* material = static_cast<CQuadrilateralMaterial*>(
-        ElementMaterial); // Pointer to material of the element
+    CQuadrilateralMaterial* material =
+        static_cast<CQuadrilateralMaterial*>(ElementMaterial); // Pointer to material of the element
     const double& E = material->E;
     const double& v = material->nu;
 
@@ -477,6 +477,59 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
 #endif
 }
 
-void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, double* PrePositions,
+                                     double* PostPositions)
 {
+    double n[3], i[3], j[3], xe[4], ye[4];
+    Convert3d22d(nodes, n, i, j, xe, ye);
+
+    // form d first.
+    // d represent 3d displacements at boundary nodes.
+    double d[12];
+    for (unsigned index = 0; index < 12; ++index)
+    {
+        if (LocationMatrix[index])
+            d[index] = Displacement[LocationMatrix[index] - 1];
+        else
+            d[index] = 0.0f;
+        PrePositions[index] = nodes[index / 3]->XYZ[index % 3];
+        PostPositions[index] = PrePositions[index] + d[index];
+    }
+
+    // generate de, convert from 3d to 2d.
+    double de[8] = {
+        d[0] * i[0] + d[1] * i[1] + d[2] * i[2],   d[0] * j[0] + d[1] * j[1] + d[2] * j[2],
+        d[3] * i[0] + d[4] * i[1] + d[5] * i[2],   d[3] * j[0] + d[4] * j[1] + d[5] * j[2],
+        d[6] * i[0] + d[7] * i[1] + d[8] * i[2],   d[6] * j[0] + d[7] * j[1] + d[8] * j[2],
+        d[9] * i[0] + d[10] * i[1] + d[11] * i[2], d[9] * j[0] + d[10] * j[1] + d[11] * j[2]};
+
+    // ======================= calculate stress ========================
+    CQuadrilateralMaterial* material =
+        static_cast<CQuadrilateralMaterial*>(ElementMaterial); // Pointer to material of the element
+    const double& E = material->E;
+    const double& v = material->nu;
+
+    double pos = 1 / std::sqrt(3.0f);
+    double etas[2] = {-pos, pos};
+    double psis[2] = {-pos, pos};
+
+    double tempStress[12];
+    clear(tempStress, 12);
+
+    // calculate stresses
+    CalculateStressAt(etas[0], psis[0], xe, ye, E, v, de, tempStress + 0);
+    CalculateStressAt(etas[1], psis[0], xe, ye, E, v, de, tempStress + 3);
+    CalculateStressAt(etas[1], psis[1], xe, ye, E, v, de, tempStress + 6);
+    CalculateStressAt(etas[0], psis[1], xe, ye, E, v, de, tempStress + 9);
+
+    // calc stress at nodes
+    for (unsigned nodeIndex = 0; nodeIndex < 4; nodeIndex++)
+    {
+        stress[nodeIndex * 6 + 0] = tempStress[nodeIndex * 3 + 0];
+        stress[nodeIndex * 6 + 1] = tempStress[nodeIndex * 3 + 1];
+        stress[nodeIndex * 6 + 2] = 0.0f;
+        stress[nodeIndex * 6 + 3] = tempStress[nodeIndex * 3 + 2];
+        stress[nodeIndex * 6 + 4] = 0.0f;
+        stress[nodeIndex * 6 + 5] = 0.0f;
+    }
 }
