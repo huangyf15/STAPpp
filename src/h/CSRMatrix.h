@@ -43,9 +43,7 @@ public:
     void beginPostionMark()
     {
         // _tempColumns = std::set[size]
-
-        _tempColumns = new STL_t[size]{} ;
-
+        _tempColumns = new STL_t[size];
     }
 
     void markPosition(int row, int column)
