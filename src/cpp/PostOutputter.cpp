@@ -252,8 +252,8 @@ void PostOutputter::OutputElementStress()
 			break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << "E=" << NUME
-                  << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << " E=" << NUME
+                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stresses4PE[48];
 			double PrePositions4PE[24];
@@ -266,12 +266,12 @@ void PostOutputter::OutputElementStress()
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
-                    *this << Positions4PE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 1]
+                    *this << setw(POINTS_DATA_WIDTH) << Positions4PE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 1]
                           << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
                           << stresses4PE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 1]
                           << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
                           << stresses4PE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 4]
-                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 5] << setw(POINTS_DATA_WIDTH)
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 5]
                           << endl;
 
                 }
@@ -287,8 +287,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << "E=" << NUME
-                  << " F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << 8 * NUME << " E=" << NUME
+                  << " F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stresses4SE[48];
 			double PrePostions4SE[24];
@@ -302,12 +302,12 @@ void PostOutputter::OutputElementStress()
                 for (unsigned i = 0; i < 8; ++i)
                 {
                     // four gauss points;
-                    *this << Positions4SE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 1]
+                    *this << setw(POINTS_DATA_WIDTH) << Positions4SE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 1]
                           << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
                           << stresses4SE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 1]
                           << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
                           << stresses4SE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 4]
-                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 5] << setw(POINTS_DATA_WIDTH)
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 5]
                           << endl;
                     // *this << setw(32) << stresses[i] << std::endl;
 

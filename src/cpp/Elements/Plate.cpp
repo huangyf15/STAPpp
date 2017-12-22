@@ -1,5 +1,6 @@
 #include "Elements/Plate.h"
 
+#include <cfloat>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -1155,9 +1156,9 @@ void CPlate::ElementPostInfo(double* stress2, double* Displacement, double* Posi
             stress2[6 * i + 4] = stress_nodes[6 * i] * xdir[2] * xdir[1] + stress_nodes[6 * i + 1] * ydir[2] * ydir[1] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[1] + xdir[1] * ydir[2]);
             stress2[6 * i + 5] = stress_nodes[6 * i] * xdir[2] * xdir[0] + stress_nodes[6 * i + 1] * ydir[2] * ydir[0] + stress_nodes[6 * i + 2] * (xdir[2] * ydir[0] + xdir[0] * ydir[2]);
     }
-    for (unsigned int i=0; i<24; ++i){
+    for (unsigned int i=0; i<12; ++i){
         PostPositions[i] = Positions4PE[i] + Displacement[i];
-        PostPositions[i+24] = Positions4PE[i + 24] + Displacement[i];
+        PostPositions[i+12] = Positions4PE[i + 12] + Displacement[i];
     }
 
 }
