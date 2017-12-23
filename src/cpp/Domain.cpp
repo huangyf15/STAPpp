@@ -335,6 +335,12 @@ void CDomain::CalculateColumnHeights()
 	Output->PrintColumnHeights();
 #endif
 
+#ifdef _VIB_
+	unsigned int* ColumnHeights_mass = MassMatrix->GetColumnHeights();
+	for (unsigned int i=0; i<NEQ; ++i){
+		ColumnHeights_mass[i]=ColumnHeights[i];
+	}
+#endif
 }
 
 //	Calculate address of diagonal elements in banded matrix
@@ -357,6 +363,14 @@ void CDomain::CalculateDiagnoalAddress()
 	COutputter* Output = COutputter::Instance();
 	Output->PrintDiagonalAddress();
 #endif
+
+#ifdef _VIB_
+	unsigned int* DiagonalAddress_mass = MassMatrix->GetDiagonalAddress();
+	for (unsigned int i=0; i<=NEQ; ++i){
+		DiagonalAddress_mass[i]=DiagonalAddress[i];
+	}
+#endif
+
 
 }
 
@@ -509,7 +523,7 @@ bool CDomain::VibSolver(unsigned int NVibModes){
     //an inadvanced way to get the origin vectors
 	double* vector_o = new double[numEq*NVibModes];
 	for (unsigned int i=0; i<numEq; ++i){
-		for (unsigned j=0; j<NVibModes; ++i){
+		for (unsigned j=0; j<NVibModes; ++j){
 			if (i==0 || j==i-1) {
 				vector_o[j*numEq+i]=1.0;
 			}

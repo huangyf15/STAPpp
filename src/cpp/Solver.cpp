@@ -166,7 +166,7 @@ void CLDLTSolver::Multiple(double* acc,double* force,unsigned int numeq,unsigned
 	unsigned int diag_sc=0;
 	unsigned int row_ck=0;
 
-	for (unsigned int i=0; i=numeq*vib_m; ++i){
+	for (unsigned int i=0; i<numeq*vib_m; ++i){
 		force[i]=0.0;
 	}
 
@@ -174,15 +174,15 @@ void CLDLTSolver::Multiple(double* acc,double* force,unsigned int numeq,unsigned
 		
 			if (i==diag[diag_sc]){
 				for (unsigned int j=0; j<vib_m; ++j){
-				    force[j*numeq+diag_sc] += K(diag_sc,diag_sc)*acc[j*numeq+diag_sc];
+				    force[j*numeq+diag_sc] += K(diag_sc+1,diag_sc+1)*acc[j*numeq+diag_sc];
 				}
 				
 				
 			}
 			else {
 				for (unsigned int j=0; j<vib_m; ++j){
-				    force[j*numeq+row_ck] += K(diag_sc,row_ck)*acc[j*numeq+diag_sc];
-				    force[j*numeq+diag_sc] += K(diag_sc,row_ck)*acc[j*numeq+row_ck];
+				    force[j*numeq+row_ck] += K(diag_sc+1,row_ck+1)*acc[j*numeq+diag_sc];
+				    force[j*numeq+diag_sc] += K(diag_sc+1,row_ck+1)*acc[j*numeq+row_ck];
 				}
 
 			}
