@@ -218,7 +218,7 @@ void PostOutputter::OutputElementStress()
 
 			
 			
-//#define SPR
+#define SPR
 #ifdef SPR
 			//call the SPR function 
 			unsigned int* Ele_NodeNumber = new unsigned int[NUME*8];

@@ -180,7 +180,7 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 {
 	uint* NNE = new uint[NUMNP]; // number of neibourhood elements
 	s_uint* CNT = new s_uint[NUMNP]; // how many times the stress of the node has been calculated
-
+	double* stress_tmp = new double [NUMNP*6]; //按全局节点号存储的应力值
 	// 先清点每个节点连接的单元个数
 	for(uint Np = 0; Np < NUMNP; Np++)
 	{
@@ -202,7 +202,7 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 	// 除计算该节点处的应力外，还计算该patch中NNE=1的节点的应力
 	// 最后NNE=1的节点的应力取按各个patch计算结果的平均
 	for (uint i=1; i<NUMNP*6; i++)
-		stress_SPR[i] = 0;    //对应力进行初始化
+		stress_tmp[i] = 0;    //对应力进行初始化
 
 	for(uint Np = 0; Np < NUMNP; Np++)
 	{
@@ -242,6 +242,11 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 
 			}
 
+            for (s_uint k=0;k<N_SPR;k++)
+			{
+				CNT[NP_SPR[k]-1]++;  //节点应力每被计算一次，计数增加1
+			}
+
 			//用二阶完备多项式拟合应力场，基函数为1,x,y,z,x^2,y^2,z^2,xy,xz,yz
 		
 			for (s_uint j=0;j<6;j++) //按6个应力分量遍历
@@ -277,7 +282,6 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 				a = A.inverse()*b;
 				for (s_uint k=0;k<N_SPR;k++)
 				{
-					CNT[NP_SPR[k]-1]++;  //节点应力每被计算一次，计数增加1
 					//已知待求节点编号是NP_SPR[k],求它所在的单元和单元中的节点号
 					uint N_ele; 
 					s_uint Np_ele;
@@ -308,21 +312,23 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 							z*z;
 						MatrixXd tmp;
 						tmp =  p.transpose()*a;
-						stress_SPR[(NP_SPR[k]-1)*6+j] = stress_SPR[(NP_SPR[k]-1)*6+j] + tmp(0,0);
+						stress_tmp[(NP_SPR[k]-1)*6+j] = stress_tmp[(NP_SPR[k]-1)*6+j] + tmp(0,0);
 				}
 			}
 
 		}
 	}
 
-	for(uint Np = 0; Np < NUMNP; Np++)
+	for(uint Ele = 0; Ele < NUME; Ele++ )
 	{
-		for (s_uint j=0;j<6;j++)
+		for (s_uint N=0;N<8;N++)
 		{
-			stress_SPR[Np*6+j] = stress_SPR[Np*6+j]/CNT[Np];
+			for (s_uint j=0;j<6;j++)
+			{
+				stress_SPR[Ele*48+N*6+j] = stress_tmp[(Ele_NodeNumber[Ele*8+N]-1)*6+j]/CNT[Ele_NodeNumber[Ele*8+N]-1];
+			}
 		}
 	}
-	//stress_SPR = stressG;
 }
 
 
