@@ -169,13 +169,13 @@ void CBar::ElementStress(double* stress, double* Displacement)
 // PostPositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
 void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
 {
-	// Calculate the axis of codimension
+	// Calculate the axis of co-dimension
 	// DX[3] = [x2-x1, y2-y1, z2-z1]
 	double DX[3], Thetay[3], Thetaz[3];
 	for (unsigned int i = 0; i < 3; i++)
 		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
 
-	if (abs(DX[1]) > DBL_EPSILON && abs(DX[2]) > DBL_EPSILON)
+	if (abs(DX[1]) > DBL_EPSILON)
 	{
 		Thetay[0] = 0.0;
 		Thetay[1] = DX[2];
@@ -190,13 +190,22 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 		Thetay[1] = 0.0;
 		Thetay[2] = -DX[0];
 		Thetaz[0] = -DX[0] * DX[1];
-		Thetaz[1] = DX[0] * DX[0] + DX[1] * DX[1];
+		Thetaz[1] = DX[0] * DX[0] + DX[2] * DX[2];
 		Thetaz[2] = -DX[1] * DX[2];
 	}
 
+	double leny = sqrt(Thetay[0] * Thetay[0] + Thetay[1] * Thetay[1] + Thetay[2] * Thetay[2]);
+	Thetay[0] /= leny;
+	Thetay[1] /= leny;
+	Thetay[2] /= leny;
+	double lenz = sqrt(Thetaz[0] * Thetaz[0] + Thetaz[1] * Thetaz[1] + Thetaz[2] * Thetaz[2]);
+	Thetaz[0] /= lenz;
+	Thetaz[1] /= lenz;
+	Thetaz[2] /= lenz;
+
 	// Determine the quasi-prepositions for POSTPROCESS
 	// PrePositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
-	// Define the scale of codimension
+	// Define the scale of co-dimension
 	double magCodim = 1.0E-5;
 	for (unsigned i = 0; i < 2; i++)
 	{
@@ -204,17 +213,17 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 		PrePositions[12 * i + 1] = nodes[i]->XYZ[1] + magCodim * ( Thetay[1] + Thetaz[1]);
 		PrePositions[12 * i + 2] = nodes[i]->XYZ[2] + magCodim * ( Thetay[2] + Thetaz[2]);
 
-		PrePositions[12 * i + 3] = nodes[i]->XYZ[0] + magCodim * ( Thetay[0] - Thetaz[0]);
-		PrePositions[12 * i + 4] = nodes[i]->XYZ[1] + magCodim * ( Thetay[1] - Thetaz[1]);
-		PrePositions[12 * i + 5] = nodes[i]->XYZ[2] + magCodim * ( Thetay[2] - Thetaz[2]);
+		PrePositions[12 * i + 3] = nodes[i]->XYZ[0] + magCodim * ( - Thetay[0] + Thetaz[0]);
+		PrePositions[12 * i + 4] = nodes[i]->XYZ[1] + magCodim * ( - Thetay[1] + Thetaz[1]);
+		PrePositions[12 * i + 5] = nodes[i]->XYZ[2] + magCodim * ( - Thetay[2] + Thetaz[2]);
 
 		PrePositions[12 * i + 6] = nodes[i]->XYZ[0] + magCodim * ( - Thetay[0] - Thetaz[0]);
 		PrePositions[12 * i + 7] = nodes[i]->XYZ[1] + magCodim * ( - Thetay[1] - Thetaz[1]);
-		PrePositions[12 * i + 8] = nodes[i]->XYZ[2] + magCodim * ( - Thetay[2] - Thetaz[1]);
+		PrePositions[12 * i + 8] = nodes[i]->XYZ[2] + magCodim * ( - Thetay[2] - Thetaz[2]);
 
-		PrePositions[12 * i + 9] = nodes[i]->XYZ[0] + magCodim * ( - Thetay[0] + Thetaz[0]);
-		PrePositions[12 * i + 10] = nodes[i]->XYZ[1] + magCodim * ( - Thetay[1] + Thetaz[1]);
-		PrePositions[12 * i + 11] = nodes[i]->XYZ[2] + magCodim * ( - Thetay[2] + Thetaz[2]);
+		PrePositions[12 * i + 9] = nodes[i]->XYZ[0] + magCodim * ( Thetay[0] - Thetaz[0]);
+		PrePositions[12 * i + 10] = nodes[i]->XYZ[1] + magCodim * ( Thetay[1] - Thetaz[1]);
+		PrePositions[12 * i + 11] = nodes[i]->XYZ[2] + magCodim * ( Thetay[2] - Thetaz[2]);
 	}
 	
 	// Calculate the postpositions for POSTPROCESS

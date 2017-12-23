@@ -271,6 +271,167 @@ void CBeam::ElementStress(double* stress, double* Displacement)
     }
 }
 
-void CBeam::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* prePositionBeam, double* postPositionBeam)
 {
+    const CBeamMaterial& material =
+        static_cast<CBeamMaterial&>(*ElementMaterial); // Pointer to material of the element
+	double DX[3];	//	dx = x2-x1, dy = y2-y1, dz = z2-z1
+	double L2 = 0;	//	Square of bar length (L^2)
+
+	for (unsigned int i = 0; i < 3; i++){
+		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
+		L2 = L2 + DX[i]*DX[i];
+	}
+
+    double n[3][3];
+    double L = sqrt(L2);
+    for (unsigned int i = 0; i < 3; i++)
+        n[0][i] = DX[i] / L; //orientation of x'
+
+    n[1][0] = material.n1;
+    n[1][1] = material.n2;
+    n[1][2] = material.n3; // orientation of y'
+    n[2][0] = n[0][1] * n[1][2] - n[0][2] * n[1][1];
+    n[2][1] = n[0][2] * n[1][0] - n[0][0] * n[1][2];
+    n[2][2] = n[0][0] * n[1][1] - n[0][1] * n[1][0]; //orientation of z'
+	
+    double Loc[2][3]; // preposition
+    double d[2][3]; //displacement in the main coordinate
+    double D[2][3]; //displacement in the local coordinate
+    double theta[2][3]; //rotation in the main coordinate
+    double phi[2][3]; //rotation in the local coordinate
+    double r[4][3];//vector from center of rectangle to four angles in the local coordinate
+    double R[4][3];//vector from center of rectangle to four angles in the main coordinate
+    double a = material.a;
+    double b = material.b;
+    double Iz = (material.a * material.a * material.a) * material.b / 12 -
+                pow(material.a - material.t1 - material.t3, 3.0) *
+                    (material.b - material.t2 - material.t4) / 12;
+    double Iy = (material.b * material.b * material.b) * material.a / 12 -
+                pow(material.b - material.t2 - material.t4, 3.0) *
+                    (material.a - material.t1 - material.t3) / 12;
+    double Ip = Iz + Iy;
+
+    r[0][0] = 0;
+    r[1][0] = 0;
+    r[2][0] = 0;
+    r[3][0] = 0;
+    r[0][1] = -0.5 * a;
+    r[1][1] = 0.5 * a;
+    r[2][1] = 0.5 * a;
+    r[3][1] = -0.5 * a;
+    r[0][2] = 0.5 * b;
+    r[1][2] = 0.5 * b;
+    r[2][2] = -0.5 * b;
+    r[3][2] = -0.5 * b;
+
+    for (unsigned int i = 0; i < 4; i++){
+        R[i][0] = n[0][0] * r[i][0] + n[1][0] * r[i][1] + n[2][0] * r[i][2];
+        R[i][1] = n[0][1] * r[i][0] + n[1][1] * r[i][1] + n[2][1] * r[i][2];
+        R[i][2] = n[0][2] * r[i][0] + n[1][2] * r[i][1] + n[2][2] * r[i][2];
+    }    
+	for (unsigned int i = 0; i < 3; i++){
+
+		if (LocationMatrix[i]){
+		    d[0][i] = Displacement[LocationMatrix[i]-1];
+            Loc[0][i] = nodes[0]->XYZ[i];
+		 }
+		else{
+            d[0][i] = 0.0;
+		    Loc[0][i] = nodes[0]->XYZ[i];	 
+		}
+
+		if (LocationMatrix[i+6]){
+	        d[1][i] = Displacement[LocationMatrix[i+6]-1];
+            Loc[1][i] = nodes[1]->XYZ[i];
+		}
+		else{
+            d[1][i] = 0.0;
+		    Loc[1][i] = nodes[1]->XYZ[i];
+		}
+	}
+	
+	for (unsigned int i = 3; i < 6; i++){
+
+		if (LocationMatrix[i]){
+		  theta[0][i-3] = Displacement[LocationMatrix[i]-1];
+		 }
+		else{
+		  theta[0][i-3] = nodes[0]->XYZ[i];	 
+		}
+
+		if (LocationMatrix[i+6]){
+		  theta[1][i-3] = Displacement[LocationMatrix[i+6]-1];
+		}
+		else{		 
+		  theta[1][i-3] = nodes[1]->XYZ[i];
+		}
+	}
+
+    for (unsigned int i = 0; i < 2; i++){
+        for (unsigned int j = 0; j < 4; j++){
+            postPositionBeam[(i * 4 + j) * 3] = Loc[i][0] + d[i][0] + R[j][0] + R[j][2] * theta[i][1] - R[j][1] * theta[i][2];
+            postPositionBeam[(i * 4 + j) * 3 + 1] = Loc[i][1] + d[i][1] + R[j][1] + R[j][0] * theta[i][2] - R[j][2] * theta[i][0];
+            postPositionBeam[(i * 4 + j) * 3 + 2] = Loc[i][2] + d[i][2] + R[j][2] + R[j][1] * theta[i][0] - R[j][0] * theta[i][1];
+            prePositionBeam[(i * 4 + j) * 3] = Loc[i][0] + R[j][0];
+            prePositionBeam[(i * 4 + j) * 3 + 1] = Loc[i][1] + R[j][1];
+            prePositionBeam[(i * 4 + j) * 3 + 2] = Loc[i][2] + R[j][2];
+        }
+    }
+    
+    //coordinate conversion
+    for (unsigned int i = 0; i < 2; i++){
+        D[i][0] = n[0][0] * d[i][0] + n[1][0] * d[i][1] + n[2][0] * d[i][2];
+        D[i][1] = n[0][1] * d[i][0] + n[1][1] * d[i][1] + n[2][1] * d[i][2];
+        D[i][2] = n[0][2] * d[i][0] + n[1][2] * d[i][1] + n[2][2] * d[i][2];
+        phi[i][0] = n[0][0] * theta[i][0] + n[1][0] * theta[i][1] + n[2][0] * theta[i][2];
+        phi[i][1] = n[0][1] * theta[i][0] + n[1][1] * theta[i][1] + n[2][1] * theta[i][2];
+        phi[i][2] = n[0][2] * theta[i][0] + n[1][2] * theta[i][1] + n[2][2] * theta[i][2];
+    }
+
+    double dtheta[2][3];//rate of the change of the corner
+    dtheta[0][0] = (phi[1][2] - phi[0][2]) / L;
+    dtheta[1][0] = dtheta[0][0];
+    dtheta[0][1] = (D[0][2] - D[1][2]) * 6 / L2 - phi[0][1] * 4 / L + phi[1][1] * 2 / L;
+    dtheta[1][1] = (D[1][2] - D[0][2]) * 6 / L2 + phi[0][1] * 2 / L - phi[1][1] * 2 / L;
+    dtheta[0][2] = (D[1][1] - D[0][1]) * 6 / L2 - phi[0][2] * 4 / L + phi[1][2] * 2 / L;
+    dtheta[1][2] = (D[0][1] - D[1][1]) * 6 / L2 + phi[0][2] * 2 / L - phi[1][2] * 4 / L;
+
+    double sigma1; //Normal stress caused by strech
+    double sigma2[2][2]; //Normal stress caused by bending(z-bending and y-bending)
+    double tau_xy;
+    double tau_xz;
+
+    sigma1 = material.E * (D[1][0] - D[0][0]) / L;
+    tau_xy = material.E * b / (4 + 4 * material.nu);
+    tau_xz = material.E * a / (4 + 4 * material.nu);
+    for (unsigned int i = 0; i < 2; i++){
+        sigma2[i][0] = material.E * a * dtheta[i][2] / 2;
+        sigma2[i][1] = material.E * b * dtheta[i][1] / 2;
+        
+        beamstress[i * 24] = sigma1 - sigma2[i][0] + sigma2[i][1];
+        beamstress[i * 24 + 1] = 0;
+        beamstress[i * 24 + 2] = 0;
+        beamstress[i * 24 + 3] = -tau_xy;
+        beamstress[i * 24 + 4] = 0;
+        beamstress[i * 24 + 5] = tau_xz;
+        beamstress[i * 24 + 6] = sigma1 - sigma2[i][0] - sigma2[i][1];
+        beamstress[i * 24 + 7] = 0;
+        beamstress[i * 24 + 8] = 0;
+        beamstress[i * 24 + 9] = tau_xy;
+        beamstress[i * 24 + 10] = 0;
+        beamstress[i * 24 + 11] = tau_xz;
+        beamstress[i * 24 + 12] = sigma1 + sigma2[i][0] - sigma2[i][1];
+        beamstress[i * 24 + 13] = 0;
+        beamstress[i * 24 + 14] = 0;
+        beamstress[i * 24 + 15] = tau_xy;
+        beamstress[i * 24 + 16] = 0;
+        beamstress[i * 24 + 17] = -tau_xz;
+        beamstress[i * 24 + 18] = sigma1 + sigma2[i][0] + sigma2[i][1];
+        beamstress[i * 24 + 19] = 0;
+        beamstress[i * 24 + 20] = 0;
+        beamstress[i * 24 + 21] = -tau_xy;
+        beamstress[i * 24 + 22] = 0;
+        beamstress[i * 24 + 23] = -tau_xz;   
+    }
 }
