@@ -67,6 +67,15 @@ int main(int argc, char *argv[])
     Solver->LDLT();
 #endif
 
+#ifdef _VIB_
+	FEMData->AssembleMassMatrix();
+
+	if (!FEMData->VibSolver(FEMData->GetNumEig())){
+	    exit(9);
+		cout<< "ERROR: MKL SOLVER FAILED FOR SINGULARITY OR SOMETHING ELSE"<<endl;
+	}
+#endif
+
     COutputter* Output = COutputter::Instance();
 
 #ifdef _DEBUG_
@@ -89,6 +98,9 @@ int main(int argc, char *argv[])
         Output->OutputNodalDisplacement(lcase);
     }
 
+#ifdef _VIB_
+	Output->OutputVibDisps();
+#endif
     double time_solution = timer.ElapsedTime();
 
 //  Calculate and output stresses of all elements

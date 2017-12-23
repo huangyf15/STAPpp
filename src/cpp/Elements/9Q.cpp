@@ -396,3 +396,8 @@ void C9Q::ElementStress(double stress[27], double* Displacement, double Position
         }
     }
 }
+
+#ifdef _VIB_
+void C9Q::ElementMass(double* mass) {
+}
+#endif

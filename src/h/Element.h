@@ -82,8 +82,18 @@ public:
 //!	Assemble the element stiffness matrix to the global stiffness matrix
 	void assembly(double* Matrix, CSkylineMatrix<double>* StiffnessMatrix, CSRMatrix<double>* CSRMatrix);
 
+#ifdef _VIB_
+    //!	Assemble the element stiffness matrix to the global stiffness matrix
+	void assembly_mass(double* Matrix, CSkylineMatrix<double>* MassMatrix);
+#endif
+
 //!	Calculate element stiffness matrix (Upper triangular matrix, stored as an array column by colum)
 	virtual void ElementStiffness(double* stiffness) = 0; 
+
+#ifdef _VIB_
+//!	Calculate element mass matrix (Upper triangular matrix, stored as an array column by colum)
+	virtual void ElementMass(double* mass) = 0; 
+#endif
 
 //!	Calculate element stress 
 	virtual void ElementStress(double* stress, double* Displacement){};

@@ -30,7 +30,13 @@ bool CBarMaterial::Read(ifstream& Input, unsigned int mset)
 		return false;
 	}
 
+#ifndef _VIB_
+
 	Input >> E >> Area;	// Young's modulus and section area
+
+#else
+	Input >> rho >> E >> Area;
+#endif
 
 	return true;
 }

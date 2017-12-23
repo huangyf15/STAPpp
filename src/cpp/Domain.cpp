@@ -10,8 +10,11 @@
 
 #include "Domain.h"
 #include "Material.h"
+#include <Eigen/Dense>
+#include "mkl.h"
 
 using namespace std;
+using namespace Eigen;
 
 //	Clear an array
 template <class type> void clear( type* a, unsigned int N )
@@ -44,6 +47,9 @@ CDomain::CDomain()
 
 	Force = nullptr;
 	StiffnessMatrix = nullptr;
+#ifdef _VIB_
+	MassMatrix = nullptr;
+#endif
 	CSRStiffnessMatrix = nullptr;
 }
 
@@ -59,6 +65,9 @@ CDomain::~CDomain()
 
 	delete [] Force;
 	delete StiffnessMatrix;
+#ifdef _VIB_
+	delete MassMatrix;
+#endif
 	delete CSRStiffnessMatrix;
 }
 
@@ -113,6 +122,12 @@ bool CDomain::ReadData(string FileName, string OutFile)
     CalculateEquationNumber();
     Output->OutputEquationNumber();
 
+#ifdef _VIB_
+	if (ReadVibNum())
+		Output->PrintVibModNum();
+	else
+		return false;
+#endif
     return true;
 }
 
@@ -254,6 +269,9 @@ void CDomain::CalculateEquationNumber()
     CalculateCSRColumns();
 #else
     StiffnessMatrix = new CSkylineMatrix<double>(NEQ);
+#ifdef _VIB_
+	MassMatrix = new CSkylineMatrix<double>(NEQ);
+#endif
     //	Calculate column heights
 	CalculateColumnHeights();
 	//	Calculate address of diagonal elements in banded matrix
@@ -414,6 +432,10 @@ void CDomain::AllocateMatrices()
 #else
 	StiffnessMatrix->Allocate();
 #endif
+
+#ifdef _VIB_
+	MassMatrix->Allocate();
+#endif
 	
 	COutputter* Output = COutputter::Instance();
 	Output->OutputTotalSystemData();
@@ -454,3 +476,123 @@ void CDomain::CalculateCSRColumns()
         }
     }
 }
+
+#ifdef _VIB_
+
+void CDomain::AssembleMassMatrix()
+{
+//	Loop over for all element groups
+	for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)
+	{
+        CElementGroup& ElementGrp = EleGrpList[EleGrp];
+        unsigned int NUME = ElementGrp.GetNUME();
+
+		unsigned int size = ElementGrp.GetElement(0).SizeOfStiffnessMatrix();
+		double* Matrix = new double[size];
+
+//		Loop over for all elements in group EleGrp
+		for (unsigned int Ele = 0; Ele < NUME; Ele++)
+			ElementGrp.GetElement(Ele).assembly_mass(Matrix, MassMatrix);
+
+		delete[] Matrix;
+		Matrix = nullptr;
+	}
+/*
+#ifdef _DEBUG_
+	COutputter::Instance()->PrintStiffnessMatrix();
+#endif
+*/
+}
+
+bool CDomain::VibSolver(unsigned int NVibModes){
+    unsigned int numEq = GetNEQ();
+    //an inadvanced way to get the origin vectors
+	double* vector_o = new double[numEq*NVibModes];
+	for (unsigned int i=0; i<numEq; ++i){
+		for (unsigned j=0; j<NVibModes; ++i){
+			if (i==0 || j==i-1) {
+				vector_o[j*numEq+i]=1.0;
+			}
+			else {
+				vector_o[j*numEq+i]=0.0;
+			}
+		}
+	}
+    double* K_reduced = new double[NVibModes*(NVibModes+1)/2];
+
+	double* vector_oY= new double[numEq*NVibModes];
+	double* M_reduced = new double[NVibModes*(NVibModes+1)/2];
+	CLDLTSolver* KSolver= new CLDLTSolver(*StiffnessMatrix);
+	CLDLTSolver* MSolver= new CLDLTSolver(*MassMatrix);
+	MSolver->Multiple(vector_o,vector_oY,numEq,NVibModes);
+	double* vec_x_n = new double[NVibModes*numEq];
+	double* vec_y_n = new double[NVibModes*numEq];
+	double* lambdas_this = new double[NVibModes];
+	double* lambdas_n = new double[NVibModes];
+	double* eig_vecs = new double[NVibModes*NVibModes];
+	double l_diffs = 1.0;
+    while (l_diffs > 1.19e-7){
+		for (unsigned int i=0; i<NVibModes; ++i){
+			lambdas_this[i] = lambdas_n[i];
+		}
+		for (unsigned int i=0; i<NVibModes*numEq; ++i){
+			vec_x_n[i] = vector_oY[i];
+		}
+		for (unsigned int i=0; i<NVibModes; ++i){
+			KSolver->BackSubstitution(vec_x_n+i*numEq);
+		}
+		MSolver->Multiple(vec_x_n,vec_y_n,numEq,NVibModes);
+		int ord=NVibModes;
+		for (unsigned int i=0; i<NVibModes; ++i){
+			for (unsigned int j=i; j<NVibModes; ++j){
+				K_reduced[i+j*(j+1)/2] = 0.0;
+				M_reduced[i+j*(j+1)/2] = 0.0;
+				for (unsigned int k=0; k<numEq; ++k){
+					K_reduced[i+j*(j+1)/2] += vec_x_n[i*numEq+k] * vector_oY[j*numEq+k];
+					M_reduced[i+j*(j+1)/2] += vec_x_n[i*numEq+k] * vec_y_n[i*numEq+k];
+				}
+			}
+		}
+		//LAPACKE_dpotrf(LAPACK_COL_MAJOR, 'U', ord,M_reduced, ord);
+		if (LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1,'V','U',ord,K_reduced,M_reduced,lambdas_n,eig_vecs,ord))
+			return false;
+		for (unsigned int i=0; i<numEq; ++i){
+			for (unsigned int j=0; j<NVibModes; ++j){
+				vec_x_n[i+j*numEq] = 0.0;
+				for (unsigned int k=0; k<NVibModes; ++k){
+					vec_x_n[i+j*numEq] += vector_o[i+k*numEq] * eig_vecs[k+j*numEq];
+				}
+			}
+		}
+	    for (unsigned int i=0; i<NVibModes*numEq; ++i){
+			vector_o[i] = vec_x_n[i];
+		}
+		MSolver->Multiple(vec_x_n,vec_y_n,numEq,NVibModes);
+
+	}
+	VibDisp = new double[NVibModes*numEq];
+	for (unsigned int i=0; i<NVibModes*numEq; ++i){
+		VibDisp[i] = vector_o[i];
+	}
+	for (unsigned int i=0; i<NVibModes; ++i){
+		EigenValues[i] = lambdas_n[i];
+	}
+	delete vector_o;
+	delete vector_oY;
+	delete vec_x_n;
+	delete vec_y_n;
+	delete lambdas_n;
+	delete lambdas_this;
+	delete K_reduced;
+	delete M_reduced;
+	delete eig_vecs;
+	delete KSolver;
+	delete MSolver;
+	return true;
+}
+
+bool CDomain::ReadVibNum() {
+	Input >> numEig;
+	return true;
+}
+#endif

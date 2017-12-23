@@ -270,3 +270,8 @@ void CBeam::ElementStress(double* stress, double* Displacement)
         }
     }
 }
+
+#ifdef _VIB_
+void CBeam::ElementMass(double* mass) {
+}
+#endif

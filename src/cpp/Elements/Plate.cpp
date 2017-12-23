@@ -889,3 +889,8 @@ void CPlate::ElementStress(double* stress, double* Displacement, double* positio
     position[10] = ymid + sqrt(1.0 / 3) * (yeta);
     position[11] = zmid;
 }
+
+#ifdef _VIB_
+void CPlate::ElementMass(double* mass) {
+}
+#endif

@@ -1095,3 +1095,39 @@ void COutputter::PrintDisplacement(unsigned int loadcase)
 }
 
 #endif
+
+#ifdef _VIB_
+void COutputter::PrintVibModNum()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	*this << "The input vibration mod number is" << setw(5) << vibn << endl;
+	*this << std::endl;
+}
+
+void COutputter::OutputVibDisps()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	unsigned int NEQ = FEMData->GetNEQ();
+	double* lam = FEMData->GetEigenValues();
+	double* vibdisp = FEMData->GetVibDisp();
+	CNode* Nodelist = FEMData->GetNodeList();
+	unsigned int NodeNum = FEMData->GetNUMNP();
+	for (unsigned int i=0; i<vibn; ++i){
+		*this << endl;
+		*this << "VIBRATION MODE " << i+1 << endl;
+		*this << "EIGEN VALUE :" << setw(20) << lam[i] <<endl;
+		*this << " NUMBER           X           Y           Z               DX              DY              DZ"<<endl;
+		for (unsigned int j=0; j<NodeNum; ++j){
+			*this << j+1 << setw(13) << Nodelist[j].XYZ[0] << setw(13) << Nodelist[j].XYZ[1] << setw(13) << Nodelist[j].XYZ[2] ;
+			Nodelist[j].WriteNodalDisplacement(*this, j, vibdisp);
+
+		}
+		*this << endl;
+	}
+}
+
+#endif

@@ -1097,3 +1097,8 @@ void CShell::ElementStress(double* stress, double* Displacement, double* positio
     position[13] = ymid;
     position[14] = zmid;
 }
+
+#ifdef _VIB_
+void CShell::ElementMass(double* mass) {
+}
+#endif

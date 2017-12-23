@@ -26,6 +26,8 @@
 #include "LoadCaseData.h"
 #include "SkylineMatrix.h"
 #include "CSRMatrix.h"
+#include "Eigen/Dense"
+
 
 using namespace std;
 
@@ -88,7 +90,21 @@ private:
     global stiffness matrix. */
     CSkylineMatrix<double>* StiffnessMatrix;
 
+
 	CSRMatrix<double>* CSRStiffnessMatrix;
+
+#ifdef _VIB_
+    //Banded mass matrix
+    CSkylineMatrix<double>* MassMatrix;
+
+	//Vibration displacement modes
+	double* VibDisp;
+
+	double* EigenValues;
+
+	int numEig;
+#endif
+
 
 //!	Global nodal force/displacement vector
 	double* Force;
@@ -137,6 +153,10 @@ public:
 
 //!	Assemble the banded gloabl stiffness matrix
 	void AssembleStiffnessMatrix();
+
+//!	Assemble the banded global mass matrix
+	void AssembleMassMatrix();
+
 
 //!	Assemble the global nodal force vector for load case LoadCase
 	bool AssembleForce(unsigned int LoadCase); 
@@ -188,4 +208,16 @@ public:
 
 	CSRMatrix<double>& GetCSRStiffnessMatrix() { return *CSRStiffnessMatrix; }
 
+#ifdef _VIB_
+//! Subspace Iteration Method
+    bool VibSolver(unsigned int NVibModes);
+
+	inline double* GetVibDisp() {return VibDisp;}
+
+	inline double* GetEigenValues() {return EigenValues;}
+
+	bool ReadVibNum();
+
+	inline unsigned int GetNumEig() {return numEig;}
+#endif
 };

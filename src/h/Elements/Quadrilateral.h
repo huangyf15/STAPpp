@@ -44,4 +44,10 @@ public:
 
 //!	Return the size of the element stiffness matrix (stored as an array column by column)
 	virtual unsigned int SizeOfStiffnessMatrix();
+
+#ifdef _VIB_
+//!	Calculate element mass matrix (Upper triangular matrix, stored as an array column by colum)
+	virtual void ElementMass(double* mass); 
+#endif
+
 };

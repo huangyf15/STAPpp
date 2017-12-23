@@ -635,3 +635,8 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 		}
 	}
 }
+
+#ifdef _VIB_
+void CHex::ElementMass(double* mass) {
+}
+#endif

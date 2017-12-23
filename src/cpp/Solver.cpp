@@ -158,3 +158,42 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
     delete[] res;
 }
 #endif
+
+#ifdef _VIB_
+void CLDLTSolver::Multiple(double* acc,double* force,unsigned int numeq,unsigned int vib_m){
+	unsigned int* diag = K.GetDiagonalAddress();
+    unsigned int* colh = K.GetColumnHeights();
+	unsigned int diag_sc=0;
+	unsigned int row_ck=0;
+
+	for (unsigned int i=0; i=numeq*vib_m; ++i){
+		force[i]=0.0;
+	}
+
+	for (unsigned int i=0; i<diag[numeq]; ++i){
+		
+			if (i==diag[diag_sc]){
+				for (unsigned int j=0; j<vib_m; ++j){
+				    force[j*numeq+diag_sc] += K(diag_sc,diag_sc)*acc[j*numeq+diag_sc];
+				}
+				
+				
+			}
+			else {
+				for (unsigned int j=0; j<vib_m; ++j){
+				    force[j*numeq+row_ck] += K(diag_sc,row_ck)*acc[j*numeq+diag_sc];
+				    force[j*numeq+diag_sc] += K(diag_sc,row_ck)*acc[j*numeq+row_ck];
+				}
+
+			}
+		    if (diag_sc-row_ck < colh[diag_sc]) row_ck--;
+			else {
+				diag_sc++;
+				row_ck=diag_sc;
+			}
+		
+	}
+
+}
+
+#endif

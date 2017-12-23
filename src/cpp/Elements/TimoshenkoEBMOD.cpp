@@ -340,3 +340,8 @@ void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double*
                                     3 * bz / (1 + bz) * (EleDisp[5] + EleDisp[11]) * len +
                                     (2 * EleDisp[5] + 4 * EleDisp[11]) * len);
 }
+
+#ifdef _VIB_
+void CTimoshenkoEBMOD::ElementMass(double* mass) {
+}
+#endif

@@ -38,6 +38,11 @@ public:
 //!	Calculate element stiffness matrix
 	virtual void ElementStiffness(double* Matrix);
 
+#ifdef _VIB_
+//!	Calculate element mass matrix (Upper triangular matrix, stored as an array column by colum)
+	virtual void ElementMass(double* mass); 
+#endif
+
 //!	Calculate element stress
 	virtual void ElementStress(double* stress, double* Displacement);
 

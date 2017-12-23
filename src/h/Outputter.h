@@ -135,4 +135,11 @@ public:
 
 #endif
 
+#ifdef _VIB_
+	void PrintVibModNum();
+
+	void OutputVibDisps();
+#endif
+
+
 };
