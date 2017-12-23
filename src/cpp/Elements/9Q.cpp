@@ -122,12 +122,11 @@ double GenerateB9Q(Matrix<double>& BB, const double xi, const double eta, const 
     return JeDet;
 }
 
-void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weight,
-                        const double* xe, const double* ye, Matrix<double>& ke, const double E,
-                        const double v)
+void AccumulateXiEta9Q(const double& xi, const double& eta, double weight, const double* xe,
+                       const double* ye, Matrix<double>& ke, const double E, const double v)
 {
     Matrix<double> BB(2, 9);
-    double DetJe = GenerateB9Q(BB, eta, psi, xe, ye);
+    double DetJe = GenerateB9Q(BB, xi, eta, xe, ye);
 
     Matrix<double> B(3, 18);
     for (unsigned i = 0; i < 9; i++)
@@ -140,13 +139,13 @@ void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weig
         B.at(3, 1 + 2 * i) = partialY;
     }
 
-    double DData[9] = {1, v, 0, v, 1, 0, 0, 0, (1 - v) / 2};
+    double DData[9] = {1, v, 0, v, 1, 0, 0, 0, (1. - v) / 2.};
     Matrix<double> D(3, 3, DData);
-    double cof = E / (1 - v * v) * std::abs(DetJe);
+    double cof = E / (1 - v * v) * std::abs(DetJe) * weight;
     D = D * cof;
 
-    // see 4Q.nb and 4Q-form-key.py
-    ke += B.transpose() * D * B;
+    Matrix<double>&& ke_ = B.transpose() * D * B;
+    ke += ke_;
 }
 
 // convert ke' to ke with R (input as i and j)
@@ -176,7 +175,7 @@ void Convert2d23d9Q(Matrix<double>& k, double* matrix, const double i[3], const 
 
 // calculate n, i, j and xe, ye
 void Convert3d22d9Q(CNode* const nodes[9], double n[3], double i[3], double j[3], double xe[9],
-                         double ye[9])
+                    double ye[9])
 {
     const CNode& n1 = *nodes[0];
     const CNode& n2 = *nodes[1];
@@ -186,10 +185,10 @@ void Convert3d22d9Q(CNode* const nodes[9], double n[3], double i[3], double j[3]
     const double p31[3] = {n3.XYZ[0] - n1.XYZ[0], n3.XYZ[1] - n1.XYZ[1], n3.XYZ[2] - n1.XYZ[2]};
     const double p21[3] = {n2.XYZ[0] - n1.XYZ[0], n2.XYZ[1] - n1.XYZ[1], n2.XYZ[2] - n1.XYZ[2]};
 
-    // n = p31 cross p21 (normalized)
-    n[0] = p31[1] * p21[2] - p31[2] * p21[1];
-    n[1] = p31[2] * p21[0] - p31[0] * p21[2];
-    n[2] = p31[0] * p21[1] - p31[1] * p21[0];
+    // n = p21 cross p31 (normalized)
+    n[0] = -p31[1] * p21[2] + p31[2] * p21[1];
+    n[1] = -p31[2] * p21[0] + p31[0] * p21[2];
+    n[2] = -p31[0] * p21[1] + p31[1] * p21[0];
     normalize(n);
 
     // i = normalized p21
@@ -227,10 +226,10 @@ void C9Q::ElementStiffness(double* matrix)
     // =========================== assembly Ke' =========================
     // generate GN4Q for eta, psi
 
-    const double pos = 1 / std::sqrt(3.0f);
-    const double etas[2] = {-pos, pos};
-    const double psis[2] = {-pos, pos};
-    const double weights[2][2] = {{1.0, 1.0}, {1.0, 1.0}};
+    const double pos = std::sqrt(0.6f);
+    const double xis[3] = {-pos, 0, pos};
+    const double etas[3] = {-pos, 0, pos};
+    const double weights[3] = {5. / 9., 8. / 9., 5. / 9.};
 
     const C9QMaterial* material =
         static_cast<C9QMaterial*>(ElementMaterial); // Pointer to material of the element
@@ -238,10 +237,9 @@ void C9Q::ElementStiffness(double* matrix)
     const double& v = material->nu;
 
     Matrix<double> ke(18, 18);
-    AccumulateEtaPsi9Q(etas[0], psis[0], weights[0][0], xe, ye, ke, E, v);
-    AccumulateEtaPsi9Q(etas[0], psis[1], weights[0][1], xe, ye, ke, E, v);
-    AccumulateEtaPsi9Q(etas[1], psis[0], weights[1][0], xe, ye, ke, E, v);
-    AccumulateEtaPsi9Q(etas[1], psis[1], weights[1][1], xe, ye, ke, E, v);
+    for (unsigned px = 0; px < 3; px++)
+        for (unsigned py = 0; py < 3; py++)
+            AccumulateXiEta9Q(xis[px], etas[py], weights[px] * weights[py], xe, ye, ke, E, v);
 
     // ======================== assembly Ke (2d to 3d) ======================
 
@@ -306,18 +304,19 @@ void CalculateDisplacementAt9Q(double eta, double psi, double de[8], double i[3]
 
 double CalculateWeightAt9Q(double eta, double psi, double xe[4], double ye[4])
 {
-    double GN4Q[8] = {
-        (eta - 1) / 4, (1 - eta) / 4,  (1 + eta) / 4, (-eta - 1) / 4, // first row
-        (psi - 1) / 4, (-psi - 1) / 4, (1 + psi) / 4, (1 - psi) / 4   // second row
-    };
-    // Je = GN4Q * [xe ye]
-    double Je[4] = {
-        GN4Q[0] * xe[0] + GN4Q[1] * xe[1] + GN4Q[2] * xe[2] + GN4Q[3] * xe[3],
-        GN4Q[0] * ye[0] + GN4Q[1] * ye[1] + GN4Q[2] * ye[2] + GN4Q[3] * ye[3], // first row
-        GN4Q[4] * xe[0] + GN4Q[5] * xe[1] + GN4Q[6] * xe[2] + GN4Q[7] * xe[3],
-        GN4Q[4] * ye[0] + GN4Q[5] * ye[1] + GN4Q[6] * ye[2] + GN4Q[7] * ye[3] // second row
-    };
-    return std::abs(Je[0] * Je[3] - Je[1] * Je[2]);
+    // double GN4Q[8] = {
+    //     (eta - 1) / 4, (1 - eta) / 4,  (1 + eta) / 4, (-eta - 1) / 4, // first row
+    //     (psi - 1) / 4, (-psi - 1) / 4, (1 + psi) / 4, (1 - psi) / 4   // second row
+    // };
+    // // Je = GN4Q * [xe ye]
+    // double Je[4] = {
+    //     GN4Q[0] * xe[0] + GN4Q[1] * xe[1] + GN4Q[2] * xe[2] + GN4Q[3] * xe[3],
+    //     GN4Q[0] * ye[0] + GN4Q[1] * ye[1] + GN4Q[2] * ye[2] + GN4Q[3] * ye[3], // first row
+    //     GN4Q[4] * xe[0] + GN4Q[5] * xe[1] + GN4Q[6] * xe[2] + GN4Q[7] * xe[3],
+    //     GN4Q[4] * ye[0] + GN4Q[5] * ye[1] + GN4Q[6] * ye[2] + GN4Q[7] * ye[3] // second row
+    // };
+    // return std::abs(Je[0] * Je[3] - Je[1] * Je[2]);
+    return 0.0f;
 }
 
 //	Calculate element stress
