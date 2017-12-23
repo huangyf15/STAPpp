@@ -660,6 +660,7 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 		{Disp[i] = 0.0;}
 
 		PostPositions[i] = PrePositions[i] + Disp[i];
+
 	}
 
 	// Construct constitutive matrix
