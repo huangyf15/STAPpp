@@ -35,7 +35,7 @@ void PostOutputter::OutputElementStress()
 
     double* Displacement = FEMData->GetDisplacement();
 
-    const unsigned int NUMEG = FEMData->GetNUMEG(); // number of element group
+    const unsigned int NUMEG = FEMData->GetNUMEG(); // Number of element groups
 
     *this << "TITLE = \" STAPpp FEM \" " << endl
         << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
@@ -80,7 +80,6 @@ void PostOutputter::OutputElementStress()
                     *this << endl;
                 }
             }
-
             // Node numbers corresponding to each element
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -147,7 +146,7 @@ void PostOutputter::OutputElementStress()
                 for (unsigned i = 0; i < 8; i++){
 
                     for (unsigned DegOF = 0; DegOF < 3; DegOF++){
-                        *this << setw(POINTS_DATA_WIDTH) << postPositionBeam[3 * i + DegOF];
+                        *this << setw(POINTS_DATA_WIDTH) << (1 - coeff) * prePositionBeam[3 * i + DegOF] + coeff * postPositionBeam[3 * i + DegOF];
                     }
 
                     for (unsigned DegOF = 0; DegOF < 6; DegOF++){
@@ -237,9 +236,9 @@ void PostOutputter::OutputElementStress()
                 CHexMaterial& material = *dynamic_cast<CHexMaterial*>(Element.GetElementMaterial());
                 for (unsigned _ = 0; _ < 8; _++)
                 {
-                    *this << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 0]+coeff*(Position8H[_ * 3 + 0]-PrePosition8H[_*3 + 0])
-                        << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 1]+coeff*(Position8H[_ * 3 + 1]-PrePosition8H[_*3 + 1])
-                        << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 2]+coeff*(Position8H[_ * 3 + 2]-PrePosition8H[_*3 + 2])
+                    *this << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 0] + coeff*(Position8H[_ * 3 + 0] - PrePosition8H[_*3 + 0])
+                        << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 1] + coeff*(Position8H[_ * 3 + 1] - PrePosition8H[_*3 + 1])
+                        << setw(POINTS_DATA_WIDTH) << PrePosition8H[_*3 + 2] + coeff*(Position8H[_ * 3 + 2] - PrePosition8H[_*3 + 2])
                         << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 0] << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 1]
                         << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 2] << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 3]
                         << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 4] << setw(POINTS_DATA_WIDTH) << stressHex[_*6 + 5]
@@ -270,13 +269,6 @@ void PostOutputter::OutputElementStress()
             {
                 dynamic_cast<CTimoshenkoSRINT&>(EleGrp.GetElement(Ele))
                     .ElementPostInfo(stressTimoSRINT, Displacement, PrePositionTimoSRINT, PositionTimoSRINT);
-
-                for (unsigned _ = 0; _ < 8; _++)
-                    *this << setw(POINTS_DATA_WIDTH) << PositionTimoSRINT[_ * 3 + 0]
-                        << setw(POINTS_DATA_WIDTH) << PositionTimoSRINT[_ * 3 + 1]
-                        << setw(POINTS_DATA_WIDTH) << PositionTimoSRINT[_ * 3 + 2]
-                        << endl;
-                *this << std::endl;
             }
 
             break;
@@ -293,13 +285,6 @@ void PostOutputter::OutputElementStress()
             {
                 dynamic_cast<CTimoshenkoEBMOD&>(EleGrp.GetElement(Ele))
                     .ElementPostInfo(stressTimoEBMOD, Displacement, PrePositionTimoEBMOD, PositionTimoEBMOD);
-
-                for (unsigned _ = 0; _ < 8; _++)
-                    *this << setw(POINTS_DATA_WIDTH) << PositionTimoEBMOD[_ * 3 + 0]
-                        << setw(POINTS_DATA_WIDTH) << PositionTimoEBMOD[_ * 3 + 1]
-                        << setw(POINTS_DATA_WIDTH) << PositionTimoEBMOD[_ * 3 + 2] 
-                        << endl;
-                *this << std::endl;
             }
 
             break;
@@ -319,11 +304,14 @@ void PostOutputter::OutputElementStress()
 
                 for (unsigned i = 0; i < 4; ++i)
                 { // four gauss points
-                    *this << setw(POINTS_DATA_WIDTH) << Positions4PE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 1]
-                          << setw(POINTS_DATA_WIDTH) << Positions4PE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
-                          << stresses4PE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 1]
-                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
-                          << stresses4PE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 4]
+                    *this << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4PE[3 * i] + coeff * Positions4PE[3 * i]
+                          << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4PE[3 * i + 1] + coeff * Positions4PE[3 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4PE[3 * i + 2] + coeff * Positions4PE[3 * i + 2]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 2]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 3]
+                          << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 4]
                           << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 5]
                           << endl;
 
@@ -344,22 +332,25 @@ void PostOutputter::OutputElementStress()
                   << " F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stresses4SE[48];
-            double PrePostions4SE[24];
+            double PrePositions4SE[24];
             double Positions4SE[24];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 dynamic_cast<CShell&>(EleGrp.GetElement(Ele))
-                    .ElementPostInfo(stresses4SE, Displacement, PrePostions4SE, Positions4SE);
+                    .ElementPostInfo(stresses4SE, Displacement, PrePositions4SE, Positions4SE);
 
                 for (unsigned i = 0; i < 8; ++i)
                 {
                     // four gauss points;
-                    *this << setw(POINTS_DATA_WIDTH) << Positions4SE[3*i] << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 1]
-                          << setw(POINTS_DATA_WIDTH) << Positions4SE[3 * i + 2] << setw(POINTS_DATA_WIDTH)
-                          << stresses4SE[6 * i] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 1]
-                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 2] << setw(POINTS_DATA_WIDTH)
-                          << stresses4SE[6 * i + 3] << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 4]
+                    *this << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4SE[3 * i] + coeff * Positions4SE[3 * i]
+                          << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4SE[3 * i + 1] + coeff * Positions4SE[3 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << (1 - coeff) * PrePositions4SE[3 * i + 2] + coeff * Positions4SE[3 * i + 2]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 1]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 2]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 3]
+                          << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 4]
                           << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 5]
                           << endl;
 
