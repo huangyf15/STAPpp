@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 
-
 using std::size_t;
 
 template <typename T> class Matrix
@@ -370,6 +369,21 @@ public:
         }
 
         return res;
+    }
+
+    Matrix<T>& operator+=(const Matrix<T>& m)
+    {
+        if (_rows != m._rows || _columns != m._columns)
+        {
+            throw std::runtime_error("in Matrix<T>::operator-: matrix size don't match.");
+        }
+
+        for (Pos_t i = 0; i < _rows * _columns; ++i)
+        {
+            _elements[i] += m._elements[i];
+        }
+
+        return *this;
     }
 
     Matrix<T>& operator=(const Matrix<T>& m)

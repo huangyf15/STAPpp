@@ -146,7 +146,7 @@ void AccumulateEtaPsi9Q(const double& eta, const double& psi, const double& weig
     D = D * cof;
 
     // see 4Q.nb and 4Q-form-key.py
-    ke = B.transpose() * D * B;
+    ke += B.transpose() * D * B;
 }
 
 // convert ke' to ke with R (input as i and j)
