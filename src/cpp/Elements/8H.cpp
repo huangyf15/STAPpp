@@ -770,9 +770,8 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 			stress[6 * j + i] = recovery[j];
 		}
 	}
+
 }
 
-void  CHex::ElementPostInfoSPR(double* stress, double* Displacement , double* PrePositions, double* PostPositions)
-{
-	
-}
+
+
