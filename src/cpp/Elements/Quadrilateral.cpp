@@ -481,7 +481,7 @@ void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, doubl
                                      double* PostPositions)
 {
     double n[3], i[3], j[3], xe[4], ye[4];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d4Q(nodes, n, i, j, xe, ye);
 
     // form d first.
     // d represent 3d displacements at boundary nodes.

@@ -922,7 +922,7 @@ void COutputter::OutputElementStress()
 					static_cast<C9Q&>(
 						EleGrp.GetElement(Ele)).ElementStress(stresses9Q, Displacement, Positions9Q);
 
-					for (unsigned i=0; i<9; ++i) { // four gauss points
+					for (unsigned i=0; i<9; ++i) { // 9 gauss points
 						*this << setw(8) << Ele + 1;
 						*this << setw(10) << i+1;
 						*this << setw(17) << Positions9Q[i*3] << setw(14) << Positions9Q[i*3+1] << setw(14) << Positions9Q[i*3+2];
@@ -936,6 +936,7 @@ void COutputter::OutputElementStress()
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
 					<< " has not been implemented.\n\n";
+				break;
 		}
 	}
 }
