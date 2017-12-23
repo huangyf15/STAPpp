@@ -28,8 +28,10 @@ PostOutputter* PostOutputter::Instance(string FileName)
 // Postprocess
 void PostOutputter::OutputElementStress()
 {
-    // the amplification factor 
-    double coeff = 1E4;
+    // The amplification factor coeff
+    // Output = InitPosition + coeff * Displacement
+    //        = InitPosition + coeff * (FinalPosition - InitPosition);
+    double coeff = 1.0;
 
     CDomain* FEMData = CDomain::Instance();
 
@@ -53,7 +55,7 @@ void PostOutputter::OutputElementStress()
         {
         case ElementTypes::Bar: // Bar element
 
-            *this << "ZONE T = \"Bar\", N = " << NUME * 8 << ", E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << NUME * 8 << ", E = " << NUME
                 << ", F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double PrePositionBar[24];
@@ -93,7 +95,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Quadrilateral: // Quadrilateral element
 
-            *this << "ZONE T = \"Quadrilateral\", N = " << NUME * 4 << ",E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << NUME * 4 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = QUADRILATERAL, C = RED" << endl;
 
             double stress4Q[24];
@@ -128,7 +130,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Beam: // Beam element
-            *this << "ZONE T = \"Beam\", N = " << NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << NUME * 8 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double beamstress[48];
@@ -172,7 +174,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Triangle: // 3T element
 
-            *this << "ZONE T = \"Triangle\", N = " <<NUME * 3 << ",E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " <<NUME * 3 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = TRIANGLE, C = RED" << endl;
 
             double stress3T[3];
@@ -210,7 +212,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Hexahedron: // 8H element
         {
-            *this << "ZONE T= \"Hexahedron\", N = " << NUME * 8 << " ,E = " << NUME
+            *this << "ZONE T= \"Bridge\", N = " << NUME * 8 << " ,E = " << NUME
                   << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressHex[48];
@@ -258,7 +260,7 @@ void PostOutputter::OutputElementStress()
         }
 
         case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
-            *this << "ZONE T = \"TimoshenkoSRINT\", N = " <<NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " <<NUME * 8 << ",E = " << NUME
                  << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressTimoSRINT[3];
@@ -274,7 +276,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
-            *this << "ZONE T = \"TimoshenkoEBMOD\", N = " << NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << NUME * 8 << ",E = " << NUME
                 << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressTimoEBMOD[3];
@@ -290,7 +292,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T = \"Plate\", N = " << 8 * NUME << " E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << 8 * NUME << " E = " << NUME
                   << " F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stresses4PE[48];
@@ -328,7 +330,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T = \"Shell\", N = " << 8 * NUME << " E = " << NUME
+            *this << "ZONE T = \"Bridge\", N = " << 8 * NUME << " E = " << NUME
                   << " F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stresses4SE[48];

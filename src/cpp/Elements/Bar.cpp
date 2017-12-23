@@ -206,7 +206,7 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 	// Determine the quasi-prepositions for POSTPROCESS
 	// PrePositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
 	// Define the scale of co-dimension
-	double magCodim = 1.0E-5;
+	double magCodim = 1E-1;
 	for (unsigned i = 0; i < 2; i++)
 	{
 		PrePositions[12 * i + 0] = nodes[i]->XYZ[0] + magCodim * ( Thetay[0] + Thetaz[0]);

@@ -653,9 +653,9 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 	{
 		if (LocationMatrix[i])
 			//locatiion matrix start from 1 not 0
-			PostPositions[i] = Displacement[LocationMatrix[i]-1];
+			PostPositions[i] = PrePositions[i] + Displacement[LocationMatrix[i]-1];
 		else
-			PostPositions[i] = 0.0;
+			PostPositions[i] = PrePositions[i];
 	}
 
 	// Construct constitutive matrix
