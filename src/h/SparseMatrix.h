@@ -2,6 +2,9 @@
 
 template <typename T> class SparseMatrix
 {
+private:
+    SparseMatrix(SparseMatrix<T>&);
+
 public:
     SparseMatrix(unsigned size) {}
 
