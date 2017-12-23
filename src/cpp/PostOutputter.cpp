@@ -38,7 +38,7 @@ void PostOutputter::OutputElementStress()
     const unsigned int NUMEG = FEMData->GetNUMEG(); // Number of element groups
 
     *this << "TITLE = \" STAPpp FEM \" " << endl
-        << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\",  " << endl;
+        << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", \"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\" " << endl;
 
     // loop for each element group
     for (unsigned int EleGrpIndex = 0; EleGrpIndex < NUMEG; EleGrpIndex++)
@@ -53,7 +53,7 @@ void PostOutputter::OutputElementStress()
         {
         case ElementTypes::Bar: // Bar element
 
-            *this << "ZONE T = \"SCENE1\", N = " << NUME * 8 << ", E = " << NUME
+            *this << "ZONE T = \"Bar\", N = " << NUME * 8 << ", E = " << NUME
                 << ", F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double PrePositionBar[24];
@@ -93,7 +93,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Quadrilateral: // Quadrilateral element
 
-            *this << "ZONE T = \"SCENE1\", N = " << NUME * 4 << ",E = " << NUME
+            *this << "ZONE T = \"Quadrilateral\", N = " << NUME * 4 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = QUADRILATERAL, C = RED" << endl;
 
             double stress4Q[24];
@@ -128,7 +128,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Beam: // Beam element
-            *this << "ZONE T = \"SCENE1\", N = " <<NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"Beam\", N = " << NUME * 8 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double beamstress[48];
@@ -172,7 +172,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Triangle: // 3T element
 
-            *this << "ZONE T = \"SCENE1\", N = " <<NUME * 3 << ",E = " << NUME
+            *this << "ZONE T = \"Triangle\", N = " <<NUME * 3 << ",E = " << NUME
                   << " ,F = FEPOINT , ET = TRIANGLE, C = RED" << endl;
 
             double stress3T[3];
@@ -210,7 +210,7 @@ void PostOutputter::OutputElementStress()
 
         case ElementTypes::Hexahedron: // 8H element
         {
-            *this << "ZONE T= \"SCENE1\", N = " << NUME * 8 << " ,E = " << NUME
+            *this << "ZONE T= \"Hexahedron\", N = " << NUME * 8 << " ,E = " << NUME
                   << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressHex[48];
@@ -258,7 +258,7 @@ void PostOutputter::OutputElementStress()
         }
 
         case ElementTypes::TimoshenkoSRINT: // TimoshenkoSRINT beam element
-            *this << "ZONE T = \"SCENE1\", N = " <<NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"TimoshenkoSRINT\", N = " <<NUME * 8 << ",E = " << NUME
                  << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressTimoSRINT[3];
@@ -274,7 +274,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::TimoshenkoEBMOD: // TimoshenkoEBMOD beam element
-            *this << "ZONE T = \"SCENE1\", N = " << NUME * 8 << ",E = " << NUME
+            *this << "ZONE T = \"TimoshenkoEBMOD\", N = " << NUME * 8 << ",E = " << NUME
                 << " ,F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stressTimoEBMOD[3];
@@ -290,7 +290,7 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T = \"SCENE1\", N = " << 8 * NUME << " E = " << NUME
+            *this << "ZONE T = \"Plate\", N = " << 8 * NUME << " E = " << NUME
                   << " F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stresses4PE[48];
@@ -321,14 +321,14 @@ void PostOutputter::OutputElementStress()
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
                 for (unsigned int i = 0; i < 8; ++i){
-                    *this << setw(10) << 8 * Ele + i + 1;
+                    *this << setw(POINTS_DATA_WIDTH) << 8 * Ele + i + 1;
                 }
                 *this << std::endl;
             }
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T = \"SCENE1\", N = " << 8 * NUME << " E = " << NUME
+            *this << "ZONE T = \"Shell\", N = " << 8 * NUME << " E = " << NUME
                   << " F = FEPOINT , ET = BRICK, C = RED" << endl;
 
             double stresses4SE[48];
@@ -359,7 +359,7 @@ void PostOutputter::OutputElementStress()
                         for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
             for (unsigned int i = 0; i < 8; ++i){
-                    *this << setw(10) << 8 * Ele + i + 1;
+                    *this << setw(POINTS_DATA_WIDTH) << 8 * Ele + i + 1;
                 }
                 *this << std::endl;
             }
