@@ -218,7 +218,7 @@ void PostOutputter::OutputElementStress()
 
 			
 			
-#define SPR
+//#define SPR
 #ifdef SPR
 			//call the SPR function 
 			unsigned int* Ele_NodeNumber = new unsigned int[NUME*8];
@@ -234,11 +234,11 @@ void PostOutputter::OutputElementStress()
 				CElement& Element = EleGrp.GetElement(Ele);
                // Element.ElementPostInfo( &stressHex[48*Ele], Displacement, &PrePosition8H[24*Ele], &Position8H[24*Ele]);
 				dynamic_cast<CHex&>(EleGrp.GetElement(Ele)).
-				ElementPostSPR(&stressHex[48*Ele], Displacement , &PrePosition8H[24*Ele], &Position8H[24*Ele], &PositionG[24*Ele]);
+				ElementPostSPR(&stressG[48*Ele], Displacement , &PrePosition8H[24*Ele], &Position8H[24*Ele], &PositionG[24*Ele]);
 			}
 
 			// call the SPR function
-			//StressSPR( stressHex, stressG, PrePosition8H, PositionG, Ele_NodeNumber, NUME, NUMNP);
+			StressSPR( stressHex, stressG, PrePosition8H, PositionG, Ele_NodeNumber, NUME, NUMNP);
 #else
 			for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -253,19 +253,12 @@ void PostOutputter::OutputElementStress()
 			{
 				for (unsigned _ = 0; _ < 8; _++)
 				{
-                    *this << Position8H[24*Ele+_*3 + 0]<< setw(POINTS_DATA_WIDTH)
-                          << Position8H[24*Ele+_*3 + 1]<< setw(POINTS_DATA_WIDTH)
-                          << Position8H[24*Ele+_*3 + 2]<< setw(POINTS_DATA_WIDTH) 
+                    *this << PrePosition8H[24*Ele+_*3 + 0]+coeff*(Position8H[24*Ele+_ * 3 + 0]-PrePosition8H[24*Ele+_*3 + 0]) << setw(POINTS_DATA_WIDTH)
+                          << PrePosition8H[24*Ele+_*3 + 1]+coeff*(Position8H[24*Ele+_ * 3 + 1]-PrePosition8H[24*Ele+_*3 + 1]) << setw(POINTS_DATA_WIDTH)
+                          << PrePosition8H[24*Ele+_*3 + 2]+coeff*(Position8H[24*Ele+_ * 3 + 2]-PrePosition8H[24*Ele+_*3 + 2]) << setw(POINTS_DATA_WIDTH) 
 						  << stressHex[48*Ele+_*6 + 0] << setw(16)<< stressHex[48*Ele+_*6 + 1] << setw(16)<< stressHex[48*Ele+_*6 +2]<< setw(16)
 						  << stressHex[48*Ele+_*6 + 3] << setw(16)<< stressHex[48*Ele+_*6 + 4] << setw(16)<< stressHex[48*Ele+_*6 +5]
 						  << endl;
-
-					//*this << PrePosition8H[24*Ele+_*3 + 0]+coeff*(Position8H[24*Ele+_ * 3 + 0]-PrePosition8H[24*Ele+_*3 + 0]) << setw(POINTS_DATA_WIDTH)
-                      //    << PrePosition8H[24*Ele+_*3 + 1]+coeff*(Position8H[24*Ele+_ * 3 + 1]-PrePosition8H[24*Ele+_*3 + 1]) << setw(POINTS_DATA_WIDTH)
-                        //  << PrePosition8H[24*Ele+_*3 + 2]+coeff*(Position8H[24*Ele+_ * 3 + 2]-PrePosition8H[24*Ele+_*3 + 2]) << setw(POINTS_DATA_WIDTH) 
-					//	  << stressHex[48*Ele+_*6 + 0] << setw(16)<< stressHex[48*Ele+_*6 + 1] << setw(16)<< stressHex[48*Ele+_*6 +2]<< setw(16)
-					//	  << stressHex[48*Ele+_*6 + 3] << setw(16)<< stressHex[48*Ele+_*6 + 4] << setw(16)<< stressHex[48*Ele+_*6 +5]
-					//	  << endl;
 				}
 			}
 
@@ -332,8 +325,8 @@ void PostOutputter::OutputElementStress()
 			break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME*8 << ",E=" << NUME
-                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*4 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stresses4PE[12];
 			double PrePositions4PE[12];
@@ -367,8 +360,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME*8<< ",E=" << NUME
-                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*4<< ",E=" << NUME
+                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
 
             double stresses4SE[15];
 			double PrePostions4SE[15];

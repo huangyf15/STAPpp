@@ -4,9 +4,11 @@
 #include <iomanip>
 #include <cmath>
 #include "SPR8H.h"
+
 using namespace Eigen;
 using namespace std;
-
+typedef short unsigned int s_uint;
+typedef unsigned int uint;
 
 void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG)
 {
@@ -171,22 +173,22 @@ for (unsigned int i=0;i<8;i++)
 
 		}
 	}
-
-
-
-
 }
 
 void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double* PositionG, 
-			   unsigned int* Ele_NodeNumber, unsigned int NUME, unsigned int NUMNP)
+			   uint* Ele_NodeNumber, uint NUME, uint NUMNP)
 {
-	unsigned int* NNE = new unsigned int[NUMNP]; // number of neibourhood elements
-	for(unsigned int Np = 0; Np < NUMNP; Np++)
+	uint* NNE = new uint[NUMNP]; // number of neibourhood elements
+	s_uint* CNT = new s_uint[NUMNP]; // how many times the stress of the node has been calculated
+
+	// 先清点每个节点连接的单元个数
+	for(uint Np = 0; Np < NUMNP; Np++)
 	{
+		CNT[Np] = 0;
 		NNE[Np] = 0;
-		for(unsigned int Ele = 0; Ele < NUME; Ele++)
+		for(uint Ele = 0; Ele < NUME; Ele++)
 		{
-			for(unsigned int N = 0; N < 8; N++)
+			for(uint N = 0; N < 8; N++)
 			{
 				if(Ele_NodeNumber[Ele*8+N] == Np+1)
 					NNE[Np]++;
@@ -196,6 +198,131 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 		}
 	}
 
-	stress_SPR = stressG;
+	// 按节点遍历，如果与该节点相连的单元个数大于等于2（NNE>=2），则将这些单元作为SPR的patch。
+	// 除计算该节点处的应力外，还计算该patch中NNE=1的节点的应力
+	// 最后NNE=1的节点的应力取按各个patch计算结果的平均
+	for (uint i=1; i<NUMNP*6; i++)
+		stress_SPR[i] = 0;    //对应力进行初始化
 
+	for(uint Np = 0; Np < NUMNP; Np++)
+	{
+		if(NNE[Np]>=2)
+		{
+			uint* Ele_Np = new uint[NNE[Np]];     // 与Np节点相连的单元的编号
+			s_uint index = 0; // 与Np节点相连的单元计数
+			for(uint Ele = 0; Ele < NUME; Ele++ ) // 找出与Np节点相连的单元编号	
+			{
+				for(s_uint N = 0; N < 8; N++)
+				{
+					if(Ele_NodeNumber[N+Ele*8] == Np+1)
+					{
+						Ele_Np[index] = Ele;
+						index++;
+						break;
+					}
+				}
+				if(index>=NNE[Np]) 
+					break;
+			}
+
+			s_uint N_SPR = 1; //patch中需要计算应力的点的个数，Np已经算一个，NNE等于1的点也要算
+			uint* NP_SPR = new uint [NNE[Np]*8]; 
+			//patch中需要计算应力的节点的编号，因为事先不知道有多少个点要计算的，所以大小取了富余
+			NP_SPR[0] = Np+1; //Np是patch的中心点，是第一个需要计算应力的点；
+			for(s_uint i=0;i<NNE[Np];i++)
+			{
+				for(s_uint N=0;N<8;N++)
+				{
+					if (NNE[Ele_NodeNumber[Ele_Np[i]*8+N]]==1)
+					{
+						NP_SPR[N_SPR] = Ele_NodeNumber[Ele_Np[i]*8+N];
+						N_SPR++;
+					}					
+				}
+
+			}
+
+			//用二阶完备多项式拟合应力场，基函数为1,x,y,z,x^2,y^2,z^2,xy,xz,yz
+		
+			for (s_uint j=0;j<6;j++) //按6个应力分量遍历
+			{
+				// 先提取该patch中计算所需要的数据
+				// a = inv(A)*b A=sum(ppT)
+				MatrixXd A(10,10); A=MatrixXd::Zero(10,10);
+				MatrixXd b(10,1);  b=MatrixXd::Zero(10,1);
+				MatrixXd p(10,1);  
+				MatrixXd a(10,1);  //二阶完备多项式的系数
+				for (s_uint k=0;k<NNE[Np];k++)
+				{
+					for (s_uint m=0;m<8;m++)
+					{
+						double x = PositionG[Ele_Np[k]*24+3*m+0];
+						double y = PositionG[Ele_Np[k]*24+3*m+1];
+						double z = PositionG[Ele_Np[k]*24+3*m+2];
+						p <<1,
+							x,
+							y,
+							z,
+							x*y,
+							x*z,
+							y*z,
+		                    x*x,
+							y*y,
+							z*z;
+						
+						A = A + p * p.transpose();
+						b = b + p * stressG[Ele_Np[k]*48+6*m+j];
+					}					
+				}
+				a = A.inverse()*b;
+				for (s_uint k=0;k<N_SPR;k++)
+				{
+					CNT[NP_SPR[k]-1]++;  //节点应力每被计算一次，计数增加1
+					//已知待求节点编号是NP_SPR[k],求它所在的单元和单元中的节点号
+					uint N_ele; 
+					s_uint Np_ele;
+					for(uint Ele = 0; Ele < NUME; Ele++ )
+					{   
+						for (s_uint N=0;N<8;N++)
+						{
+							if (Ele_NodeNumber[Ele*8+N]==NP_SPR[k])
+							{
+								N_ele = Ele;
+								Np_ele = N;
+								break;
+							}
+						}
+					}
+			       double x = PrePositions[N_ele*24+Np_ele*3+0];
+				   double y = PrePositions[N_ele*24+Np_ele*3+1];
+				   double z = PrePositions[N_ele*24+Np_ele*3+2];				
+						p <<1,
+							x,
+							y,
+							z,
+							x*y,
+							x*z,
+							y*z,
+		                    x*x,
+							y*y,
+							z*z;
+						MatrixXd tmp;
+						tmp =  p.transpose()*a;
+						stress_SPR[(NP_SPR[k]-1)*6+j] = stress_SPR[(NP_SPR[k]-1)*6+j] + tmp(0,0);
+				}
+			}
+
+		}
+	}
+
+	for(uint Np = 0; Np < NUMNP; Np++)
+	{
+		for (s_uint j=0;j<6;j++)
+		{
+			stress_SPR[Np*6+j] = stress_SPR[Np*6+j]/CNT[Np];
+		}
+	}
+	//stress_SPR = stressG;
 }
+
+
