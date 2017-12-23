@@ -27,6 +27,7 @@ def main():
     run('shell')
     run('TimoEBMOD')
     run("TimoSRINT")
+    run("9Q")
     print('patch test passed for all.')
 
 

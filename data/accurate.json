@@ -17,6 +17,15 @@
         "dx": "b / E * node.x",
         "dy": "-v * b / E * node.y"
     },
+    "9Q": {
+        "args": {
+            "b": 15,
+            "E": 1.0e6,
+            "v": 0.3
+        },
+        "dx": "b / E * node.x",
+        "dy": "-v * b / E * node.y"
+    },
     "8H": {
         "args": {
             "E": 1e6,
