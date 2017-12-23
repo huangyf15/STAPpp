@@ -8,7 +8,7 @@ using namespace Eigen;
 using namespace std;
 
 
-void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG, unsigned int* mingtianzaishuo)
+void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG)
 {
 	
 	//construct ideal displacement vector
@@ -38,6 +38,7 @@ void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePo
 		0,			0,			0,				0,					0,					(1-2*v)/2/(1-v);
 	D=D*k;
 
+	
 	//construct coordinate matrix
 	MatrixXd coorxyz(8,3);
 	for (unsigned int i=0;i<8;i++)
@@ -93,9 +94,11 @@ void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePo
 	MatrixXd Bele; // elements in Be
 	MatrixXd Be(6,24);
 	MatrixXd stressXYZ(6,8); //8 gauss point, 6 stress 
-	MatrixXd interpo(8,8);  //interpolation for stress recovery 
-	MatrixXd recovery; //
-
+	// shape function 
+	VectorXd N(8);
+	// coordinate for gauss points
+	MatrixXd coorG(1,3);
+	
 	for (unsigned p=0;p<8;p++)
 	{
 		
@@ -129,34 +132,33 @@ void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePo
 	stressXYZ.col(p)=D*Be*idealdisp;  
 	//loop for every gauss point 
 
-	}
-	
-	// stress recovery for tress on nodes
-	double a=2.549038105676658;
-	double b=-0.683012701892219;
-	double c=0.183012701892219;
-	double d=-0.049038105676658;
-
-	interpo << a, b, c, b, b, c, d, c,
-			   b, a, b, c, c, b, c, d,
-			   c, b, a, b, d, c, b, c,
-			   b, c, b, a, c, d, c, b,
-			   b, c, d, c, a, b, c, b,
-			   c, b, c, d, b, a, b, c,
-			   d, c, b, c, c, b, a, b,
-			   c, d, c, b, b, c, b ,a;
-
-
-// interpolate stress on nodes in order of xx,yy,zz,xy,yz,xz
-	for (unsigned i=0;i<6;i++)
+	// stress for gauss points
+	for (unsigned int i=0;i<6;i++)
 	{
-		recovery = interpo*(stressXYZ.row(i).transpose());
-		for (unsigned j=0;j<8;j++)
+		stressG[p*6+i]=stressXYZ(i,p);
+	}
+}
+	
+// calculate the coordinate of gauss points
+
+	for (unsigned int i=0; i<8; i++)
+	{
+		xi   = xi8[i];
+		eta  = eta8[i];
+		zeta = zeta8[i];
+		N << (1+xi)*(1-eta)*(1-zeta), (1+xi)*(1+eta)*(1-zeta),  (1-xi)*(1+eta)*(1-zeta),  (1-xi)*(1-eta)*(1-zeta),  (1+xi)*(1-eta)*(1+zeta),  (1+xi)*(1+eta)*(1+zeta),  (1-xi)*(1+eta)*(1+zeta),  (1-xi)*(1-eta)*(1+zeta);
+		N=N/8; // coefficient
+
+		coorG=N*coorxyz;
+
+		for(unsigned int j=0;j<3;j++)
 		{
-			stressHex[6*j+i]=recovery(i);
+			PositionG[i*3+j]=coorG(j);
+
 		}
 	}
-	
+
+
+
+
 }
-
-

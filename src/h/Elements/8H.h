@@ -46,7 +46,7 @@ public:
 	virtual void ElementPostInfo(double* stress, double* Displacement , double* PrePositions, double* PostPositions);
 
 //!	Calculate the values required in the POSTPROCESS SPR 
-	virtual void ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG, unsigned int* mingtianzaishuo);
+	virtual void ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG);
 
 
 //!	Return the size of the element stiffness matrix (stored as an array column by column)

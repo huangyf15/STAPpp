@@ -300,8 +300,8 @@ void PostOutputter::OutputElementStress()
 			break;
 
         case ElementTypes::Plate:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME*4 << ",E=" << NUME
-                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*8 << ",E=" << NUME
+                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stresses4PE[12];
 			double PrePositions4PE[12];
@@ -335,8 +335,8 @@ void PostOutputter::OutputElementStress()
             break;
 
         case ElementTypes::Shell:
-            *this << "ZONE T=\"SCENE1\", N=" << NUME*4<< ",E=" << NUME
-                  << " ,F=FEPOINT , ET= QUADRILATERAL, C= RED" << endl;
+            *this << "ZONE T=\"SCENE1\", N=" << NUME*8<< ",E=" << NUME
+                  << " ,F=FEPOINT , ET= BRICK, C= RED" << endl;
 
             double stresses4SE[15];
 			double PrePostions4SE[15];
