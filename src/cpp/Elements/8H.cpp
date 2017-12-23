@@ -654,6 +654,7 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 	
 		if (LocationMatrix[i])
 			//locatiion matrix start from 1 not 0
+
 		{Disp[i] = Displacement[LocationMatrix[i]-1];}
 		else
 		{Disp[i] = 0.0;}
