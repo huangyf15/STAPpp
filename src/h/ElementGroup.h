@@ -13,16 +13,16 @@
 #include <fstream>
 
 #include "Element.h"
-#include "Elements/Bar.h"
-#include "Elements/Quadrilateral.h"
-#include "Elements/Triangle.h"
 #include "Elements/8H.h"
-#include "Elements/Beam.h"
-#include "Elements/TimoshenkoSRINT.h"
-#include "Elements/TimoshenkoEBMOD.h"
-#include "Elements/Plate.h"
-#include "Elements/Shell.h"
 #include "Elements/9Q.h"
+#include "Elements/Bar.h"
+#include "Elements/Beam.h"
+#include "Elements/Plate.h"
+#include "Elements/Quadrilateral.h"
+#include "Elements/Shell.h"
+#include "Elements/TimoshenkoEBMOD.h"
+#include "Elements/TimoshenkoSRINT.h"
+#include "Elements/Triangle.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -31,16 +31,16 @@ using namespace std;
 enum ElementTypes
 {
     UNDEFINED = 0,
-    Bar,
-    Quadrilateral,
-    Triangle,
-    Hexahedron,
-    Beam,
-    Plate,
-    Shell,
-    TimoshenkoSRINT,
-    TimoshenkoEBMOD,
-    T9Q
+    Bar = 1,
+    Quadrilateral = 2,
+    Triangle = 3,
+    Hexahedron = 4,
+    Beam = 5,
+    Plate = 6,
+    Shell = 7,
+    TimoshenkoSRINT = 8,
+    TimoshenkoEBMOD = 9,
+    T9Q = 10
 };
 
 //! Element group class
