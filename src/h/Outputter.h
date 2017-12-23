@@ -83,6 +83,9 @@ public:
 //!	Output Shell element data
     void PrintShellElementData(unsigned int EleGrp);
 
+//!	Output 9Q element data
+	void Print9QElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
