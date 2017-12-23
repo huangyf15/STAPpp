@@ -3,7 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-
+#include "SPR8H.h"
 using namespace Eigen;
 using namespace std;
 
@@ -11,16 +11,30 @@ using namespace std;
 void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG)
 {
 	
-	//construct ideal displacement vector
-		//LM can be used here
+
+//position before displacement for nodes
+for (unsigned int i=0;i<8;i++)
+	{ 
+		for (unsigned int j=0;j<3;j++)
+	   {
+			PrePositions[i*3+j]=nodes[i]->XYZ[j];
+	    }
+	}
+
+	
 
 //ideal displacement matrix de
 	VectorXd idealdisp(24); 
 		for (unsigned int i=0;i<24;i++ )
-		{ if (LocationMatrix[i])
-			idealdisp(i) = Displacement[LocationMatrix[i]-1];
-		  else
-		    idealdisp(i) = 0;
+		{ 
+			if (LocationMatrix[i])
+				{idealdisp(i) = Displacement[LocationMatrix[i]-1];}
+			else
+				{idealdisp(i) = 0.0;}
+
+		
+			PostPositions[i] = PrePositions[i] + idealdisp(i);
+
 		}
 	
 	CHexMaterial* material = dynamic_cast<CHexMaterial*>(ElementMaterial);	// Pointer to material of the element
@@ -95,9 +109,9 @@ void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePo
 	MatrixXd Be(6,24);
 	MatrixXd stressXYZ(6,8); //8 gauss point, 6 stress 
 	// shape function 
-	VectorXd N(8);
+	MatrixXd N(1,8);
 	// coordinate for gauss points
-	MatrixXd coorG(1,3);
+	MatrixXd coorG;
 	
 	for (unsigned p=0;p<8;p++)
 	{
@@ -160,5 +174,28 @@ void  CHex::ElementPostSPR(double* stressG, double* Displacement , double* PrePo
 
 
 
+
+}
+
+void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double* PositionG, 
+			   unsigned int* Ele_NodeNumber, unsigned int NUME, unsigned int NUMNP)
+{
+	unsigned int* NNE = new unsigned int[NUMNP]; // number of neibourhood elements
+	for(unsigned int Np = 0; Np < NUMNP; Np++)
+	{
+		NNE[Np] = 0;
+		for(unsigned int Ele = 0; Ele < NUME; Ele++)
+		{
+			for(unsigned int N = 0; N < 8; N++)
+			{
+				if(Ele_NodeNumber[Ele*8+N] == Np+1)
+					NNE[Np]++;
+				else
+					continue;
+			}
+		}
+	}
+
+	stress_SPR = stressG;
 
 }
