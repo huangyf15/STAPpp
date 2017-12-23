@@ -359,7 +359,7 @@ public:
     {
         if (_rows != m._rows || _columns != m._columns)
         {
-            throw std::runtime_error("in Matrix<T>::operator-: matrix size don't match.");
+            throw std::runtime_error("in Matrix<T>::operator+: matrix size don't match.");
         }
         Matrix<T> res(_rows, _columns);
 
@@ -375,7 +375,7 @@ public:
     {
         if (_rows != m._rows || _columns != m._columns)
         {
-            throw std::runtime_error("in Matrix<T>::operator-: matrix size don't match.");
+            throw std::runtime_error("in Matrix<T>::operator+=: matrix size don't match.");
         }
 
         for (Pos_t i = 0; i < _rows * _columns; ++i)
