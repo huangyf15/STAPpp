@@ -250,39 +250,58 @@ void C9Q::ElementStiffness(double* matrix)
 void CalculateStressAt9Q(double xi, double eta, double xe[9], double ye[9], double E, double v,
                          const double de[18], double* stress)
 {
-    // generate B first
-    // double B[8];
-    // GenerateB9Q(B, xi, eta, xe, ye);
+    Matrix<double> BB(2, 9);
+    GenerateB9Q(BB, xi, eta, xe, ye);
+    Matrix<double> B(3, 18);
+    for (unsigned i = 0; i < 9; i++)
+    {
+        double partialX = BB.c_at(1, 1 + i);
+        double partialY = BB.c_at(2, 1 + i);
+        B.at(1, 1 + 2 * i) = partialX;
+        B.at(3, 1 + 2 * i + 1) = partialX;
+        B.at(2, 1 + 2 * i + 1) = partialY;
+        B.at(3, 1 + 2 * i) = partialY;
+    }
 
-    // // see ../../memo/4Q/4Q.nb and ../../memo/4Q/4Q-calc-stress.py
-    // double d33 = (1.f - v) / 2.0f;
-    // const double cof = E / (1 - v * v);
-    // stress[0] = cof * (B[0] * de[0] + B[1] * de[2] + B[2] * de[4] + B[3] * de[6] +
-    //                    v * (B[4] * de[1] + B[5] * de[3] + B[6] * de[5] + B[7] * de[7]));
-    // stress[1] =
-    //     cof * (B[4] * de[1] + B[5] * de[3] + B[6] * de[5] +
-    //            v * (B[0] * de[0] + B[1] * de[2] + B[2] * de[4] + B[3] * de[6]) + B[7] * de[7]);
-    // stress[2] = cof * (d33 * (B[4] * de[0] + B[0] * de[1] + B[5] * de[2] + B[1] * de[3] +
-    //                           B[6] * de[4] + B[2] * de[5] + B[7] * de[6] + B[3] * de[7]));
+    // sigma = D B d
+    double DData[9] = {1, v, 0, v, 1, 0, 0, 0, (1. - v) / 2.};
+    Matrix<double> D(3, 3, DData);
+
+    Matrix<double> d(18, 1, de);
+
+    Matrix<double>&& stress_ = D * B * d;
+
+    stress[0] = stress_.c_at(1, 1);
+    stress[1] = stress_.c_at(2, 1);
+    stress[2] = stress_.c_at(3, 1);
 }
 
-void CalculateN9Q(double eta, double psi, double N[4])
+void CalculateN9Q(double xi, double eta, double N[9])
 {
-    N[0] = (1 - psi) * (1 - eta) / 4.;
-    N[1] = (1 + psi) * (1 - eta) / 4.;
-    N[2] = (1 + psi) * (1 + eta) / 4.;
-    N[3] = (1 - psi) * (1 + eta) / 4.;
+    N[0] = ((-1 + eta) * eta * (-1 + xi) * xi) / 4.;
+    N[1] = ((-1 + eta) * eta * xi * (1 + xi)) / 4.;
+    N[2] = (eta * (1 + eta) * xi * (1 + xi)) / 4.;
+    N[3] = (eta * (1 + eta) * (-1 + xi) * xi) / 4.;
+    N[4] = ((-1 + eta) * eta * (1 - std::pow(xi, 2))) / 2.;
+    N[5] = ((1 - std::pow(eta, 2)) * xi * (1 + xi)) / 2.;
+    N[6] = (eta * (1 + eta) * (1 - std::pow(xi, 2))) / 2.;
+    N[7] = ((1 - std::pow(eta, 2)) * (-1 + xi) * xi) / 2.;
+    N[8] = (1 - std::pow(eta, 2)) * (1 - std::pow(xi, 2));
 }
 
 // generate 3d position and return weight
-void CalculatePositionAt9Q(double eta, double psi, double xe[4], double ye[4], double i[3],
+void CalculatePositionAt9Q(double eta, double psi, double xe[9], double ye[9], double i[3],
                            double j[3], double Positions[3])
 {
-    double N[4];
+    double N[9];
     CalculateN9Q(eta, psi, N);
     // generate local x
-    double x2d = N[0] * xe[0] + N[1] * xe[1] + N[2] * xe[2] + N[3] * xe[3];
-    double y2d = N[0] * ye[0] + N[1] * ye[1] + N[2] * ye[2] + N[3] * ye[3];
+    double x2d = 0, y2d = 0;
+    for (unsigned _ = 0; _ < 9; _++)
+    {
+        x2d += N[_] * xe[_];
+        y2d += N[_] * ye[_];
+    }
 
     // convert to 3d
     Positions[0] = i[0] * x2d + j[0] * y2d;
@@ -320,22 +339,19 @@ double CalculateWeightAt9Q(double eta, double psi, double xe[4], double ye[4])
 }
 
 //	Calculate element stress
-// stress:              double[12], represent 3 stress for 4 gauss points in C9Q element.
+// stress:              double[27], represent 3 stress for 9 gauss points in C9Q element.
 // Displacement:        double[NEQ], represent the Force vector.
-// Positions:           double[12], represent 3d position for 4 gauss points.
-// GaussDisplacements:  double[12], represent 3d displacements for 4 gauss points.
-// Weights:             double[4], represent integrate weights.
-void C9Q::ElementStress(double stress[12], double* Displacement, double Positions[12],
-                        double GaussDisplacements[12], double weights[4])
+// Positions:           double[27], represent 3d position for 9 gauss points.
+void C9Q::ElementStress(double stress[27], double* Displacement, double Positions[27])
 {
     // =========================== 3d to 2d ============================
-    double n[3], i[3], j[3], xe[4], ye[4];
+    double n[3], i[3], j[3], xe[9], ye[9];
     Convert3d22d9Q(nodes, n, i, j, xe, ye);
 
     // form d first.
     // d represent 3d displacements at boundary nodes.
-    double d[12];
-    for (unsigned index = 0; index < 12; ++index)
+    double d[27];
+    for (unsigned index = 0; index < 27; ++index)
     {
         if (LocationMatrix[index])
         {
@@ -348,11 +364,16 @@ void C9Q::ElementStress(double stress[12], double* Displacement, double Position
     }
 
     // generate de, convert from 3d to 2d.
-    double de[8] = {
-        d[0] * i[0] + d[1] * i[1] + d[2] * i[2],   d[0] * j[0] + d[1] * j[1] + d[2] * j[2],
-        d[3] * i[0] + d[4] * i[1] + d[5] * i[2],   d[3] * j[0] + d[4] * j[1] + d[5] * j[2],
-        d[6] * i[0] + d[7] * i[1] + d[8] * i[2],   d[6] * j[0] + d[7] * j[1] + d[8] * j[2],
-        d[9] * i[0] + d[10] * i[1] + d[11] * i[2], d[9] * j[0] + d[10] * j[1] + d[11] * j[2]};
+    double de[2 * 9];
+    clear(de, 2 * 9);
+    for (unsigned nodeIndex = 0; nodeIndex < 9; nodeIndex++)
+    {
+        for (unsigned _ = 0; _ < 3; _++)
+        {
+            de[nodeIndex * 2 + 0] += d[3 * nodeIndex + _] * i[_];
+            de[nodeIndex * 2 + 1] += d[3 * nodeIndex + _] * j[_];
+        }
+    }
 
     // ======================= calculate stress ========================
     C9QMaterial* material =
@@ -360,31 +381,18 @@ void C9Q::ElementStress(double stress[12], double* Displacement, double Position
     const double& E = material->E;
     const double& v = material->nu;
 
-    double pos = 1 / std::sqrt(3.0f);
-    double etas[2] = {-pos, pos};
-    double psis[2] = {-pos, pos};
+    const double pos = std::sqrt(0.6f);
+    const double xis[3] = {-pos, 0, pos};
+    const double etas[3] = {-pos, 0, pos};
 
     // calculate Positions
-    CalculatePositionAt9Q(etas[0], psis[0], xe, ye, i, j, Positions + 0);
-    CalculatePositionAt9Q(etas[0], psis[1], xe, ye, i, j, Positions + 3);
-    CalculatePositionAt9Q(etas[1], psis[0], xe, ye, i, j, Positions + 6);
-    CalculatePositionAt9Q(etas[1], psis[1], xe, ye, i, j, Positions + 9);
+    for (unsigned px = 0; px < 3; px++)
+    {
 
-    // calculate stresses
-    CalculateStressAt9Q(etas[0], psis[0], xe, ye, E, v, de, stress + 0);
-    CalculateStressAt9Q(etas[0], psis[1], xe, ye, E, v, de, stress + 3);
-    CalculateStressAt9Q(etas[1], psis[0], xe, ye, E, v, de, stress + 6);
-    CalculateStressAt9Q(etas[1], psis[1], xe, ye, E, v, de, stress + 9);
-
-#ifdef _TEST_
-    CalculateDisplacementAt9Q(etas[0], psis[0], de, i, j, GaussDisplacements + 0);
-    CalculateDisplacementAt9Q(etas[0], psis[1], de, i, j, GaussDisplacements + 3);
-    CalculateDisplacementAt9Q(etas[1], psis[0], de, i, j, GaussDisplacements + 6);
-    CalculateDisplacementAt9Q(etas[1], psis[1], de, i, j, GaussDisplacements + 9);
-
-    weights[0] = 1.0 * CalculateWeightAt9Q(etas[0], psis[0], xe, ye);
-    weights[1] = 1.0 * CalculateWeightAt9Q(etas[0], psis[1], xe, ye);
-    weights[2] = 1.0 * CalculateWeightAt9Q(etas[1], psis[0], xe, ye);
-    weights[3] = 1.0 * CalculateWeightAt9Q(etas[1], psis[1], xe, ye);
-#endif
+        for (unsigned py = 0; py < 3; py++)
+        {
+            CalculatePositionAt9Q(xis[px], etas[py], xe, ye, i, j, Positions + 9 * px + 3 * py);
+            CalculateStressAt9Q(xis[px], etas[py], xe, ye, E, v, de, stress + 9 * px + 3 * py);
+        }
+    }
 }
