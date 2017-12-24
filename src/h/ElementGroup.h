@@ -17,6 +17,7 @@
 #include "Elements/9Q.h"
 #include "Elements/Bar.h"
 #include "Elements/Beam.h"
+#include "Elements/Frustum.h"
 #include "Elements/Plate.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/Shell.h"
@@ -40,7 +41,8 @@ enum ElementTypes
     Shell = 7,
     TimoshenkoSRINT = 8,
     TimoshenkoEBMOD = 9,
-    T9Q = 10
+    T9Q = 10,
+    Frustum = 13
 };
 
 //! Element group class
@@ -88,12 +90,6 @@ public:
 
     //! Read element data from the input data file
     bool ReadElementData(ifstream& Input);
-
-    //! Read quadrilateral element data from the input data file
-    bool ReadQuadrilateralElementData(ifstream& Input);
-
-    //! Read plate element data from the input data file
-    bool ReadPlateElementData(ifstream& Input);
 
     //! Return element type of this group
     ElementTypes GetElementType() { return ElementType_; }

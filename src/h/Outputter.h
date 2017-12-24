@@ -86,6 +86,9 @@ public:
 //!	Output 9Q element data
 	void Print9QElementData(unsigned int EleGrp);
 
+//!	Output Frustum Shell element data
+	void PrintFrustumElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 

@@ -53,7 +53,7 @@ bool CFrustum::Read(ifstream& Input, unsigned int Ele, CMaterial* MaterialSets, 
 	unsigned int N1, N2;	// Left node number and right node number
 
 	Input >> N1 >> N2 >> MSet;
-	ElementMaterial = static_cast<CBarMaterial*>(MaterialSets) + MSet - 1;
+	ElementMaterial = static_cast<CShellMaterial*>(MaterialSets) + MSet - 1;
 	nodes[0] = &NodeList[N1 - 1];
 	nodes[1] = &NodeList[N2 - 1];
 
@@ -89,76 +89,49 @@ void CFrustum::ElementStiffness(double* Matrix)
 {
 	clear(Matrix, SizeOfStiffnessMatrix());
 
-	//	Calculate bar length
-	double DX[3];		//	dx = x2-x1, dy = y2-y1, dz = z2-z1
+	//	Only X and Z matter
+	double DX[3];		//	dx = x2-x1, dy = 0, dz = z2-z1
 	for (unsigned int i = 0; i < 3; i++)
 		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
 
-	double DX2[6];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
-	DX2[0] = DX[0] * DX[0];
-	DX2[1] = DX[1] * DX[1];
-	DX2[2] = DX[2] * DX[2];
-	DX2[3] = DX[0] * DX[1];
-	DX2[4] = DX[1] * DX[2];
-	DX2[5] = DX[0] * DX[2];
-
-	double L2 = DX2[0] + DX2[1] + DX2[2];
-	double L = sqrt(L2);
-
+	double L2 = DX[0] * DX[0] + DX[2] * DX[2];
+	double l = sqrt(L2);
+	double S = DX[2] / l;
+	double C = DX[0] / l;
+	double r = DX[2];
 	//	Calculate element stiffness matrix
 
-	CBarMaterial* material = static_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
+	CShellMaterial* material = static_cast<CShellMaterial*>(ElementMaterial);	// Pointer to material of the element
 
-	const double k = material->E * material->Area / L / L2;
+	const double nu = material->nu;
+	const double k = material->E / (1 - nu*nu);
+	const double h = material->h;
 
-	Matrix[0] = k*DX2[0];
-	Matrix[1] = k*DX2[1];
-	Matrix[2] = k*DX2[3];
-	Matrix[3] = k*DX2[2];
-	Matrix[4] = k*DX2[4];
-	Matrix[5] = k*DX2[5];
-	Matrix[6] = k*DX2[0];
-	Matrix[7] = -k*DX2[5];
-	Matrix[8] = -k*DX2[3];
-	Matrix[9] = -k*DX2[0];
-	Matrix[10] = k*DX2[1];
-	Matrix[11] = k*DX2[3];
-	Matrix[12] = -k*DX2[4];
-	Matrix[13] = -k*DX2[1];
-	Matrix[14] = -k*DX2[3];
-	Matrix[15] = k*DX2[2];
-	Matrix[16] = k*DX2[4];
-	Matrix[17] = k*DX2[5];
-	Matrix[18] = -k*DX2[2];
-	Matrix[19] = -k*DX2[4];
-	Matrix[20] = -k*DX2[5];
+	Matrix[0] = S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*1.0 / (l*l*l)*3.141592653589793*((C*C)*(l*l*l*l)*1.3E1 + (S*S)*(l*l)*4.2E1 + (h*h)*(r*r)*3.5E1 + C*S*(l*l*l)*3.5E1)*(2.0 / 3.5E1)) / r) + C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) - S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[1] = -C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) - (C*h*k*1.0 / (l*l*l)*3.141592653589793*((C*C)*(l*l*l*l)*1.3E1 + (S*S)*(l*l)*4.2E1 + (h*h)*(r*r)*3.5E1 + C*S*(l*l*l)*3.5E1)*(2.0 / 3.5E1)) / r) - S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) - (S*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) - S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[2] = -C*(C*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*1.0 / (l*l*l)*3.141592653589793*((C*C)*(l*l*l*l)*1.3E1 + (S*S)*(l*l)*4.2E1 + (h*h)*(r*r)*3.5E1 + C*S*(l*l*l)*3.5E1)*(2.0 / 3.5E1)) / r) + S*(S*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) - S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[3] = (h*k*3.141592653589793*((C*C)*(l*l*l*l)*2.0 + (S*S)*(l*l)*6.7E1 + (h*h)*(r*r)*7.0E1 + C*S*(l*l*l)*9.0)*(1.0 / 1.05E2)) / (l*r);
+	Matrix[4] = -S*(h*k*3.141592653589793*(S*nu*1.5E1 + C*l*nu*5.0)*(1.0 / 3.0E1) - (h*k*3.141592653589793*((S*S)*l + C*S*(l*l)*3.0)*(1.0 / 3.0E1)) / r) + (C*h*k*1.0 / (l*l)*3.141592653589793*((C*C)*(l*l*l*l)*2.2E1 + (S*S)*(l*l)*1.68E2 + (h*h)*(r*r)*2.1E2 + C*S*(l*l*l)*3.9E1)*(1.0 / 2.1E2)) / r;
+	Matrix[5] = -C*(h*k*3.141592653589793*(S*nu*1.5E1 + C*l*nu*5.0)*(1.0 / 3.0E1) - (h*k*3.141592653589793*((S*S)*l + C*S*(l*l)*3.0)*(1.0 / 3.0E1)) / r) - (S*h*k*1.0 / (l*l)*3.141592653589793*((C*C)*(l*l*l*l)*2.2E1 + (S*S)*(l*l)*1.68E2 + (h*h)*(r*r)*2.1E2 + C*S*(l*l*l)*3.9E1)*(1.0 / 2.1E2)) / r;
+	Matrix[6] = S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*3.141592653589793*((S*S)*4.2E1 + (C*C)*(l*l)*1.3E1 + (h*h)*(r*r)*3.5E1 - C*S*l*3.5E1)*(2.0 / 3.5E1)) / (l*r)) + C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) + S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[7] = C*(h*k*3.141592653589793*(S*nu*1.5E1 + C*l*nu*5.0)*(1.0 / 3.0E1) + (h*k*3.141592653589793*((S*S)*l*1.4E1 + C*S*(l*l)*2.0)*(1.0 / 3.0E1)) / r) + (S*h*k*3.141592653589793*((S*S)*l*1.68E2 - (C*C)*(l*l*l)*1.3E1 + (h*h)*(r*r)*2.1E2 - C*S*(l*l)*6.6E1)*(1.0 / 2.1E2)) / (l*r);
+	Matrix[8] = -S*(S*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) - (C*h*k*1.0 / (l*l)*3.141592653589793*((S*S)*l*8.4E1 - (C*C)*(l*l*l)*9.0 + (h*h)*(r*r)*7.0E1)*(1.0 / 3.5E1)) / r) + C*(C*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) - (S*h*k*3.141592653589793*((r*r)*6.0 - (S*S)*(l*l))*(1.0 / 3.0)) / (l*r));
+	Matrix[9] = -S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*1.0 / (l*l)*3.141592653589793*((S*S)*l*8.4E1 - (C*C)*(l*l*l)*9.0 + (h*h)*(r*r)*7.0E1)*(1.0 / 3.5E1)) / r) - C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*6.0 - (S*S)*(l*l))*(1.0 / 3.0)) / (l*r));
+	Matrix[10] = -C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) - (C*h*k*3.141592653589793*((S*S)*4.2E1 + (C*C)*(l*l)*1.3E1 + (h*h)*(r*r)*3.5E1 - C*S*l*3.5E1)*(2.0 / 3.5E1)) / (l*r)) - S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) - (S*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) + S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[11] = -C*(C*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*3.141592653589793*((S*S)*4.2E1 + (C*C)*(l*l)*1.3E1 + (h*h)*(r*r)*3.5E1 - C*S*l*3.5E1)*(2.0 / 3.5E1)) / (l*r)) + S*(S*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*7.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*3.0 + (S*S)*(l*l) + S*l*nu*r*3.0)*(2.0 / 3.0)) / (l*r));
+	Matrix[12] = S*(h*k*3.141592653589793*(S*nu*1.5E1 + C*l*nu*5.0)*(1.0 / 3.0E1) + (h*k*3.141592653589793*((S*S)*l*1.4E1 + C*S*(l*l)*2.0)*(1.0 / 3.0E1)) / r) - (C*h*k*3.141592653589793*((S*S)*l*1.68E2 - (C*C)*(l*l*l)*1.3E1 + (h*h)*(r*r)*2.1E2 - C*S*(l*l)*6.6E1)*(1.0 / 2.1E2)) / (l*r);
+	Matrix[13] = C*(S*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) - (C*h*k*1.0 / (l*l)*3.141592653589793*((S*S)*l*8.4E1 - (C*C)*(l*l*l)*9.0 + (h*h)*(r*r)*7.0E1)*(1.0 / 3.5E1)) / r) + S*(C*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) - (S*h*k*3.141592653589793*((r*r)*6.0 - (S*S)*(l*l))*(1.0 / 3.0)) / (l*r));
+	Matrix[14] = C*(C*((h*k*3.141592653589793*(S*nu*2.0E1 - C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l - (h*k*3.141592653589793*((S*S)*l*1.0E1 - C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) + (S*h*k*1.0 / (l*l)*3.141592653589793*((S*S)*l*8.4E1 - (C*C)*(l*l*l)*9.0 + (h*h)*(r*r)*7.0E1)*(1.0 / 3.5E1)) / r) - S*(S*((h*k*3.141592653589793*(S*nu*2.0E1 + C*l*nu*1.0E1)*(1.0 / 1.0E1)) / l + (h*k*3.141592653589793*((S*S)*l*1.0E1 + C*S*(l*l)*3.0)*(1.0 / 1.0E1)) / (l*r)) + (C*h*k*3.141592653589793*((r*r)*6.0 - (S*S)*(l*l))*(1.0 / 3.0)) / (l*r));
+	Matrix[15] = (h*k*3.141592653589793*((C*C)*(l*l*l*l) + (S*S)*(l*l)*1.4E1 + (h*h)*(r*r)*3.5E1)*(2.0 / 1.05E2)) / (l*r);
+	Matrix[16] = (C*h*k*3.141592653589793*((S*S)*l*2.1E1 + (C*C)*(l*l*l)*1.1E1 + (h*h)*(r*r)*1.05E2)*(-1.0 / 1.05E2)) / (l*r) - (S*h*k*l*3.141592653589793*((S*S)*5.0 + C*S*l*3.0 + C*nu*r*5.0)*(1.0 / 3.0E1)) / r;
+	Matrix[17] = (S*h*k*3.141592653589793*((S*S)*l*2.1E1 + (C*C)*(l*l*l)*1.1E1 + (h*h)*(r*r)*1.05E2)*(1.0 / 1.05E2)) / (l*r) - (C*h*k*l*3.141592653589793*((S*S)*5.0 + C*S*l*3.0 + C*nu*r*5.0)*(1.0 / 3.0E1)) / r;
+	Matrix[18] = (h*k*3.141592653589793*((C*C)*(l*l*l*l)*3.0 + (S*S)*(l*l)*1.4E1 - (h*h)*(r*r)*7.0E1 + C*S*(l*l*l)*1.2E1)*(-1.0 / 2.1E2)) / (l*r);
+	Matrix[19] = (C*h*k*1.0 / (l*l)*3.141592653589793*((C*C)*(l*l*l*l)*-1.3E1 + (S*S)*(l*l)*4.2E1 + (h*h)*(r*r)*2.1E2)*(1.0 / 2.1E2)) / r + (S*h*k*l*3.141592653589793*((S*S)*5.0 - C*S*l*2.0 + C*nu*r*5.0)*(1.0 / 3.0E1)) / r;
+	Matrix[20] = (C*h*k*l*3.141592653589793*((S*S)*5.0 - C*S*l*2.0 + C*nu*r*5.0)*(1.0 / 3.0E1)) / r - (S*h*k*1.0 / (l*l)*3.141592653589793*((C*C)*(l*l*l*l)*-1.3E1 + (S*S)*(l*l)*4.2E1 + (h*h)*(r*r)*2.1E2)*(1.0 / 2.1E2)) / r;
 }
 
 //	Calculate element stress 
 void CFrustum::ElementStress(double* stress, double* Displacement)
 {
-	CBarMaterial* material = static_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
 
-	double DX[3];	//	dx = x2-x1, dy = y2-y1, dz = z2-z1
-	double L2 = 0;	//	Square of bar length (L^2)
-
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-		L2 = L2 + DX[i] * DX[i];
-	}
-
-	double S[6];
-	for (unsigned int i = 0; i < 3; i++)
-	{
-		S[i] = -DX[i] * material->E / L2;
-		S[i + 3] = -S[i];
-	}
-
-	*stress = 0.0;
-	for (unsigned int i = 0; i < 6; i++)
-	{
-		if (LocationMatrix[i])
-			*stress += S[i] * Displacement[LocationMatrix[i] - 1];
-	}
 }
