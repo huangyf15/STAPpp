@@ -539,6 +539,7 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 	CLDLTSolver* KSolver= new CLDLTSolver(*StiffnessMatrix);
 	CLDLTSolver* MSolver= new CLDLTSolver(*MassMatrix);
 	MSolver->Multiple(vector_o,vector_oY,numEq,NVibModes);
+	KSolver->LDLT();
 	double* vec_x_n = new double[NVibModes*numEq];
 	double* vec_y_n = new double[NVibModes*numEq];
 	double* lambdas_this = new double[NVibModes];
@@ -568,7 +569,8 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 			}
 		}
 		//LAPACKE_dpotrf(LAPACK_COL_MAJOR, 'U', ord,M_reduced, ord);
-		if (LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1,'V','U',ord,K_reduced,M_reduced,lambdas_n,eig_vecs,ord))
+		int test = LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1, 'V', 'U', ord, K_reduced, M_reduced, lambdas_n, eig_vecs, ord);
+		if (test)
 			return false;
 		for (unsigned int i=0; i<numEq; ++i){
 			for (unsigned int j=0; j<NVibModes; ++j){

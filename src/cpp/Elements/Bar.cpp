@@ -189,7 +189,7 @@ void CBar::ElementMass(double* mass){
 
     double mass_c = material->rho * L;
 
-    double km = mass_c / L2;
+    double km = mass_c / L2 * 0.166666666666667;
     mass[0] = 2*km*DX2[0];
 	mass[1] = 2*km*DX2[1];
 	mass[2] = 2*km*DX2[3];
