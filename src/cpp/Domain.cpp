@@ -12,6 +12,7 @@
 #include "Material.h"
 #include <Eigen/Dense>
 #include "mkl.h"
+#include <cmath>
 
 using namespace std;
 using namespace Eigen;
@@ -524,7 +525,7 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 	double* vector_o = new double[numEq*NVibModes];
 	for (unsigned int i=0; i<numEq; ++i){
 		for (unsigned j=0; j<NVibModes; ++j){
-			if (i==0 || j==i-1) {
+			if (j==0 || i==j-1) {
 				vector_o[j*numEq+i]=1.0;
 			}
 			else {
@@ -539,13 +540,15 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 	CLDLTSolver* KSolver= new CLDLTSolver(*StiffnessMatrix);
 	CLDLTSolver* MSolver= new CLDLTSolver(*MassMatrix);
 	MSolver->Multiple(vector_o,vector_oY,numEq,NVibModes);
-	KSolver->LDLT();
+	//KSolver->LDLT();
 	double* vec_x_n = new double[NVibModes*numEq];
 	double* vec_y_n = new double[NVibModes*numEq];
 	double* lambdas_this = new double[NVibModes];
 	double* lambdas_n = new double[NVibModes];
 	double* eig_vecs = new double[NVibModes*NVibModes];
 	double l_diffs = 1.0;
+	double est_oy = 0.0;
+	double est_yn = 0.0;
     while (l_diffs > 1.19e-7){
 		for (unsigned int i=0; i<NVibModes; ++i){
 			lambdas_this[i] = lambdas_n[i];
@@ -557,6 +560,20 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 			KSolver->BackSubstitution(vec_x_n+i*numEq);
 		}
 		MSolver->Multiple(vec_x_n,vec_y_n,numEq,NVibModes);
+		/*
+		for (unsigned int i = 0; i < NVibModes; ++i) {
+			est_oy += vector_oY[i*numEq] * vector_oY[i*numEq];
+			est_yn += vec_y_n[i*numEq] * vec_y_n[i*numEq];
+		}
+		double ests = sqrt(est_oy / est_yn);
+		for (unsigned int i = 0; i < NVibModes * numEq; ++i) {
+			vector_oY[i] *= ests;
+			vec_x_n[i] *= ests;
+			vec_y_n[i] *= ests;
+		}
+		est_oy = 0.0;
+		est_yn = 0.0;
+		*/
 		int ord=NVibModes;
 		for (unsigned int i=0; i<NVibModes; ++i){
 			for (unsigned int j=i; j<NVibModes; ++j){
@@ -564,18 +581,22 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 				M_reduced[i+j*(j+1)/2] = 0.0;
 				for (unsigned int k=0; k<numEq; ++k){
 					K_reduced[i+j*(j+1)/2] += vec_x_n[i*numEq+k] * vector_oY[j*numEq+k];
-					M_reduced[i+j*(j+1)/2] += vec_x_n[i*numEq+k] * vec_y_n[i*numEq+k];
+					M_reduced[i+j*(j+1)/2] += vec_x_n[i*numEq+k] * vec_y_n[j*numEq+k];
 				}
 			}
 		}
 		//LAPACKE_dpotrf(LAPACK_COL_MAJOR, 'U', ord,M_reduced, ord);
 		if (LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1,'V','U',ord,K_reduced,M_reduced,lambdas_n,eig_vecs,ord))
 			return false;
+		double* vec_x_n2 = new double[NVibModes*numEq];
+		for (unsigned int i = 0; i < NVibModes*numEq; ++i) {
+			vec_x_n2[i] = vec_x_n[i];
+		}
 		for (unsigned int i=0; i<numEq; ++i){
 			for (unsigned int j=0; j<NVibModes; ++j){
 				vec_x_n[i+j*numEq] = 0.0;
 				for (unsigned int k=0; k<NVibModes; ++k){
-					vec_x_n[i+j*numEq] += vector_o[i+k*numEq] * eig_vecs[k+j*numEq];
+					vec_x_n[i+j*numEq] += vec_x_n2[i+k*numEq] * eig_vecs[k+j*numEq];
 				}
 			}
 		}
@@ -583,12 +604,16 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 			vector_o[i] = vec_x_n[i];
 		}
 		MSolver->Multiple(vec_x_n,vec_y_n,numEq,NVibModes);
-
+		l_diffs = 0.0;
+		for (unsigned int i = 0; i < NVibModes; ++i) {
+			l_diffs += abs(lambdas_n[i] - lambdas_this[i]);
+		}
 	}
 	VibDisp = new double[NVibModes*numEq];
 	for (unsigned int i=0; i<NVibModes*numEq; ++i){
 		VibDisp[i] = vector_o[i];
 	}
+	EigenValues = new double[NVibModes];
 	for (unsigned int i=0; i<NVibModes; ++i){
 		EigenValues[i] = lambdas_n[i];
 	}

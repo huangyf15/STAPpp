@@ -171,7 +171,7 @@ void CLDLTSolver::Multiple(double* acc,double* force,unsigned int numeq,unsigned
 		force[i]=0.0;
 	}
 
-	for (unsigned int i=0; i<diag[numeq]; ++i){
+	for (unsigned int i=1; i<diag[numeq]; ++i){
 		
 			if (i==diag[diag_sc]){
 				for (unsigned int j=0; j<vib_m; ++j){

@@ -1175,7 +1175,7 @@ void COutputter::OutputVibDisps()
 		*this << " NUMBER           X           Y           Z               DX              DY              DZ"<<endl;
 		for (unsigned int j=0; j<NodeNum; ++j){
 			*this << j+1 << setw(13) << Nodelist[j].XYZ[0] << setw(13) << Nodelist[j].XYZ[1] << setw(13) << Nodelist[j].XYZ[2] ;
-			Nodelist[j].WriteNodalDisplacement(*this, j, vibdisp);
+			Nodelist[j].WriteNodalDisplacement(*this, j, vibdisp+i*NEQ);
 
 		}
 		*this << endl;
