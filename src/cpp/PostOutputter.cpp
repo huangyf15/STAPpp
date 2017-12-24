@@ -40,8 +40,9 @@ void PostOutputter::OutputElementStress()
     const unsigned int NUMEG = FEMData->GetNUMEG(); // Number of element groups
 
     *this << "TITLE = \" STAPpp FEM \" " << endl
-          << "VARIABLES = \"X_POST\",\"Y_POST\",\"Z_POST\", "
-             "\"STRESS_XX\",\"STRESS_YY\",\"STRESS_ZZ\",\"STRESS_XY\",\"STRESS_YZ\",\"STRESS_ZX\" "
+          << "VARIABLES = \"X_POST\", \"Y_POST\", \"Z_POST\", "
+             "\"STRESS_I\", \"STRESS_II\", \"STRESS_VONMISES\", "
+             "\"STRESS_XX\", \"STRESS_YY\", \"STRESS_ZZ\", \"STRESS_XY\", \"STRESS_YZ\", \"STRESS_ZX\""
           << endl;
 
     // loop for each element group
@@ -63,6 +64,7 @@ void PostOutputter::OutputElementStress()
             double PrePositionBar[24];
             double PostPositionBar[24];
             double stressBar[48];
+            double cmptStressBar[3];  // cmptStressBar = {stressI, stressII, stress_vonMises};
 
             // Loop for each element
             // Node infos in the present ZONE
