@@ -123,10 +123,10 @@ public:
 
 //!	Print banded and full stiffness matrix for debuging
 	void PrintStiffnessMatrix();
-
+#ifdef _VIB_
 //! Print matrix for mass
 	void PrintMassMatrix();
-
+#endif
 //!	Print address of diagonal elements for debuging
 	void PrintDiagonalAddress();
 

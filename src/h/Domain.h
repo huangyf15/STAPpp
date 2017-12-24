@@ -154,9 +154,10 @@ public:
 //!	Assemble the banded gloabl stiffness matrix
 	void AssembleStiffnessMatrix();
 
+#ifdef _VIB_
 //!	Assemble the banded global mass matrix
 	void AssembleMassMatrix();
-
+#endif
 
 //!	Assemble the global nodal force vector for load case LoadCase
 	bool AssembleForce(unsigned int LoadCase); 
