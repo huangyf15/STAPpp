@@ -35,7 +35,8 @@ class Calculator():
 
         self.fin3 = open(datname + '.3', 'r')
 
-        with open('data/material.json') as f:
+        self.jsonname = os.path.dirname(os.path.abspath(datname)) + os.sep + 'material.json'
+        with open(self.jsonname) as f:
             self.materialInfo = json.load(f)
 
     def loadData(self):
@@ -93,6 +94,7 @@ class Calculator():
         self.loadData()
         self.calc()
         self.output()
+        os.remove(self.jsonname)
 
     def output(self):
         print('%8d %8d' % (1, len(self.forces)),

@@ -254,7 +254,7 @@ void Convert2d23d(const double* k, double* Matrix, const double i[3], const doub
 }
 
 // calculate n, i, j and xe, ye
-inline void Convert3d22d(CNode* const nodes[4], double n[3], double i[3], double j[3], double xe[4],
+void Convert3d22d4Q(CNode* const nodes[4], double n[3], double i[3], double j[3], double xe[4],
                          double ye[4])
 {
     const CNode& n1 = *nodes[0];
@@ -307,7 +307,7 @@ void CQuadrilateral::ElementStiffness(double* Matrix)
 
     // =========================== 3d to 2d ============================
     double n[3], i[3], j[3], xe[4], ye[4];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d4Q(nodes, n, i, j, xe, ye);
 
     // =========================== assembly Ke' =========================
     // generate GN4Q for eta, psi
@@ -418,7 +418,7 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
 {
     // =========================== 3d to 2d ============================
     double n[3], i[3], j[3], xe[4], ye[4];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d4Q(nodes, n, i, j, xe, ye);
 
     // form d first.
     // d represent 3d displacements at boundary nodes.
@@ -481,7 +481,7 @@ void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, doubl
                                      double* PostPositions)
 {
     double n[3], i[3], j[3], xe[4], ye[4];
-    Convert3d22d(nodes, n, i, j, xe, ye);
+    Convert3d22d4Q(nodes, n, i, j, xe, ye);
 
     // form d first.
     // d represent 3d displacements at boundary nodes.
