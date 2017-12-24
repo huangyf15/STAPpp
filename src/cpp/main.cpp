@@ -100,7 +100,6 @@ int main(int argc, char *argv[])
 	Output->OutputElementStress();
 #endif    
 
-#define _POST_
 #ifdef _POST_
 //	Calculate and output infos for post process 
     PostOutput->OutputElementStress();

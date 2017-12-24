@@ -2,7 +2,9 @@
 #include "PostOutputter.h"
 #include "Domain.h"
 #include "SPR8H.h"
+
 #define POINTS_DATA_WIDTH 14
+const double coeff = 107.7;
 
 PostOutputter* PostOutputter::_instance = nullptr;
 
@@ -31,7 +33,6 @@ void PostOutputter::OutputElementStress()
     // The amplification factor coeff
     // Output = InitPosition + coeff * Displacement
     //        = InitPosition + coeff * (FinalPosition - InitPosition);
-    double coeff = 107.7;
 
     CDomain* FEMData = CDomain::Instance();
 
