@@ -41,7 +41,7 @@ void PostOutputter::OutputElementStress()
 
     *this << "TITLE = \" STAPpp FEM \" " << endl
           << "VARIABLES = \"X_POST\", \"Y_POST\", \"Z_POST\", "
-             "\"STRESS_I\", \"STRESS_II\", \"STRESS_VONMISES\", "
+             "\"STRESS_I\", \"STRESS_II\", \"STRESS_III\", \"STRESS_VONMISES\", "
              "\"STRESS_XX\", \"STRESS_YY\", \"STRESS_ZZ\", \"STRESS_XY\", \"STRESS_YZ\", \"STRESS_ZX\""
           << endl;
 
@@ -64,7 +64,7 @@ void PostOutputter::OutputElementStress()
             double PrePositionBar[24];
             double PostPositionBar[24];
             double stressBar[48];
-            double cmptStressBar[3];  // cmptStressBar = {stressI, stressII, stress_vonMises};
+            double cmptStressBar[4];  // cmptStressBar = {stressI, stressII, stressIII, stress_vonMises};
 
             // Loop for each element
             // Node infos in the present ZONE
@@ -86,10 +86,16 @@ void PostOutputter::OutputElementStress()
                     cmptStressBar[1] = stressBar[6 * nodeIndex]*stressBar[6 * nodeIndex + 1] - stressBar[6 * nodeIndex + 3]*stressBar[6 * nodeIndex + 3]
                                      + stressBar[6 * nodeIndex]*stressBar[6 * nodeIndex + 2] - stressBar[6 * nodeIndex + 5]*stressBar[6 * nodeIndex + 5]
                                      + stressBar[6 * nodeIndex + 1]*stressBar[6 * nodeIndex + 2] - stressBar[6 * nodeIndex + 4]*stressBar[6 * nodeIndex + 4];
-                    cmptStressBar[2] = sqrt(cmptStressBar[0]*cmptStressBar[0] - cmptStressBar[1]);
+                    cmptStressBar[2] = stressBar[6 * nodeIndex]*stressBar[6 * nodeIndex + 1]*stressBar[6 * nodeIndex + 2]
+                                     + stressBar[6 * nodeIndex + 3]*stressBar[6 * nodeIndex + 4]*stressBar[6 * nodeIndex + 5]*2
+                                     - stressBar[6 * nodeIndex + 1]*stressBar[6 * nodeIndex + 5]*stressBar[6 * nodeIndex + 5]
+                                     - stressBar[6 * nodeIndex + 2]*stressBar[6 * nodeIndex + 3]*stressBar[6 * nodeIndex + 3]
+                                     - stressBar[6 * nodeIndex + 4]*stressBar[6 * nodeIndex + 4]*stressBar[6 * nodeIndex];
+                    cmptStressBar[3] = sqrt(cmptStressBar[0]*cmptStressBar[0] - cmptStressBar[1]);
                     *this << setw(POINTS_DATA_WIDTH) << cmptStressBar[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStressBar[1]
-                          << setw(POINTS_DATA_WIDTH) << cmptStressBar[2];
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBar[2]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBar[3];
 
                     for (unsigned DegOF = 0; DegOF < 6; DegOF++)
                     {
@@ -117,7 +123,7 @@ void PostOutputter::OutputElementStress()
             double stress4Q[24];
             double PrePosition4Q[12];
             double PostPosition4Q[12];
-            double cmptStress4Q[3];  // cmptStress4Q = {stressI, stressII, stress_vonMises};
+            double cmptStress4Q[4];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -134,10 +140,16 @@ void PostOutputter::OutputElementStress()
                     cmptStress4Q[1] = stress4Q[6 * ni]*stress4Q[6 * ni + 1] - stress4Q[6 * ni + 3]*stress4Q[6 * ni + 3]
                                      + stress4Q[6 * ni]*stress4Q[6 * ni + 2] - stress4Q[6 * ni + 5]*stress4Q[6 * ni + 5]
                                      + stress4Q[6 * ni + 1]*stress4Q[6 * ni + 2] - stress4Q[6 * ni + 4]*stress4Q[6 * ni + 4];
-                    cmptStress4Q[2] = sqrt(cmptStress4Q[0]*cmptStress4Q[0] - cmptStress4Q[1]);
+                    cmptStress4Q[2] = stress4Q[6 * ni]*stress4Q[6 * ni + 1]*stress4Q[6 * ni + 2]
+                                     + stress4Q[6 * ni + 3]*stress4Q[6 * ni + 4]*stress4Q[6 * ni + 5]*2
+                                     - stress4Q[6 * ni + 1]*stress4Q[6 * ni + 5]*stress4Q[6 * ni + 5]
+                                     - stress4Q[6 * ni + 2]*stress4Q[6 * ni + 3]*stress4Q[6 * ni + 3]
+                                     - stress4Q[6 * ni + 4]*stress4Q[6 * ni + 4]*stress4Q[6 * ni];
+                    cmptStress4Q[3] = sqrt(cmptStress4Q[0]*cmptStress4Q[0] - cmptStress4Q[1]);
                     *this << setw(POINTS_DATA_WIDTH) << cmptStress4Q[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStress4Q[1]
-                          << setw(POINTS_DATA_WIDTH) << cmptStress4Q[2];
+                          << setw(POINTS_DATA_WIDTH) << cmptStress4Q[2]
+                          << setw(POINTS_DATA_WIDTH) << cmptStress4Q[3];
 
                     for (unsigned dof = 0; dof < 6; ++dof)
                         *this << setw(POINTS_DATA_WIDTH) << stress4Q[ni * 6 + dof];
@@ -163,7 +175,7 @@ void PostOutputter::OutputElementStress()
             double beamstress[48];
             double prePositionBeam[24];
             double postPositionBeam[24];
-            double cmptStressBeam[3];  // cmptStressBeam = {stressI, stressII, stress_vonMises};
+            double cmptStressBeam[4];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -188,10 +200,16 @@ void PostOutputter::OutputElementStress()
                     cmptStressBeam[1] = beamstress[6 * i]*beamstress[6 * i + 1] - beamstress[6 * i + 3]*beamstress[6 * i + 3]
                                      + beamstress[6 * i]*beamstress[6 * i + 2] - beamstress[6 * i + 5]*beamstress[6 * i + 5]
                                      + beamstress[6 * i + 1]*beamstress[6 * i + 2] - beamstress[6 * i + 4]*beamstress[6 * i + 4];
-                    cmptStressBeam[2] = sqrt(cmptStressBeam[0]*cmptStressBeam[0] - cmptStressBeam[1]);
+                    cmptStressBeam[2] = beamstress[6 * i]*beamstress[6 * i + 1]*beamstress[6 * i + 2]
+                                     + beamstress[6 * i + 3]*beamstress[6 * i + 4]*beamstress[6 * i + 5]*2
+                                     - beamstress[6 * i + 1]*beamstress[6 * i + 5]*beamstress[6 * i + 5]
+                                     - beamstress[6 * i + 2]*beamstress[6 * i + 3]*beamstress[6 * i + 3]
+                                     - beamstress[6 * i + 4]*beamstress[6 * i + 4]*beamstress[6 * i];
+                    cmptStressBeam[3] = sqrt(cmptStressBeam[0]*cmptStressBeam[0] - cmptStressBeam[1]);
                     *this << setw(POINTS_DATA_WIDTH) << cmptStressBeam[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStressBeam[1]
-                          << setw(POINTS_DATA_WIDTH) << cmptStressBeam[2];
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBeam[2]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBeam[3];
 
                     for (unsigned DegOF = 0; DegOF < 6; DegOF++)
                     {
@@ -223,7 +241,7 @@ void PostOutputter::OutputElementStress()
             double stress3T[3];
             double PrePosition3T[9];
             double PostPosition3T[9];
-            double cmptStress3T[3];  // cmptStress3T = {stressI, stressII, stress_vonMises};
+            double cmptStress3T[4];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -239,10 +257,12 @@ void PostOutputter::OutputElementStress()
 
                     cmptStress3T[0] = stress3T[6 * nodeIndex] + stress3T[6 * nodeIndex + 1];
                     cmptStress3T[1] = stress3T[6 * nodeIndex]*stress3T[6 * nodeIndex + 1] - stress3T[6 * nodeIndex + 2]*stress3T[6 * nodeIndex + 2];
-                    cmptStress3T[2] = sqrt(cmptStress3T[0]*cmptStress3T[0] - cmptStress3T[1]);
+					cmptStress3T[2] = sqrt(cmptStress3T[0] * cmptStress3T[0] - cmptStress3T[1]);
+                    cmptStress3T[3] = 0.0;
                     *this << setw(POINTS_DATA_WIDTH) << cmptStress3T[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStress3T[1]
-                          << setw(POINTS_DATA_WIDTH) << cmptStress3T[2];
+                          << setw(POINTS_DATA_WIDTH) << cmptStress3T[2]
+                          << setw(POINTS_DATA_WIDTH) << cmptStress3T[3];
 
                     *this << setw(POINTS_DATA_WIDTH) << stress3T[0] << setw(POINTS_DATA_WIDTH)
                           << stress3T[1] << setw(POINTS_DATA_WIDTH) << 0.0
@@ -268,7 +288,7 @@ void PostOutputter::OutputElementStress()
             double stressHex[48];
             double PrePosition8H[24];
             double Position8H[24];
-            double cmptStress8H[3];  // cmptStress8H = {stressI, stressII, stress_vonMises};
+            double cmptStress8H[4];
             // for SPR
             unsigned int* glo2ET = new unsigned int[NUME * 8];
 
@@ -304,10 +324,16 @@ void PostOutputter::OutputElementStress()
                     cmptStress8H[1] = stressHex[6 * _]*stressHex[6 * _ + 1] - stressHex[6 * _ + 3]*stressHex[6 * _ + 3]
                                      + stressHex[6 * _]*stressHex[6 * _ + 2] - stressHex[6 * _ + 5]*stressHex[6 * _ + 5]
                                      + stressHex[6 * _ + 1]*stressHex[6 * _ + 2] - stressHex[6 * _ + 4]*stressHex[6 * _ + 4];
-                    cmptStress8H[2] = sqrt(cmptStress8H[0]*cmptStress8H[0] - cmptStress8H[1]);
+                    cmptStress8H[2] = stressHex[6 * _]*stressHex[6 * _ + 1]*stressHex[6 * _ + 2]
+                                     + stressHex[6 * _ + 3]*stressHex[6 * _ + 4]*stressHex[6 * _ + 5]*2
+                                     - stressHex[6 * _ + 1]*stressHex[6 * _ + 5]*stressHex[6 * _ + 5]
+                                     - stressHex[6 * _ + 2]*stressHex[6 * _ + 3]*stressHex[6 * _ + 3]
+                                     - stressHex[6 * _ + 4]*stressHex[6 * _ + 4]*stressHex[6 * _];
+                    cmptStress8H[3] = sqrt(cmptStress8H[0]*cmptStress8H[0] - cmptStress8H[1]);
                     *this << setw(POINTS_DATA_WIDTH) << cmptStress8H[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStress8H[1]
-                          << setw(POINTS_DATA_WIDTH) << cmptStress8H[2];
+                          << setw(POINTS_DATA_WIDTH) << cmptStress8H[2]
+                          << setw(POINTS_DATA_WIDTH) << cmptStress8H[3];
 
                     *this << setw(POINTS_DATA_WIDTH) << stressHex[_ * 6 + 0]
                           << setw(POINTS_DATA_WIDTH) << stressHex[_ * 6 + 1]
@@ -345,7 +371,7 @@ void PostOutputter::OutputElementStress()
             double stresses4PE[48];
             double PrePositions4PE[24];
             double Positions4PE[24];
-            double cmptStressPlate[3];  // cmptStressPlate = {stressI, stressII, stress_vonMises};
+            double cmptStressPlate[4];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -367,10 +393,16 @@ void PostOutputter::OutputElementStress()
 					cmptStressPlate[1] = stresses4PE[6 * i] * stresses4PE[6 * i + 1] - stresses4PE[6 * i + 3] * stresses4PE[6 * i + 3]
 						+ stresses4PE[6 * i] * stresses4PE[6 * i + 2] - stresses4PE[6 * i + 5] * stresses4PE[6 * i + 5]
 						+ stresses4PE[6 * i + 1] * stresses4PE[6 * i + 2] - stresses4PE[6 * i + 4] * stresses4PE[6 * i + 4];
+                    cmptStressPlate[2] = stresses4PE[6 * i]*stresses4PE[6 * i + 1]*stresses4PE[6 * i + 2]
+                                     + stresses4PE[6 * i + 3]*stresses4PE[6 * i + 4]*stresses4PE[6 * i + 5]*2
+                                     - stresses4PE[6 * i + 1]*stresses4PE[6 * i + 5]*stresses4PE[6 * i + 5]
+                                     - stresses4PE[6 * i + 2]*stresses4PE[6 * i + 3]*stresses4PE[6 * i + 3]
+                                     - stresses4PE[6 * i + 4]*stresses4PE[6 * i + 4]*stresses4PE[6 * i];
 					cmptStressPlate[2] = sqrt(cmptStressPlate[0] * cmptStressPlate[0] - cmptStressPlate[1]);
 					*this << setw(POINTS_DATA_WIDTH) << cmptStressPlate[0]
 						<< setw(POINTS_DATA_WIDTH) << cmptStressPlate[1]
-						<< setw(POINTS_DATA_WIDTH) << cmptStressPlate[2];
+						<< setw(POINTS_DATA_WIDTH) << cmptStressPlate[2]
+						<< setw(POINTS_DATA_WIDTH) << cmptStressPlate[3];
 
 					*this << setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i]
 						<< setw(POINTS_DATA_WIDTH) << stresses4PE[6 * i + 1]
@@ -398,7 +430,7 @@ void PostOutputter::OutputElementStress()
             double stresses4SE[48];
             double PrePositions4SE[24];
             double Positions4SE[24];
-            double cmptStressShell[3];  // cmptStressShell = {stressI, stressII, stress_vonMises};
+            double cmptStressShell[4];
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -421,10 +453,16 @@ void PostOutputter::OutputElementStress()
 					cmptStressShell[1] = stresses4SE[6 * i] * stresses4SE[6 * i + 1] - stresses4SE[6 * i + 3] * stresses4SE[6 * i + 3]
 						+ stresses4SE[6 * i] * stresses4SE[6 * i + 2] - stresses4SE[6 * i + 5] * stresses4SE[6 * i + 5]
 						+ stresses4SE[6 * i + 1] * stresses4SE[6 * i + 2] - stresses4SE[6 * i + 4] * stresses4SE[6 * i + 4];
-					cmptStressShell[2] = sqrt(cmptStressShell[0] * cmptStressShell[0] - cmptStressShell[1]);
+                    cmptStressShell[2] = stresses4SE[6 * i]*stresses4SE[6 * i + 1]*stresses4SE[6 * i + 2]
+                                     + stresses4SE[6 * i + 3]*stresses4SE[6 * i + 4]*stresses4SE[6 * i + 5]*2
+                                     - stresses4SE[6 * i + 1]*stresses4SE[6 * i + 5]*stresses4SE[6 * i + 5]
+                                     - stresses4SE[6 * i + 2]*stresses4SE[6 * i + 3]*stresses4SE[6 * i + 3]
+                                     - stresses4SE[6 * i + 4]*stresses4SE[6 * i + 4]*stresses4SE[6 * i];
+					cmptStressShell[3] = sqrt(cmptStressShell[0] * cmptStressShell[0] - cmptStressShell[1]);
 					*this << setw(POINTS_DATA_WIDTH) << cmptStressShell[0]
 						<< setw(POINTS_DATA_WIDTH) << cmptStressShell[1]
-						<< setw(POINTS_DATA_WIDTH) << cmptStressShell[2];
+						<< setw(POINTS_DATA_WIDTH) << cmptStressShell[2]
+						<< setw(POINTS_DATA_WIDTH) << cmptStressShell[3];
 
 					*this << setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i]
 						<< setw(POINTS_DATA_WIDTH) << stresses4SE[6 * i + 1]
