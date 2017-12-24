@@ -330,5 +330,3 @@ void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double
 		}
 	}
 }
-
-

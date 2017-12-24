@@ -312,18 +312,20 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
                     (material.a - material.t1 - material.t3) / 12;
     double Ip = Iz + Iy;
 
+	// Define the scale of co-dimension
+	double magCodim = 1E-1;
     r[0][0] = 0;
     r[1][0] = 0;
     r[2][0] = 0;
     r[3][0] = 0;
-    r[0][1] = -0.5 * a;
-    r[1][1] = 0.5 * a;
-    r[2][1] = 0.5 * a;
-    r[3][1] = -0.5 * a;
-    r[0][2] = 0.5 * b;
-    r[1][2] = 0.5 * b;
-    r[2][2] = -0.5 * b;
-    r[3][2] = -0.5 * b;
+    r[0][1] = - magCodim * a;
+    r[1][1] = magCodim * a;
+    r[2][1] = magCodim * a;
+    r[3][1] = -magCodim * a;
+    r[0][2] = magCodim * b;
+    r[1][2] = magCodim * b;
+    r[2][2] = - magCodim * b;
+    r[3][2] = - magCodim * b;
 
     for (unsigned int i = 0; i < 4; i++){
         R[i][0] = n[0][0] * r[i][0] + n[1][0] * r[i][1] + n[2][0] * r[i][2];

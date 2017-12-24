@@ -31,7 +31,7 @@ void PostOutputter::OutputElementStress()
     // The amplification factor coeff
     // Output = InitPosition + coeff * Displacement
     //        = InitPosition + coeff * (FinalPosition - InitPosition);
-    double coeff = 1.0;
+    double coeff = 50.0;
 
     CDomain* FEMData = CDomain::Instance();
 
