@@ -173,6 +173,23 @@ void CDomain::CalculateEquationNumber()
                 }
             }
         }
+		else if (eleType == ElementTypes::Frustum)
+		{
+			const unsigned int NumE = EleGrpList[EleGrp].GetNUME();
+			for (unsigned int NumEle = 0; NumEle < NumE; NumEle++)
+			{
+				const unsigned int NEN = EleGrpList[EleGrp].GetElement(NumEle).GetNEN();
+				CNode** ElementNode = EleGrpList[EleGrp].GetElement(NumEle).GetNodes();
+				for (unsigned int NumNode = 0; NumNode < NEN; NumNode++)
+				{
+					if (!ElementNode[NumNode]->RotationDOFManuallyInputFlag)
+					{
+						const unsigned int N = ElementNode[NumNode]->NodeNumber;
+						NodeList[N - 1].bcode[4] = 0;
+					}
+				}
+			}
+		}
         else if (eleType == ElementTypes::Shell || 
                  eleType == ElementTypes::Plate)
         {
