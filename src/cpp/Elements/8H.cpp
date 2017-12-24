@@ -647,15 +647,20 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 			PrePositions[i+3*j] = nodes[j]->XYZ[i];	 			
 		}
 	}
-
+    double Disp[24];
 	// Get nodal displacements [LM can be used here]
 	for (unsigned int i = 0; i < 24; i++)
 	{
+	
 		if (LocationMatrix[i])
 			//locatiion matrix start from 1 not 0
-			PostPositions[i] = PrePositions[i] + Displacement[LocationMatrix[i]-1];
+
+		{Disp[i] = Displacement[LocationMatrix[i]-1];}
 		else
-			PostPositions[i] = PrePositions[i];
+		{Disp[i] = 0.0;}
+
+		PostPositions[i] = PrePositions[i] + Disp[i];
+
 	}
 
 	// Construct constitutive matrix
@@ -744,12 +749,12 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 		kerB[22] = -GN[2] * invJ[1] - GN[7] * invJ[4] + GN[11] * invJ[7];
 		kerB[23] = -GN[2] * invJ[2] - GN[7] * invJ[5] + GN[11] * invJ[8];
 
-		stressXYZ[0][p] = D[0] * PostPositions[0] * kerB[0] + D[1] * PostPositions[1] * kerB[1] + D[1] * PostPositions[2] * kerB[2] + D[0] * PostPositions[3] * kerB[3] + D[1] * PostPositions[4] * kerB[4] + D[1] * PostPositions[5] * kerB[5] + D[0] * PostPositions[6] * kerB[6] + D[1] * PostPositions[7] * kerB[7] + D[1] * PostPositions[8] * kerB[8] + D[0] * PostPositions[9] * kerB[9] + D[1] * PostPositions[10] * kerB[10] + D[1] * PostPositions[11] * kerB[11] + D[0] * PostPositions[12] * kerB[12] + D[1] * PostPositions[13] * kerB[13] + D[1] * PostPositions[14] * kerB[14] + D[0] * PostPositions[15] * kerB[15] + D[1] * PostPositions[16] * kerB[16] + D[1] * PostPositions[17] * kerB[17] + D[0] * PostPositions[18] * kerB[18] + D[1] * PostPositions[19] * kerB[19] + D[1] * PostPositions[20] * kerB[20] + D[0] * PostPositions[21] * kerB[21] + D[1] * PostPositions[22] * kerB[22] + D[1] * PostPositions[23] * kerB[23];
-		stressXYZ[1][p] = D[1] * PostPositions[0] * kerB[0] + D[0] * PostPositions[1] * kerB[1] + D[1] * PostPositions[2] * kerB[2] + D[1] * PostPositions[3] * kerB[3] + D[0] * PostPositions[4] * kerB[4] + D[1] * PostPositions[5] * kerB[5] + D[1] * PostPositions[6] * kerB[6] + D[0] * PostPositions[7] * kerB[7] + D[1] * PostPositions[8] * kerB[8] + D[1] * PostPositions[9] * kerB[9] + D[0] * PostPositions[10] * kerB[10] + D[1] * PostPositions[11] * kerB[11] + D[1] * PostPositions[12] * kerB[12] + D[0] * PostPositions[13] * kerB[13] + D[1] * PostPositions[14] * kerB[14] + D[1] * PostPositions[15] * kerB[15] + D[0] * PostPositions[16] * kerB[16] + D[1] * PostPositions[17] * kerB[17] + D[1] * PostPositions[18] * kerB[18] + D[0] * PostPositions[19] * kerB[19] + D[1] * PostPositions[20] * kerB[20] + D[1] * PostPositions[21] * kerB[21] + D[0] * PostPositions[22] * kerB[22] + D[1] * PostPositions[23] * kerB[23];
-		stressXYZ[2][p] = D[1] * PostPositions[0] * kerB[0] + D[1] * PostPositions[1] * kerB[1] + D[0] * PostPositions[2] * kerB[2] + D[1] * PostPositions[3] * kerB[3] + D[1] * PostPositions[4] * kerB[4] + D[0] * PostPositions[5] * kerB[5] + D[1] * PostPositions[6] * kerB[6] + D[1] * PostPositions[7] * kerB[7] + D[0] * PostPositions[8] * kerB[8] + D[1] * PostPositions[9] * kerB[9] + D[1] * PostPositions[10] * kerB[10] + D[0] * PostPositions[11] * kerB[11] + D[1] * PostPositions[12] * kerB[12] + D[1] * PostPositions[13] * kerB[13] + D[0] * PostPositions[14] * kerB[14] + D[1] * PostPositions[15] * kerB[15] + D[1] * PostPositions[16] * kerB[16] + D[0] * PostPositions[17] * kerB[17] + D[1] * PostPositions[18] * kerB[18] + D[1] * PostPositions[19] * kerB[19] + D[0] * PostPositions[20] * kerB[20] + D[1] * PostPositions[21] * kerB[21] + D[1] * PostPositions[22] * kerB[22] + D[0] * PostPositions[23] * kerB[23];
-		stressXYZ[3][p] = D[2] * PostPositions[0] * kerB[1] + D[2] * PostPositions[1] * kerB[0] + D[2] * PostPositions[3] * kerB[4] + D[2] * PostPositions[4] * kerB[3] + D[2] * PostPositions[6] * kerB[7] + D[2] * PostPositions[7] * kerB[6] + D[2] * PostPositions[9] * kerB[10] + D[2] * PostPositions[10] * kerB[9] + D[2] * PostPositions[12] * kerB[13] + D[2] * PostPositions[13] * kerB[12] + D[2] * PostPositions[15] * kerB[16] + D[2] * PostPositions[16] * kerB[15] + D[2] * PostPositions[18] * kerB[19] + D[2] * PostPositions[19] * kerB[18] + D[2] * PostPositions[21] * kerB[22] + D[2] * PostPositions[22] * kerB[21];
-		stressXYZ[4][p] = D[2] * PostPositions[1] * kerB[2] + D[2] * PostPositions[2] * kerB[1] + D[2] * PostPositions[4] * kerB[5] + D[2] * PostPositions[5] * kerB[4] + D[2] * PostPositions[7] * kerB[8] + D[2] * PostPositions[8] * kerB[7] + D[2] * PostPositions[10] * kerB[11] + D[2] * PostPositions[11] * kerB[10] + D[2] * PostPositions[13] * kerB[14] + D[2] * PostPositions[14] * kerB[13] + D[2] * PostPositions[16] * kerB[17] + D[2] * PostPositions[17] * kerB[16] + D[2] * PostPositions[19] * kerB[20] + D[2] * PostPositions[20] * kerB[19] + D[2] * PostPositions[22] * kerB[23] + D[2] * PostPositions[23] * kerB[22];
-		stressXYZ[5][p] = D[2] * PostPositions[0] * kerB[2] + D[2] * PostPositions[2] * kerB[0] + D[2] * PostPositions[3] * kerB[5] + D[2] * PostPositions[5] * kerB[3] + D[2] * PostPositions[6] * kerB[8] + D[2] * PostPositions[8] * kerB[6] + D[2] * PostPositions[9] * kerB[11] + D[2] * PostPositions[11] * kerB[9] + D[2] * PostPositions[12] * kerB[14] + D[2] * PostPositions[14] * kerB[12] + D[2] * PostPositions[15] * kerB[17] + D[2] * PostPositions[17] * kerB[15] + D[2] * PostPositions[18] * kerB[20] + D[2] * PostPositions[20] * kerB[18] + D[2] * PostPositions[21] * kerB[23] + D[2] * PostPositions[23] * kerB[21];
+		stressXYZ[0][p] = D[0] * Disp[0] * kerB[0] + D[1] * Disp[1] * kerB[1] + D[1] * Disp[2] * kerB[2] + D[0] * Disp[3] * kerB[3] + D[1] * Disp[4] * kerB[4] + D[1] * Disp[5] * kerB[5] + D[0] * Disp[6] * kerB[6] + D[1] * Disp[7] * kerB[7] + D[1] * Disp[8] * kerB[8] + D[0] * Disp[9] * kerB[9] + D[1] * Disp[10] * kerB[10] + D[1] * Disp[11] * kerB[11] + D[0] * Disp[12] * kerB[12] + D[1] * Disp[13] * kerB[13] + D[1] * Disp[14] * kerB[14] + D[0] * Disp[15] * kerB[15] + D[1] * Disp[16] * kerB[16] + D[1] * Disp[17] * kerB[17] + D[0] * Disp[18] * kerB[18] + D[1] * Disp[19] * kerB[19] + D[1] * Disp[20] * kerB[20] + D[0] * Disp[21] * kerB[21] + D[1] * Disp[22] * kerB[22] + D[1] * Disp[23] * kerB[23];
+		stressXYZ[1][p] = D[1] * Disp[0] * kerB[0] + D[0] * Disp[1] * kerB[1] + D[1] * Disp[2] * kerB[2] + D[1] * Disp[3] * kerB[3] + D[0] * Disp[4] * kerB[4] + D[1] * Disp[5] * kerB[5] + D[1] * Disp[6] * kerB[6] + D[0] * Disp[7] * kerB[7] + D[1] * Disp[8] * kerB[8] + D[1] * Disp[9] * kerB[9] + D[0] * Disp[10] * kerB[10] + D[1] * Disp[11] * kerB[11] + D[1] * Disp[12] * kerB[12] + D[0] * Disp[13] * kerB[13] + D[1] * Disp[14] * kerB[14] + D[1] * Disp[15] * kerB[15] + D[0] * Disp[16] * kerB[16] + D[1] * Disp[17] * kerB[17] + D[1] * Disp[18] * kerB[18] + D[0] * Disp[19] * kerB[19] + D[1] * Disp[20] * kerB[20] + D[1] * Disp[21] * kerB[21] + D[0] * Disp[22] * kerB[22] + D[1] * Disp[23] * kerB[23];
+		stressXYZ[2][p] = D[1] * Disp[0] * kerB[0] + D[1] * Disp[1] * kerB[1] + D[0] * Disp[2] * kerB[2] + D[1] * Disp[3] * kerB[3] + D[1] * Disp[4] * kerB[4] + D[0] * Disp[5] * kerB[5] + D[1] * Disp[6] * kerB[6] + D[1] * Disp[7] * kerB[7] + D[0] * Disp[8] * kerB[8] + D[1] * Disp[9] * kerB[9] + D[1] * Disp[10] * kerB[10] + D[0] * Disp[11] * kerB[11] + D[1] * Disp[12] * kerB[12] + D[1] * Disp[13] * kerB[13] + D[0] * Disp[14] * kerB[14] + D[1] * Disp[15] * kerB[15] + D[1] * Disp[16] * kerB[16] + D[0] * Disp[17] * kerB[17] + D[1] * Disp[18] * kerB[18] + D[1] * Disp[19] * kerB[19] + D[0] * Disp[20] * kerB[20] + D[1] * Disp[21] * kerB[21] + D[1] * Disp[22] * kerB[22] + D[0] * Disp[23] * kerB[23];
+		stressXYZ[3][p] = D[2] * Disp[0] * kerB[1] + D[2] * Disp[1] * kerB[0] + D[2] * Disp[3] * kerB[4] + D[2] * Disp[4] * kerB[3] + D[2] * Disp[6] * kerB[7] + D[2] * Disp[7] * kerB[6] + D[2] * Disp[9] * kerB[10] + D[2] * Disp[10] * kerB[9] + D[2] * Disp[12] * kerB[13] + D[2] * Disp[13] * kerB[12] + D[2] * Disp[15] * kerB[16] + D[2] * Disp[16] * kerB[15] + D[2] * Disp[18] * kerB[19] + D[2] * Disp[19] * kerB[18] + D[2] * Disp[21] * kerB[22] + D[2] * Disp[22] * kerB[21];
+		stressXYZ[4][p] = D[2] * Disp[1] * kerB[2] + D[2] * Disp[2] * kerB[1] + D[2] * Disp[4] * kerB[5] + D[2] * Disp[5] * kerB[4] + D[2] * Disp[7] * kerB[8] + D[2] * Disp[8] * kerB[7] + D[2] * Disp[10] * kerB[11] + D[2] * Disp[11] * kerB[10] + D[2] * Disp[13] * kerB[14] + D[2] * Disp[14] * kerB[13] + D[2] * Disp[16] * kerB[17] + D[2] * Disp[17] * kerB[16] + D[2] * Disp[19] * kerB[20] + D[2] * Disp[20] * kerB[19] + D[2] * Disp[22] * kerB[23] + D[2] * Disp[23] * kerB[22];
+		stressXYZ[5][p] = D[2] * Disp[0] * kerB[2] + D[2] * Disp[2] * kerB[0] + D[2] * Disp[3] * kerB[5] + D[2] * Disp[5] * kerB[3] + D[2] * Disp[6] * kerB[8] + D[2] * Disp[8] * kerB[6] + D[2] * Disp[9] * kerB[11] + D[2] * Disp[11] * kerB[9] + D[2] * Disp[12] * kerB[14] + D[2] * Disp[14] * kerB[12] + D[2] * Disp[15] * kerB[17] + D[2] * Disp[17] * kerB[15] + D[2] * Disp[18] * kerB[20] + D[2] * Disp[20] * kerB[18] + D[2] * Disp[21] * kerB[23] + D[2] * Disp[23] * kerB[21];
 	}
 
 	// stress recovery for stress on nodes
@@ -770,9 +775,8 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 			stress[6 * j + i] = recovery[j];
 		}
 	}
+
 }
 
-void  CHex::ElementPostInfoSPR(double* stress, double* Displacement , double* PrePositions, double* PostPositions)
-{
-	
-}
+
+

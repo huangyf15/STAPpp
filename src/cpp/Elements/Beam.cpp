@@ -280,7 +280,7 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
 
 	for (unsigned int i = 0; i < 3; i++){
 		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
-		L2 = L2 + DX[i]*DX[i];
+		L2 = L2 + DX[i] * DX[i];
 	}
 
     double n[3][3];
@@ -330,6 +330,7 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
         R[i][1] = n[0][1] * r[i][0] + n[1][1] * r[i][1] + n[2][1] * r[i][2];
         R[i][2] = n[0][2] * r[i][0] + n[1][2] * r[i][1] + n[2][2] * r[i][2];
     }    
+
 	for (unsigned int i = 0; i < 3; i++){
 
 		if (LocationMatrix[i]){
@@ -393,7 +394,7 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
     dtheta[0][0] = (phi[1][2] - phi[0][2]) / L;
     dtheta[1][0] = dtheta[0][0];
     dtheta[0][1] = (D[0][2] - D[1][2]) * 6 / L2 - phi[0][1] * 4 / L + phi[1][1] * 2 / L;
-    dtheta[1][1] = (D[1][2] - D[0][2]) * 6 / L2 + phi[0][1] * 2 / L - phi[1][1] * 2 / L;
+    dtheta[1][1] = (D[1][2] - D[0][2]) * 6 / L2 + phi[0][1] * 2 / L - phi[1][1] * 4 / L;
     dtheta[0][2] = (D[1][1] - D[0][1]) * 6 / L2 - phi[0][2] * 4 / L + phi[1][2] * 2 / L;
     dtheta[1][2] = (D[0][1] - D[1][1]) * 6 / L2 + phi[0][2] * 2 / L - phi[1][2] * 4 / L;
 
@@ -403,8 +404,8 @@ void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* pr
     double tau_xz;
 
     sigma1 = material.E * (D[1][0] - D[0][0]) / L;
-    tau_xy = material.E * b / (4 + 4 * material.nu);
-    tau_xz = material.E * a / (4 + 4 * material.nu);
+    tau_xy = material.E * b * dtheta[0][0] / (4 + 4 * material.nu);
+    tau_xz = material.E * a * dtheta[0][0] / (4 + 4 * material.nu);
     for (unsigned int i = 0; i < 2; i++){
         sigma2[i][0] = material.E * a * dtheta[i][2] / 2;
         sigma2[i][1] = material.E * b * dtheta[i][1] / 2;
