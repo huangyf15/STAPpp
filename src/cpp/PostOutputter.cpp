@@ -81,6 +81,14 @@ void PostOutputter::OutputElementStress()
                               << (1 - coeff) * PrePositionBar[3 * nodeIndex + DegOF] +
                                      coeff * PostPositionBar[3 * nodeIndex + DegOF];
                     }
+                    cmptStressBar[0] = stressBar[0] + stressBar[1] + stressBar[2];
+                    cmptStressBar[1] = stressBar[0]*stressBar[1] - stressBar[3]*stressBar[3]
+                                      + stressBar[0]*stressBar[2] - stressBar[5]*stressBar[5]
+                                      + stressBar[1]*stressBar[2] - stressBar[4]*stressBar[4];
+                    cmptStressBar[2] = sqrt(cmptStressBar[0]*cmptStressBar[0] - cmptStressBar[1]);
+                    *this << setw(POINTS_DATA_WIDTH) << cmptStressBar[0]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBar[1]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBar[2];
                     for (unsigned DegOF = 0; DegOF < 6; DegOF++)
                     {
                         *this << setw(POINTS_DATA_WIDTH) << stressBar[6 * nodeIndex + DegOF];
