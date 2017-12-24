@@ -24,6 +24,7 @@
 #include "Elements/TimoshenkoEBMOD.h"
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/Triangle.h"
+#include "Elements/Infinite_4Q.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -42,6 +43,7 @@ enum ElementTypes
     TimoshenkoSRINT = 8,
     TimoshenkoEBMOD = 9,
     T9Q = 10,
+    Infinite = 11
     Frustum = 13
 };
 
@@ -76,7 +78,7 @@ public:
     //! Constructor
     CElementGroup();
 
-    //! Deconstructor
+    //! Destructor
     ~CElementGroup();
 
     //! Read element group data from stream Input

@@ -89,6 +89,9 @@ public:
 //!	Output Frustum Shell element data
 	void PrintFrustumElementData(unsigned int EleGrp);
 
+//!	Output Infinite element data
+	void PrintInfiniteElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 

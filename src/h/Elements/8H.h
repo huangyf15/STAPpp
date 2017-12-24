@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Element.h"
-#include "Eigen/Dense"
+
 
 using namespace std;
 
@@ -41,6 +41,13 @@ public:
 
 //!	Calculate element stress
 	virtual void ElementStress(double* stress, double* Displacement);
+	
+//!	Calculate the values required in the POSTPROCESS 
+	virtual void ElementPostInfo(double* stress, double* Displacement , double* PrePositions, double* PostPositions);
+
+//!	Calculate the values required in the POSTPROCESS SPR 
+	virtual void ElementPostSPR(double* stressG, double* Displacement , double* PrePositions, double* PostPositions, double* PositionG);
+
 
 //!	Return the size of the element stiffness matrix (stored as an array column by column)
 	virtual unsigned int SizeOfStiffnessMatrix();
