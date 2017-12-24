@@ -335,3 +335,7 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
     force[11] = Stfz / len * (EleDisp[11] - EleDisp[5]) - 0.5 * force[3] * len;
     force[10] = Stfz / len * (EleDisp[11] - EleDisp[5]) + 0.5 * force[3] * len;
 }
+
+void CTimoshenkoSRINT::ElementPostInfo(double stress[3], double* Displacement, double* PrePositions, double* PostPositions)
+{
+}
