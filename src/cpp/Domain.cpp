@@ -596,7 +596,7 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 			for (unsigned int j=0; j<NVibModes; ++j){
 				vec_x_n[i+j*numEq] = 0.0;
 				for (unsigned int k=0; k<NVibModes; ++k){
-					vec_x_n[i+j*numEq] += vec_x_n2[i+k*numEq] * eig_vecs[k+j*numEq];
+					vec_x_n[i+j*numEq] += vec_x_n2[i+k*numEq] * eig_vecs[k+j*NVibModes];
 				}
 			}
 		}
