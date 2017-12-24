@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioUserFile ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{AEDA27C1-5EA7-4FE3-B4E3-8E1AD662C335}">
+	<Configurations>
+		<Configuration Name="Debug|Win32" CommandArguments="Job-1.inp" WorkingDirectory="E:\finite_element_homework\STAP90_preprocess"/>
+		<Configuration Name="Release|Win32"/></Configurations></VisualStudioUserFile>

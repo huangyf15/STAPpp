@@ -1,0 +1,91 @@
+
+ a test to STAP90                                                                
+
+ C O N T R O L   I N F O R M A T I O N
+
+      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =     8
+      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =     1
+      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =     1
+      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =     1
+         EQ.0, DATA CHECK
+         EQ.1, EXECUTION
+
+
+ N O D A L   P O I N T   D A T A
+
+  NODE          BOUNDARY                         NODAL POINT
+ NUMBER     CONDITION  CODES                     COORDINATES
+               X    Y    Z   TX   TY   TZ               X            Y            Z
+    1          1    1    1    1    1    1              0.000        0.000        0.000
+    2          0    1    1    1    1    1             20.000        0.000        0.000
+    3          0    1    1    1    1    1             20.000       20.000        0.000
+    4          0    1    1    1    1    1              0.000       20.000        0.000
+    5          0    1    1    1    1    1             10.000        0.000        0.000
+    6          0    1    1    1    1    1             20.000       10.000        0.000
+    7          0    1    1    1    1    1             10.000       20.000        0.000
+    8          1    1    1    1    1    1              0.000       10.000        0.000
+
+
+ EQUATION NUMBERS
+
+   NODE         DEGREES OF FREEDOM
+  NUMBER
+     N             X    Y    Z   TX   TY   TZ
+     1             0    0    0    0    0    0
+     2             1    0    0    0    0    0
+     3             2    0    0    0    0    0
+     4             3    0    0    0    0    0
+     5             4    0    0    0    0    0
+     6             5    0    0    0    0    0
+     7             6    0    0    0    0    0
+     8             0    0    0    0    0    0
+
+
+ L O A D   C A S E   D A T A
+
+     LOAD CASE NUMBER . . . . . . . =     1
+     NUMBER OF CONCENTRATED LOADS . =     2
+
+    NODE       DIRECTION      LOAD
+   NUMBER                   MAGNITUDE
+      2            3       -0.10000E+04
+      3            3       -0.10000E+04
+
+
+ E L E M E N T   G R O U P   D A T A
+
+
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =    9
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, FOUR QUAD ELEMENTS
+     EQ.3, ELEMENTS CURRENTLY
+     EQ.4, NOT AVAILABLE
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S        POISSON
+ NUMBER     MODULUS         RATIO
+               E              v
+    1     0.10000E+11    0.300000E+00
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE     NODE     NODE     NODE     NODE     NODE     NODE       MATERIAL
+ NUMBER-N     I1       I2       I3       I4       I5       I6       I7       I8       SET NUMBER
+    1          1        2        3        4        5        6        7        8           1
+
+
+ TOTAL SYSTEM DATA
+
+     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =     6
+     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =    21
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =     6
+     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     3
