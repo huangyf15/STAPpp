@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <ctime>
 
+
 using namespace std;
 
 //	Output current time and date
@@ -34,6 +35,7 @@ void COutputter::PrintTime(const struct tm* ptm, COutputter &output)
 }
 
 COutputter* COutputter::_instance = nullptr;
+
 
 //	Constructor
 COutputter::COutputter(string FileName)
@@ -427,9 +429,6 @@ void COutputter::PrintTimoshenkoSRINTElementData(unsigned int EleGrp)
 
 	*this << endl;
 }
-	  
-
-
 
 //	Output hexahedron element data
 void COutputter::PrintHexElementData(unsigned int EleGrp)
@@ -878,8 +877,8 @@ void COutputter::OutputElementStress()
 					}
 				}
 				*this << endl;
-
 				break;
+
 			case ElementTypes::Shell:
 				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
 						<< "                       GUASS POINTS STRESSES" << endl;
@@ -907,6 +906,7 @@ void COutputter::OutputElementStress()
 							}
 				}
 				break;
+
 			case ElementTypes::T9Q:
 				*this << "    ELEMENT   GAUSS P           GUASS POINTS POSITIONS"
 					<< "                       GUASS POINTS STRESSES"
@@ -922,7 +922,7 @@ void COutputter::OutputElementStress()
 					static_cast<C9Q&>(
 						EleGrp.GetElement(Ele)).ElementStress(stresses9Q, Displacement, Positions9Q);
 
-					for (unsigned i=0; i<9; ++i) { // four gauss points
+					for (unsigned i=0; i<9; ++i) { // 9 gauss points
 						*this << setw(8) << Ele + 1;
 						*this << setw(10) << i+1;
 						*this << setw(17) << Positions9Q[i*3] << setw(14) << Positions9Q[i*3+1] << setw(14) << Positions9Q[i*3+2];
@@ -931,14 +931,16 @@ void COutputter::OutputElementStress()
 					}
 				}
 				*this << endl;
-
 				break;
+
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
 					<< " has not been implemented.\n\n";
+				break;
 		}
 	}
 }
+
 
 //	Print total system data
 void COutputter::OutputTotalSystemData()
@@ -959,6 +961,8 @@ void COutputter::OutputTotalSystemData()
 		  << endl
 		  << endl;
 }
+
+
 
 #ifdef _DEBUG_
 
@@ -983,7 +987,7 @@ void COutputter::PrintColumnHeights()
 	}
 
 	*this << endl
-		  << endl;
+ 		  << endl;
 }
 
 //	Print address of diagonal elements for debuging

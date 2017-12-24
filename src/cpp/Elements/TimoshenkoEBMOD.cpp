@@ -340,3 +340,7 @@ void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double*
                                     3 * bz / (1 + bz) * (EleDisp[5] + EleDisp[11]) * len +
                                     (2 * EleDisp[5] + 4 * EleDisp[11]) * len);
 }
+
+void CTimoshenkoEBMOD::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+{
+}
