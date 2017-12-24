@@ -189,6 +189,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::T9Q:
 				Print9QElementData(EleGrp);
 				break;
+			case ElementTypes::Infinite:
+				PrintInfiniteElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "OutputElementInfo: unknown ElementType " << ElementType << std::endl;
 				exit(2);

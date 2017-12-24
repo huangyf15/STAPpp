@@ -98,6 +98,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(C9Q);
             MaterialSize_ = sizeof(C9QMaterial);
             break;
+        case ElementTypes::Infinite:
+            ElementSize_ = sizeof(CInfEle);
+            MaterialSize_ = sizeof(CInfEle);
+            break;            
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -139,6 +143,9 @@ void CElementGroup::AllocateElement(std::size_t size)
         case ElementTypes::T9Q:
             ElementList_ = new C9Q[size];
             break;
+        case ElementTypes::Infinite:
+            ElementList_ = new CInfEle[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -178,6 +185,9 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             break;
         case ElementTypes::T9Q:
             MaterialList_ = new C9QMaterial[size];
+            break;
+        case ElementTypes::Infinite:
+            MaterialList_= new CInfiniteMaterial[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not finished yet. See CElementGroup::AllocateMaterial." << std::endl;
