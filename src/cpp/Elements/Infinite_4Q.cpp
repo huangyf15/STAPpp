@@ -101,13 +101,8 @@ void CInfEle::ElementStiffness(double* Matrix)
     double J[2][2];
     double JT[2][2];
     double B[2][4];
-    double Ke[36];
     double D[4];
     double x[4], y[4];
-    for (unsigned i = 0; i < 36; i++)
-    {
-        Ke[i] = 0;
-    }
 
     x[0] = nodes[0]->XYZ[0];
     y[0] = nodes[0]->XYZ[1];
