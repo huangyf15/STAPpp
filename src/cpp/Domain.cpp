@@ -569,8 +569,7 @@ bool CDomain::VibSolver(unsigned int NVibModes){
 			}
 		}
 		//LAPACKE_dpotrf(LAPACK_COL_MAJOR, 'U', ord,M_reduced, ord);
-		int test = LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1, 'V', 'U', ord, K_reduced, M_reduced, lambdas_n, eig_vecs, ord);
-		if (test)
+		if (LAPACKE_dspgvd(LAPACK_COL_MAJOR, 1,'V','U',ord,K_reduced,M_reduced,lambdas_n,eig_vecs,ord))
 			return false;
 		for (unsigned int i=0; i<numEq; ++i){
 			for (unsigned int j=0; j<NVibModes; ++j){

@@ -67,19 +67,23 @@ int main(int argc, char *argv[])
     Solver->LDLT();
 #endif
 
-#ifdef _VIB_
-	FEMData->AssembleMassMatrix();
-
-	if (!FEMData->VibSolver(FEMData->GetNumEig())){
-	    exit(9);
-		cout<< "ERROR: MKL SOLVER FAILED FOR SINGULARITY OR SOMETHING ELSE"<<endl;
-	}
-#endif
 
     COutputter* Output = COutputter::Instance();
 
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
+#endif
+#ifdef _VIB_
+	FEMData->AssembleMassMatrix();
+
+#ifdef _DEBUG_
+	Output->PrintMassMatrix();
+#endif
+
+	if (!FEMData->VibSolver(FEMData->GetNumEig())){
+	    exit(9);
+		cout<< "ERROR: MKL SOLVER FAILED FOR SINGULARITY OR SOMETHING ELSE"<<endl;
+	}
 #endif
 
 //  Loop over for all load cases

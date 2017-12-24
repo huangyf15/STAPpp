@@ -160,6 +160,7 @@ void CSRSolver::solve(double* Force, unsigned NLCase)
 #endif
 
 #ifdef _VIB_
+//! only to be used before LDLT() factorization
 void CLDLTSolver::Multiple(double* acc,double* force,unsigned int numeq,unsigned int vib_m){
 	unsigned int* diag = K.GetDiagonalAddress();
     unsigned int* colh = K.GetColumnHeights();

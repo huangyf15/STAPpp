@@ -1066,6 +1066,58 @@ void COutputter::PrintStiffnessMatrix()
 	*this << endl;
 }
 
+#ifdef _VIB_
+void COutputter::PrintMassMatrix()
+{
+	*this << "*** _Debug_ *** Banded mass matrix" << endl;
+
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double>& MassMatrix = FEMData->GetMassMatrix();
+	unsigned int* DiagonalAddress = MassMatrix.GetDiagonalAddress();
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
+	{
+		*this << setw(14) << MassMatrix(i);
+
+		if ((i + 1) % 6 == 0)
+		{
+			*this << endl;
+		}
+	}
+
+	*this << endl
+		  << endl;
+
+	*this << "*** _Debug_ *** Full mass matrix" << endl;
+
+	for (unsigned I = 1; I <= NEQ; I++)
+	{
+		for (unsigned J = 1; J <= NEQ; J++)
+		{
+            int i, j;
+            i = std::min(I, J);
+            j = std::max(I, J);
+			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			if (j - i - H >= 0)
+			{
+				*this << setw(14) << 0.0;
+			}
+			else
+			{
+				*this << setw(14) << MassMatrix(i, j);
+			}
+		}
+
+		*this << endl;
+	}
+	*this << endl;
+}
+#endif
+
 //	Print displacement vector for debuging
 void COutputter::PrintDisplacement(unsigned int loadcase)
 {

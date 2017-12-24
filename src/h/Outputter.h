@@ -124,6 +124,9 @@ public:
 //!	Print banded and full stiffness matrix for debuging
 	void PrintStiffnessMatrix();
 
+//! Print matrix for mass
+	void PrintMassMatrix();
+
 //!	Print address of diagonal elements for debuging
 	void PrintDiagonalAddress();
 

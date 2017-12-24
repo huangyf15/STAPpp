@@ -219,5 +219,8 @@ public:
 	bool ReadVibNum();
 
 	inline unsigned int GetNumEig() {return numEig;}
+
+	CSkylineMatrix<double>& GetMassMatrix() { return *MassMatrix; }
+
 #endif
 };
