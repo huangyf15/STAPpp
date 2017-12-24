@@ -81,10 +81,10 @@ void PostOutputter::OutputElementStress()
                               << (1 - coeff) * PrePositionBar[3 * nodeIndex + DegOF] +
                                      coeff * PostPositionBar[3 * nodeIndex + DegOF];
                     }
-                    cmptStressBar[0] = stressBar[0] + stressBar[1] + stressBar[2];
-                    cmptStressBar[1] = stressBar[0]*stressBar[1] - stressBar[3]*stressBar[3]
-                                      + stressBar[0]*stressBar[2] - stressBar[5]*stressBar[5]
-                                      + stressBar[1]*stressBar[2] - stressBar[4]*stressBar[4];
+                    cmptStressBar[0] = stressBar[6 * nodeIndex] + stressBar[6 * nodeIndex + 1] + stressBar[6 * nodeIndex + 2];
+                    cmptStressBar[1] = stressBar[6 * nodeIndex]*stressBar[6 * nodeIndex + 1] - stressBar[6 * nodeIndex + 3]*stressBar[6 * nodeIndex + 3]
+                                     + stressBar[6 * nodeIndex]*stressBar[6 * nodeIndex + 2] - stressBar[6 * nodeIndex + 5]*stressBar[6 * nodeIndex + 5]
+                                     + stressBar[6 * nodeIndex + 1]*stressBar[6 * nodeIndex + 2] - stressBar[6 * nodeIndex + 4]*stressBar[6 * nodeIndex + 4];
                     cmptStressBar[2] = sqrt(cmptStressBar[0]*cmptStressBar[0] - cmptStressBar[1]);
                     *this << setw(POINTS_DATA_WIDTH) << cmptStressBar[0]
                           << setw(POINTS_DATA_WIDTH) << cmptStressBar[1]
@@ -150,6 +150,7 @@ void PostOutputter::OutputElementStress()
             double beamstress[48];
             double prePositionBeam[24];
             double postPositionBeam[24];
+            double cmptStressBeam[3];  // cmptStressBeam = {stressI, stressII, stress_vonMises};
 
             for (unsigned int Ele = 0; Ele < NUME; Ele++)
             {
@@ -169,6 +170,15 @@ void PostOutputter::OutputElementStress()
                               << (1 - coeff) * prePositionBeam[3 * i + DegOF] +
                                      coeff * postPositionBeam[3 * i + DegOF];
                     }
+
+                    cmptStressBeam[0] = beamstress[6 * i] + beamstress[6 * i + 1] + beamstress[6 * i + 2];
+                    cmptStressBeam[1] = beamstress[6 * i]*beamstress[6 * i + 1] - beamstress[6 * i + 3]*beamstress[6 * i + 3]
+                                     + beamstress[6 * i]*beamstress[6 * i + 2] - beamstress[6 * i + 5]*beamstress[6 * i + 5]
+                                     + beamstress[6 * i + 1]*beamstress[6 * i + 2] - beamstress[6 * i + 4]*beamstress[6 * i + 4];
+                    cmptStressBeam[2] = sqrt(cmptStressBeam[0]*cmptStressBeam[0] - cmptStressBeam[1]);
+                    *this << setw(POINTS_DATA_WIDTH) << cmptStressBeam[0]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBeam[1]
+                          << setw(POINTS_DATA_WIDTH) << cmptStressBeam[2];
 
                     for (unsigned DegOF = 0; DegOF < 6; DegOF++)
                     {
