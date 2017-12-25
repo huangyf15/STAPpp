@@ -13,13 +13,14 @@
 
 #include "Domain.h"
 #include "Outputter.h"
+#include "PostOutputter.h"
 #include "Clock.h"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2) //  Print help message
+	if (argc < 2) //  Print help message
 	{
 	    cout << "Usage: stap++ InputFileName\n";
 		exit(1);
@@ -31,6 +32,7 @@ int main(int argc, char *argv[])
     }
 	string InFile = filename + ".dat";
 	string OutFile = filename + ".out";
+	string PostFile = filename + "_post.dat";
 
 	CDomain* FEMData = CDomain::Instance();
 
@@ -70,6 +72,8 @@ int main(int argc, char *argv[])
 
     COutputter* Output = COutputter::Instance();
 
+	PostOutputter* PostOutput = PostOutputter::Instance(PostFile);
+
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
 #endif
@@ -95,7 +99,7 @@ int main(int argc, char *argv[])
         Solver->BackSubstitution(FEMData->GetForce());
 #endif
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
         Output->PrintDisplacement(lcase);
 #endif
 
@@ -107,11 +111,15 @@ int main(int argc, char *argv[])
 #endif
     double time_solution = timer.ElapsedTime();
 
-//  Calculate and output stresses of all elements
-
 #ifndef _RUN_
+//  Calculate and output stresses of all elements
 	Output->OutputElementStress();
 #endif    
+
+#ifdef _POST_
+//	Calculate and output infos for post process 
+    PostOutput->OutputElementStress();
+#endif
 
     double time_stress = timer.ElapsedTime();
     

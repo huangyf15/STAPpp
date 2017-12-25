@@ -340,3 +340,6 @@ void CTimoshenkoSRINT::ElementStress(double stress[3], double force[12], double*
 void CTimoshenkoSRINT::ElementMass(double* mass) {
 }
 #endif
+void CTimoshenkoSRINT::ElementPostInfo(double stress[3], double* Displacement, double* PrePositions, double* PostPositions)
+{
+}

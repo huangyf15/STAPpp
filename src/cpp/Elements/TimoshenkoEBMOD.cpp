@@ -345,3 +345,6 @@ void CTimoshenkoEBMOD::ElementStress(double stress[3], double force[12], double*
 void CTimoshenkoEBMOD::ElementMass(double* mass) {
 }
 #endif
+void CTimoshenkoEBMOD::ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions)
+{
+}

@@ -11,7 +11,9 @@
 #include "Domain.h"
 #include "Material.h"
 #include <Eigen/Dense>
+#ifdef _VIB_
 #include "mkl.h"
+#endif
 #include <cmath>
 
 using namespace std;
