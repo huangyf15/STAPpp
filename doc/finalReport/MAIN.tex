@@ -25,13 +25,31 @@
 \numberwithin{equation}{section}        % 将公式按节编号
 
 \title{\textbf{Report for STAPpp in FEM}}
-\author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;卢晟昊\;管唯宇\;杨正宇}}
+\author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;管唯宇\;杨正宇\;卢晟昊}}
 
 \begin{document}
 %    \CTEXspace                  % 排版风格选项：使用CJK的保留空格模式
     \maketitle
 \section{Problem Description}
-    算一座桥，自由度从几千到几百万不等。
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=4.0 in]{Problem.eps}\\
+      \caption{Problem}\label{fig:Problem}
+    \end{figure}
+    其中，桥梁算例的具体描述如下：
+    
+   \begin{center}
+    \begin{tabular}{c|c|c|c|c|c|c|c}
+      \hline
+      算例序号 & 节点总数 & 单元总数 & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} & 应变能 \\
+      \hline
+      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 & 6.76E7 \\
+      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 & 6.89E7 \\
+      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 & 7.54E7 \\
+      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 &  $\backslash$ \\
+      \hline
+    \end{tabular}
+   \end{center}
 
 \section{Framework of STAPpp}
 \subsection{Preprocessing}
@@ -44,9 +62,9 @@
     \input{process/postprocessing.tex}
 
 \section{Basic elements}
-    Note. In this section, the elements used in the bridge test are introduced.
+    这一节着重介绍在桥梁算例中使用的各种单元类型。
 \subsection{Bar}
-    略*3~\cite{1}
+    略。
 \subsection{8H}
     \input{elements/8H.tex}
 \subsection{Euler-Bernoulli Beam}
@@ -79,7 +97,8 @@
     \input{features/infinite.tex}
 
 \section{Acknowledgement}
-    Thank the other teams for their enhancing our confidence. (￣┰￣*)
+    感谢我们每一位组员的努力付出，也感谢老师和助教的耐心答疑，同时也感谢与我们积极讨论的其他各组的同学们！
+
 \appendix
 \section{Input file format}
     \input{appendix/inputfile.tex}
