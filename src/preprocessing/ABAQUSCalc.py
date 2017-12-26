@@ -35,7 +35,9 @@ class Calculator():
 
         self.fin3 = open(datname + '.3', 'r')
 
-        with open('data/material.json') as f:
+        self.jsonname = os.path.dirname(
+            os.path.abspath(datname)) + os.sep + 'material.json'
+        with open(self.jsonname) as f:
             self.materialInfo = json.load(f)
 
     def loadData(self):
@@ -93,6 +95,7 @@ class Calculator():
         self.loadData()
         self.calc()
         self.output()
+        os.remove(self.jsonname)
 
     def output(self):
         print('%8d %8d' % (1, len(self.forces)),
@@ -178,7 +181,7 @@ def getGaussIntegrateFor4Q(element, nodes, c):
     s = np.array([0.0 for i in range(4)])
     for i in b:
         for j in b:
-            s += (getGaussIntegrateFor4QAtPos((i, j), w) * 4)
+            s += getGaussIntegrateFor4QAtPos((i, j), w)
 
     return {element.nodesIndexs[i]: s[i] * c for i in range(4)}
 
@@ -268,7 +271,21 @@ def getGaussIntegrateFor8HAtPos(pos, w):
 
 
 def main():
-    Calculator('data/Job-1').run()
+    # Calculator('data/Job-1').run()
+    a = 1 / math.sqrt(3.)
+    res = np.array([0.0 for _ in range(4)])
+    for i in (-a, a):
+        for j in (-a, a):
+            res += getGaussIntegrateFor4QAtPos(
+                (i, j),
+                np.array([
+                    [-1, -1],
+                    [2, -1],
+                    [2, 1],
+                    [-1, 1]
+                ])
+            )
+            print(res)
 
 
 if __name__ == '__main__':

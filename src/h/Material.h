@@ -89,6 +89,21 @@ public:
 	virtual void Write(COutputter& output, unsigned int mset);
 };
 
+class C9QMaterial : public CMaterial
+{
+public:
+
+	double nu; // Poisson's ratio
+
+public:
+	
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
+};
+
 class CHexMaterial : public CMaterial
 {
 public:
@@ -185,4 +200,20 @@ public:
 
     //!	Write material data to Stream
     virtual void Write(COutputter& output, unsigned int mset);
+};
+
+//!	Material class for Quadrilateral element
+class CInfiniteMaterial : public CMaterial
+{
+public:
+
+	double nu; // Poisson's ratio
+
+public:
+	
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input, unsigned int mset);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output, unsigned int mset);
 };

@@ -17,6 +17,7 @@
 #include <fstream>
 #include <climits>
 #include <cmath>
+#include <cfloat>
 
 #include "Node.h"
 #include "Material.h"
@@ -87,6 +88,9 @@ public:
 
 //!	Calculate element stress 
 	virtual void ElementStress(double* stress, double* Displacement){};
+
+//!	Calculate the values required in the POSTPROCESS 
+	virtual void ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions){};
 
 //!	Return nodes of the element
 	inline CNode** GetNodes() { return nodes; }

@@ -17,6 +17,21 @@ IF(STAP++_RUN)
     ADD_DEFINITIONS(-D_RUN_)
 ENDIF()
 
+OPTION(STAP++_POST "Output postprocess info at running" OFF)
+IF(STAP++_POST)
+    ADD_DEFINITIONS(-D_POST_)
+ENDIF()
+
+OPTION(STAP++_SPR "Do SPR for 8H in postprocessing. (unfinished)" OFF)
+IF(STAP++_SPR)
+    ADD_DEFINITIONS(-DSPR)
+ENDIF()
+
+OPTION(STAP++_TIMOSHENKO_ACCURATE_INTEGRATION "Use accurate integration in stiffness matrix calculation of TimoshenkoSRINT elements." OFF)
+IF(STAP++_TIMOSHENKO_ACCURATE_INTEGRATION)
+    ADD_DEFINITIONS(-D_TIMOSHENKO_ACCURATE_INTEGRATION_)
+ENDIF()
+
 OPTION(USE_MKL "Use MKL PARDISO solver instead of LDLT solver." OFF)
 IF(USE_MKL)
     ADD_DEFINITIONS(-DMKL)

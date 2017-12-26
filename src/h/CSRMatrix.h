@@ -43,7 +43,9 @@ public:
     void beginPostionMark()
     {
         // _tempColumns = std::set[size]
-        _tempColumns = new STL_t[size];
+
+        _tempColumns = new STL_t[size] ;
+
     }
 
     void markPosition(int row, int column)
@@ -133,7 +135,7 @@ public:
     }
 };
 
-template <typename T> std::ostream& operator<<(std::ostream& out, CSRMatrix<T> mat)
+template <typename T> std::ostream& operator<<(std::ostream& out, const CSRMatrix<T>& mat)
 {
     out << "CSR Matrix, size = " << mat.size << std::endl;
     out << "values = " << std::endl << "(";

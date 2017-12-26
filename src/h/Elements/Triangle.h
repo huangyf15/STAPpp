@@ -43,6 +43,9 @@ public:
                                double* GaussPosition = nullptr,
                                double* GaussDisplacements = nullptr, double* weights = nullptr);
 
+	//!	Calculate the values required in the POSTPROCESS 
+	virtual void ElementPostInfo(double* stress, double* Displacement, double* PrePositions, double* PostPositions);
+
     //!	Return the size of the element stiffness matrix (stored as an array column by column)
     virtual unsigned int SizeOfStiffnessMatrix();
 };
