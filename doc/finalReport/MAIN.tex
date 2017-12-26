@@ -1,5 +1,5 @@
 %\documentclass{ctexart}
-\documentclass[hyperref]{article}                 % 设定文档类型
+\documentclass[hyperref]{article}       % 设定文档类型（含超链接）
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
@@ -8,9 +8,13 @@
                                         % 使用AMSLaTeX宏包，用来排出更加漂亮的公式
 \usepackage{bm}                         % 用于加粗
 \usepackage{graphicx}                   % 用于插入图形
-\usepackage{subfig}                     % 用于插入子图 subfloat
-\usepackage{caption}                    % 设置图形标题格式
+\usepackage{subfig}                     % 用于插入子图
+\usepackage{caption}                    % 用于设置图形标题格式
+\usepackage{multicol}                   % 用于实现在同一页中实现不同的分栏
+\usepackage{geometry}                   % 用于设置页边距
 \usepackage{lipsum}                     % 产生随机文本
+
+\geometry{a4paper,left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}
 
 \newtheorem{Def}{Definition}[section]   % --------begin---------
 \newtheorem{Thm}{Theorem}[section]      % 以下用于定理等引语设置
@@ -33,23 +37,23 @@
 \section{问题描述}
     \begin{figure}[!htbp]
       \centering
-      \includegraphics[width=4.0 in]{Problem.eps}\\
+      \includegraphics[width=4.5 in]{Problem.eps}\\
       \caption{Problem}\label{fig:Problem}
     \end{figure}
-    其中，桥梁算例的具体描述如下：
 
-   \begin{center}
-    \begin{tabular}{c|c|c|c|c|c|c|c}
+    算例的具体描述与测试结果如下~$^[$\footnote{环境：CPU:\;intel xeon cpu e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;Ox~优化．}$^]$：
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c|c|c|c|c}
       \hline
-      算例序号 & 节点总数 & 单元总数 & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} & 应变能 \\
+      算例 & \textit{NumNode} & \textit{NumEle} & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} & $t_{min}/s$  & $RAM_{min}/M$ \\
       \hline
-      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 & 6.76E7 \\
-      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 & 6.89E7 \\
-      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 & 7.54E7 \\
-      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 &  $\backslash$ \\
+      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 & 0.27 & $\backslash$ \\
+      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 & 2.35 & $\backslash$ \\
+      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 & $25.0_{~6244M}$ & $1385_{~132.63s}$ \\
+      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 & ? & ? \\
       \hline
     \end{tabular}
-   \end{center}
+    \end{center}
 
 \section{STAPpp~程序框架}
 \subsection{前处理模块}
@@ -106,7 +110,7 @@
     \input{appendix/postfile.tex}
 \section{优化思路简述}
     \input{appendix/opt.tex}
-\section{任务分工列表}
+\section{小组合作清单}
     \input{appendix/assignment.tex}
 
 \begin{thebibliography}{99}
