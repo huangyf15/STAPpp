@@ -183,7 +183,7 @@ void CHex::ElementPostSPR(double* stressG, double* Displacement, double* PrePosi
 }
 
 void StressSPR(double* stress_SPR, double* stressG, double* PrePositions, double* PositionG,
-               uint* Ele_NodeNumber, uint NUME, uint NUMNP)
+	unsigned int* Ele_NodeNumber, unsigned int NUME, unsigned int NUMNP)
 {
     uint* NNE = new uint[NUMNP];     // number of neibourhood elements
     s_uint* CNT = new s_uint[NUMNP]; // how many times the stress of the node has been calculated

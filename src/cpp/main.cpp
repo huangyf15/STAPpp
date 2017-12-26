@@ -71,7 +71,9 @@ int main(int argc, char *argv[])
 
     COutputter* Output = COutputter::Instance();
 
+#ifdef _POST_
 	PostOutputter* PostOutput = PostOutputter::Instance(PostFile);
+#endif
 
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
