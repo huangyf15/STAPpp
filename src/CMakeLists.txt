@@ -22,7 +22,7 @@ IF(STAP++_POST)
     ADD_DEFINITIONS(-D_POST_)
 ENDIF()
 
-OPTION(STAP++_SPR "Do SPR for 8H in postprocessing. (unfinished)" OFF)
+OPTION(STAP++_SPR "Do SPR for 8H in postprocessing." OFF)
 IF(STAP++_SPR)
     ADD_DEFINITIONS(-DSPR)
 ENDIF()
