@@ -891,6 +891,10 @@ void CPlate::ElementStress(double* stress, double* Displacement, double* positio
     position[11] = zmid;
 }
 
+#ifdef _VIB_
+void CPlate::ElementMass(double* mass) {
+}
+#endif
 void CPlate::ElementPostInfo(double* stress2, double* Displacement, double* Positions4PE, double* PostPositions)
 {
     CPlateMaterial* material =

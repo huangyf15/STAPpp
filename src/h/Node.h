@@ -59,4 +59,8 @@ public:
 //!	Write nodal displacement
 	void WriteNodalDisplacement(COutputter& OutputFile, unsigned int np, double* Displacement);
 
+#ifdef _VIB_
+	void WriteVibrationDisplacement(COutputter& OutputFile, unsigned int np, double* Displacement);
+
+#endif
 };

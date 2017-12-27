@@ -150,3 +150,25 @@ void CNode::WriteNodalDisplacement(COutputter& output, unsigned int np, double* 
 
 	output << endl;
 }
+
+#ifdef _VIB_
+void CNode::WriteVibrationDisplacement(COutputter& output, unsigned int np, double* Displacement)
+{
+	output << setw(5) << np + 1 << "        ";
+
+	for (unsigned int j = 0; j < NDF; j++)
+	{
+		if (bcode[j] == 0)
+		{
+			output << setw(18) << 0.0;
+		}
+		else
+		{
+			output << setw(18) << Displacement[bcode[j] - 1];
+		}
+	}
+
+	output << endl;
+}
+
+#endif

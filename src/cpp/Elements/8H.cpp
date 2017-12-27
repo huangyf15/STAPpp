@@ -637,6 +637,12 @@ void CHex::ElementStress(double* stressHex, double* Displacement)
 }
 
 
+#ifdef _VIB_
+void CHex::ElementMass(double* mass) {
+}
+#endif
+
+
 void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePositions, double* PostPositions)
 {
 	// get original position: preposition
@@ -777,6 +783,7 @@ void  CHex::ElementPostInfo(double* stress, double* Displacement , double* PrePo
 	}
 
 }
+
 
 
 
