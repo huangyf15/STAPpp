@@ -1,5 +1,5 @@
 %\documentclass{ctexart}
-\documentclass[hyperref]{article}       % 设定文档类型（含超链接）
+\documentclass[hyperref]{report}       % 设定文档类型（含超链接）
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
@@ -28,13 +28,16 @@
 \newtheorem{Prf}{Proof}[section]        % ---------end----------
 \numberwithin{equation}{section}        % 将公式按节编号
 
-\title{\textbf{有限元大作业报告暨~STAPpp~程序说明文档}}
+\title{\textbf{有限元大作业报告} \protect\\ \textbf{暨~STAPpp~程序说明文档}}
 \author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;管唯宇\;杨正宇\;卢晟昊}}
 
 \begin{document}
-%    \CTEXspace                  % 排版风格选项：使用CJK的保留空格模式
-    \maketitle
-\section{问题描述}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{问题描述}
     \begin{figure}[!htbp]
       \centering
       \includegraphics[width=4.5 in]{Problem.eps}\\
@@ -55,64 +58,63 @@
     \end{tabular}
     \end{center}
 
-\section{STAPpp~程序框架}
-\subsection{前处理模块}
+\chapter{STAPpp~程序框架}
+\section{前处理模块}
     \input{process/preprocessing.tex}
-\subsection{单元刚度阵组装}
+\section{单元刚度阵组装}
     \input{process/formation.tex}
-\subsection{求解器设计}
+\section{求解器设计}
     \input{process/solver.tex}
-\subsection{后处理模块}
+\section{后处理模块}
     \input{process/postprocessing.tex}
 
-\section{基本单元}
-    这一节着重介绍在桥梁算例中使用的各种单元类型。
-\subsection{Bar~杆单元}
+\chapter{基本单元}
+    这一章着重介绍在桥梁算例中使用的各种单元类型。
+\section{Bar~杆单元}
     略。
-\subsection{8H~实体单元}
+\section{8H~实体单元}
     \input{elements/8H.tex}
-\subsection{Euler-Bernoullil~梁单元}
+\section{Euler-Bernoullil~梁单元}
     \input{elements/beam.tex}
-\subsection{平板壳单元}
+\section{平板壳单元}
     \input{elements/shell.tex}
 
-\section{新增单元}
-\subsection{3T~平面单元}
+\chapter{新增单元}
+\section{3T~平面单元}
     \input{elements/3T.tex}
-\subsection{4Q,~9Q~平面单元}
+\section{4Q,~9Q~平面单元}
     \input{elements/4Q.tex}
-\subsection{Timoshenko~梁单元}
+\section{Timoshenko~梁单元}
     \input{elements/Timobeam.tex}
-\subsection{薄板单元}
+\section{薄板单元}
     \input{elements/plate.tex}
-\subsection{截锥壳单元}
+\section{截锥壳单元}
     \input{elements/frustum.tex}
 
-\section{扩展功能}
-\subsection{稀疏求解器}
+\chapter{扩展功能}
+\section{稀疏求解器}
     \input{features/sparse.tex}
-\subsection{模态分析}
+\section{模态分析}
     \input{features/modal.tex}
-\subsection{分片应力恢复~(SPR)}
+\section{分片应力恢复~(SPR)}
     \input{features/SPR.tex}
-\subsection{无限单元}
+\section{无限单元}
     \input{features/infinite.tex}
-\subsection{过渡单元}
+\section{过渡单元}
     \input{features/transition.tex}
 
-\section{致谢}
+\chapter{致谢}
     感谢张老师和宋言学长在整个项目完成工作中对本组全组同学的耐心指导，也感谢在部分任务中其余组的部分同学与本组同学的积极讨论与互相扶持！最要感谢的，是我们组里的每一位同学，感谢大家一直以来的不懈努力以及团队所有成员的通力合作！
 
 \appendix
+\chapter{输入输出文件格式}
 \section{输入文件格式}
     \input{appendix/inputfile.tex}
 \section{输出文件格式~(后处理用)}
     \input{appendix/postfile.tex}
-\section{优化思路简述}
+\chapter{优化思路简述}
     \input{appendix/opt.tex}
-
-\newpage
-\section{小组合作清单}
+\chapter{小组合作清单}
     \input{appendix/assignment.tex}
 
 \begin{thebibliography}{99}
