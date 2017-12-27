@@ -128,26 +128,28 @@ public:
 
     void trim()
     {
+        std::cout << "rowIndexs[size] = " << rowIndexs[size] << std::endl;
         int* newRowIndexs = new int[size + 1];
         newRowIndexs[0] = 1;
-        int to = 0;
+        int to = 1;
         for (int column = 0; column < size; column++)
         {
-            for (int from = rowIndexs[column] - 1; from < rowIndexs[column + 1] - 1; from++)
+            for (int from = rowIndexs[column]; from < rowIndexs[column + 1]; from++)
             {
-                if (values[from] != 0.0f)
+                if (values[from - 1] != 0.0f)
                 {
-                    values[to] = values[from];
-                    columns[to] = columns[from];
+                    values[to - 1] = values[from - 1];
+                    columns[to - 1] = columns[from - 1];
                     to++;
                 }
             }
-            newRowIndexs[column + 1] = to + 1;
+            newRowIndexs[column + 1] = to;
         }
         for (int column = 0; column < size; column++)
         {
             rowIndexs[column + 1] = newRowIndexs[column + 1];
         }
+        std::cout << "newRowIndexs[size] = " << newRowIndexs[size] << std::endl;
         delete[] newRowIndexs;
     }
 

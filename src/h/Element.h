@@ -23,6 +23,7 @@
 #include "Material.h"
 #include "SkylineMatrix.h"
 #include "CSRMatrix.h"
+#include "stdafx.h"
 
 using namespace std;
 

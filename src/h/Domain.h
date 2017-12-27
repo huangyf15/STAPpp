@@ -26,11 +26,9 @@
 #include "LoadCaseData.h"
 #include "SkylineMatrix.h"
 #include "CSRMatrix.h"
+#include "stdafx.h"
 
 using namespace std;
-
-//!	Clear an array
-template <class type> void clear( type* a, unsigned int N );
 
 //!	Domain class : Define the problem domain
 /*!	Only a single instance of Domain class can be created */
