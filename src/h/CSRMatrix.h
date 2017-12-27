@@ -1,9 +1,9 @@
 #pragma once
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 #include <set>
-#include <algorithm>
+#include <vector>
 
 #include "SparseMatrix.h"
 
@@ -44,8 +44,7 @@ public:
     {
         // _tempColumns = std::set[size]
 
-        _tempColumns = new STL_t[size] ;
-
+        _tempColumns = new STL_t[size];
     }
 
     void markPosition(int row, int column)
@@ -56,14 +55,14 @@ public:
 
     void allocate()
     {
-        #ifdef CSR_USE_VECTOR
+#ifdef CSR_USE_VECTOR
         for (int row = 0; row < size; ++row)
         {
             std::vector<int>& v = _tempColumns[row];
             std::sort(v.begin(), v.end());
             v.erase(std::unique(v.begin(), v.end()), v.end());
         }
-        #endif
+#endif
         // first, calculate row indexs. Notice row index starts from 1
         rowIndexs[0] = 1;
         for (int row = 0; row < size; ++row)
@@ -126,6 +125,31 @@ public:
     }
 
     int dim() const { return size; }
+
+    void trim()
+    {
+        int* newRowIndexs = new int[size + 1];
+        newRowIndexs[0] = 1;
+        int to = 0;
+        for (int column = 0; column < size; column++)
+        {
+            for (int from = rowIndexs[column] - 1; from < rowIndexs[column + 1] - 1; from++)
+            {
+                if (values[from] != 0.0f)
+                {
+                    values[to] = values[from];
+                    columns[to] = columns[from];
+                    to++;
+                }
+            }
+            newRowIndexs[column + 1] = to + 1;
+        }
+        for (int column = 0; column < size; column++)
+        {
+            rowIndexs[column + 1] = newRowIndexs[column + 1];
+        }
+        delete[] newRowIndexs;
+    }
 
     ~CSRMatrix()
     {

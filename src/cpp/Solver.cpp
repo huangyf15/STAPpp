@@ -93,6 +93,9 @@ void CLDLTSolver::BackSubstitution(double* Force)
 #ifdef MKL
 void CSRSolver::solve(double* Force, unsigned NLCase)
 {
+
+    K.trim();
+
 	void* pt[64];
     for (unsigned _ = 0; _ < 64; _++) pt[_] = 0;
     
