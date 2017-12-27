@@ -1012,6 +1012,8 @@ void COutputter::OutputElementStress()
 				}
 				*this << endl;
 				break;
+			case ElementTypes::T5Q:
+				break;
 
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType

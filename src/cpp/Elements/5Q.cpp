@@ -200,10 +200,10 @@ void C5Q::ElementStiffness(double* Matrix)
             B[1][3] = JT[1][0] * (eta - 1) / 4 + JT[1][1] * (psi - 1) / 4;
             B[1][4] = JT[1][0] * (1 - eta * eta) / 2 + JT[1][1] * (1 + psi) * (-eta);
 
-            D[0] = E / (1 - nu * nu);
-            D[1] = nu * E / (1 - nu * nu);
-            D[2] = E / (1 - nu * nu);
-            D[3] = (1 - nu) * E / (2 - 2 * nu * nu);
+            D[0] = E / (1.0 - nu * nu);
+            D[1] = nu * E / (1.0 - nu * nu);
+            D[2] = E / (1.0 - nu * nu);
+            D[3] = (1.0 - nu) * E / (2.0 - 2.0 * nu * nu);
 
             Matrix[0] += weight * Je * (B[0][0] * B[0][0] * D[0] + B[1][0] * B[1][0] * D[3]);
             Matrix[1] += weight * Je * (B[1][0] * B[1][0] * D[2] + B[0][0] * B[0][0] * D[3]);
