@@ -84,3 +84,32 @@ void CElement::assembly(double* Matrix,
 
 	return;
 }
+
+#ifdef _VIB_
+void CElement::assembly_mass(double* Matrix, CSkylineMatrix<double>* MassMatrixPtr){
+    ElementMass(Matrix);
+
+    //	Assemble global stiffness matrix
+	for (unsigned int j = 0; j < ND; j++)
+	{
+		unsigned int Lj = LocationMatrix[j];	// Global equation number corresponding to jth DOF of the element
+		if (!Lj) 
+			continue;
+
+//		Address of diagonal element of column j in the one dimensional element stiffness matrix
+		unsigned int DiagjElement = (j+1)*j/2 + 1;
+
+		for (unsigned int i = 0; i <= j; i++)
+		{
+			unsigned int Li = LocationMatrix[i];	// Global equation number corresponding to ith DOF of the element
+
+			if (!Li)
+				continue;
+
+			
+			(*MassMatrixPtr)(Li, Lj) += Matrix[DiagjElement + j - i - 1];
+		}
+	}
+
+}
+#endif

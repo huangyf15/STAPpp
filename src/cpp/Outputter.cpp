@@ -1110,6 +1110,58 @@ void COutputter::PrintStiffnessMatrix()
 	*this << endl;
 }
 
+#ifdef _VIB_
+void COutputter::PrintMassMatrix()
+{
+	*this << "*** _Debug_ *** Banded mass matrix" << endl;
+
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double>& MassMatrix = FEMData->GetMassMatrix();
+	unsigned int* DiagonalAddress = MassMatrix.GetDiagonalAddress();
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
+	{
+		*this << setw(14) << MassMatrix(i);
+
+		if ((i + 1) % 6 == 0)
+		{
+			*this << endl;
+		}
+	}
+
+	*this << endl
+		  << endl;
+
+	*this << "*** _Debug_ *** Full mass matrix" << endl;
+
+	for (unsigned I = 1; I <= NEQ; I++)
+	{
+		for (unsigned J = 1; J <= NEQ; J++)
+		{
+            int i, j;
+            i = std::min(I, J);
+            j = std::max(I, J);
+			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			if (j - i - H >= 0)
+			{
+				*this << setw(14) << 0.0;
+			}
+			else
+			{
+				*this << setw(14) << MassMatrix(i, j);
+			}
+		}
+
+		*this << endl;
+	}
+	*this << endl;
+}
+#endif
+
 //	Print displacement vector for debuging
 void COutputter::PrintDisplacement(unsigned int loadcase)
 {
@@ -1136,6 +1188,42 @@ void COutputter::PrintDisplacement(unsigned int loadcase)
 
 	*this << endl
 		  << endl;
+}
+
+#endif
+
+#ifdef _VIB_
+void COutputter::PrintVibModNum()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	*this << "The input vibration mod number is" << setw(5) << vibn << endl;
+	*this << std::endl;
+}
+
+void COutputter::OutputVibDisps()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	unsigned int NEQ = FEMData->GetNEQ();
+	double* lam = FEMData->GetEigenValues();
+	double* vibdisp = FEMData->GetVibDisp();
+	CNode* Nodelist = FEMData->GetNodeList();
+	unsigned int NodeNum = FEMData->GetNUMNP();
+	for (unsigned int i=0; i<vibn; ++i){
+		*this << endl;
+		*this << "VIBRATION MODE " << i+1 << endl;
+		*this << "EIGEN VALUE :" << setw(20) << lam[i] <<endl;
+		*this << " NUMBER           X           Y           Z               DX              DY              DZ"<<endl;
+		for (unsigned int j=0; j<NodeNum; ++j){
+			*this << j+1 << setw(13) << Nodelist[j].XYZ[0] << setw(13) << Nodelist[j].XYZ[1] << setw(13) << Nodelist[j].XYZ[2] ;
+			Nodelist[j].WriteNodalDisplacement(*this, j, vibdisp+i*NEQ);
+
+		}
+		*this << endl;
+	}
 }
 
 #endif

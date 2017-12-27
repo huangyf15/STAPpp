@@ -271,6 +271,10 @@ void CBeam::ElementStress(double* stress, double* Displacement)
     }
 }
 
+#ifdef _VIB_
+void CBeam::ElementMass(double* mass) {
+}
+#endif
 void CBeam::ElementPostInfo(double* beamstress, double* Displacement, double* prePositionBeam, double* postPositionBeam)
 {
     const CBeamMaterial& material =

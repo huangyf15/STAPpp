@@ -28,6 +28,10 @@ public:
 	
 	double E;  //!< Young's modulus
 
+#ifdef _VIB_
+    double rho; //!<density
+#endif
+
 public:
 
 //! Virtual deconstructor
