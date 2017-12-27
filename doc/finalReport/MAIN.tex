@@ -28,7 +28,7 @@
 \newtheorem{Prf}{Proof}[section]        % ---------end----------
 \numberwithin{equation}{section}        % 将公式按节编号
 
-\title{\textbf{有限元课程报告暨~STAPpp~程序说明文档}}
+\title{\textbf{有限元大作业报告暨~STAPpp~程序说明文档}}
 \author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;管唯宇\;杨正宇\;卢晟昊}}
 
 \begin{document}
@@ -85,10 +85,8 @@
     \input{elements/Timobeam.tex}
 \subsection{薄板单元}
     \input{elements/plate.tex}
-\subsection{厚板单元}
-    \input{elements/mindlin.tex}
 \subsection{截锥壳单元}
-    \input{elements/someshell.tex}
+    \input{elements/frustum.tex}
 
 \section{扩展功能}
 \subsection{稀疏求解器}
@@ -112,6 +110,8 @@
     \input{appendix/postfile.tex}
 \section{优化思路简述}
     \input{appendix/opt.tex}
+
+\newpage
 \section{小组合作清单}
     \input{appendix/assignment.tex}
 
