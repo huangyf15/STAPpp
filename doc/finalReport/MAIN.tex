@@ -7,6 +7,7 @@
 \usepackage{amsmath,amssymb,amsfonts,amstext,amsbsy,amsopn,amsthm}
                                         % 使用AMSLaTeX宏包，用来排出更加漂亮的公式
 \usepackage{bm}                         % 用于加粗
+\usepackage{ulem}                       % 用于增加下划线
 \usepackage{graphicx}                   % 用于插入图形
 \usepackage{subfig}                     % 用于插入子图
 \usepackage{caption}                    % 用于设置图形标题格式
@@ -38,10 +39,13 @@
 \tableofcontents
 
 \chapter{问题描述与成果展示}
+    这一章简述了大作业的题目要求并列举了评测结果~(见~\ref{sec:1-1}~节)，并就~STAP++~的结果与~ABAQUS~的结果进行了对比分析~(见~\ref{sec:1-2}~节)。值得说明的是，在保证较高求解精度的基础上，本组在内存方面的优化取得了相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，
+
 \section{问题简述与评测结果}
+\label{sec:1-1}
     \begin{figure}[!htbp]
       \centering
-      \includegraphics[width=5.0 in]{Problem.eps}\\
+      \includegraphics[width=5.0 in]{Descrip+Problem.eps}\\
       \caption{Problem}\label{fig:Problem}
     \end{figure}
 
@@ -72,25 +76,30 @@
          \hline
        \end{tabular}
     \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接．}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，是所有直接求解刚度方程的小组中在相同测试环境下结果最优的，同时达到了比较高的求解精度。
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接．}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
 
 \section{变形图像与应力云图}
+\label{sec:1-2}
     \input{description/graphic.tex}
 
-\chapter{STAPpp~程序框架}
+\chapter{STAP++~程序框架}
+    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)。其中，组装刚度阵模块包括单元刚度阵的生成以及总体刚度阵的组装两部分，前者将在第~\ref{chap:3}~ 章以及第~\ref{chap:4}~章详细说明，后者的过程是平凡的，这里不再赘述。
 \section{前处理模块}
+\label{sec:2-1}
     \input{process/preprocessing.tex}
-\section{单元刚度阵组装}
-    \input{process/formation.tex}
+\section{组装刚度阵~(略)}
+\label{sec:2-2}
 \section{求解器模块}
+\label{sec:2-3}
     \input{process/solver.tex}
 \section{后处理模块}
+\label{sec:2-4}
     \input{process/postprocessing.tex}
 
 \chapter{基本单元}
+\label{chap:3}
     这一章着重介绍在桥梁算例中使用的各种单元类型。
-\section{Bar~杆单元}
-    略。
+\section{Bar~杆单元~(略)}
 \section{8H~实体单元}
     \input{elements/8H.tex}
 \section{Euler-Bernoulli~梁单元}
@@ -99,35 +108,48 @@
     \input{elements/shell.tex}
 
 \chapter{其他单元}
-\section{平面单元}
-\subsection{3T~单元}
+\label{chap:4}
+    这一章将在上一章的基础上介绍新增的其他单元，包括可用于~3~维背景空间的平面单元（包括~3T,~4Q,~9Q，详见~\ref{sec:4-1},~\ref{sec:4-2},~\ref{sec:4-3}~ 节）、为适应结构的尺度效应而发展出的构造单元（包括~Timoshenko~梁单元、薄板单元、截锥壳单元，详见~\ref{sec:4-4},~\ref{sec:4-5},~\ref{sec:4-6}~ 节）以及可用于解决更广泛的弹性力学问题的扩展单元（包括无限单元和过渡单元，详见~\ref{sec:4-7},~\ref{sec:4-8}~ 节）。
+\section{3T~平面单元}
+\label{sec:4-1}
     \input{elements/3T.tex}
-\subsection{4Q~平面单元}
+\section{4Q~平面单元}
+\label{sec:4-2}
     \input{elements/4Q.tex}
-\subsection{9Q~平面单元}
+\section{9Q~平面单元}
+\label{sec:4-3}
     \input{elements/9Q.tex}
-\section{构造单元}
-\subsection{Timoshenko~梁单元}
+\section{Timoshenko~梁单元}
+\label{sec:4-4}
     \input{elements/Timobeam.tex}
-\subsection{薄板单元}
+\section{薄板单元}
+\label{sec:4-5}
     \input{elements/plate.tex}
-\subsection{截锥壳单元}
+\section{截锥壳单元}
+\label{sec:4-6}
     \input{elements/frustum.tex}
-\section{扩展单元}
-\subsection{无限单元}
+\section{无限单元}
+\label{sec:4-7}
     \input{elements/infinite.tex}
-\subsection{过渡单元}
+\section{过渡单元}
+\label{sec:4-8}
     \input{elements/transition.tex}
 
 \chapter{扩展功能}
+\label{chap:5}
+    这一章介绍了~STAP++~程序的一些扩展功能，包括基于~MKL~的稀疏求解器~(见~\ref{sec:5-1}~节)、基于~Bar~单元的模态分析~(见~\ref{sec:5-2}~节~)以及基于~8H~ 单元的分片应力恢复~(见~\ref{sec:5-3}~节)。
 \section{稀疏求解器}
+\label{sec:5-1}
     \input{features/sparse.tex}
 \section{模态分析}
+\label{sec:5-2}
     \input{features/modal.tex}
 \section{分片应力恢复~(SPR)}
+\label{sec:5-3}
     \input{features/SPR.tex}
 
 \chapter{致谢}
+
     感谢张老师和宋言学长在整个项目完成工作中对本组全组同学的耐心指导！
 
     感谢在部分任务中，其余组的部分同学与本组同学的积极讨论与互相扶持！
