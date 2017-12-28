@@ -1,0 +1,31 @@
+这里我们仅以~Job—1~为例进行展示。其中，图~\ref{fig:STAPpp+sym}~展示了利用~STAP++~程序算得的系统变形后图像，由对称性可以初步判断计算结果的合理性。图~\ref{fig:STAPpp+vonMises}\;$\sim$\;\ref{fig:ABAQUS-Job1-C3D8}~分别展示了利用~STAP++~程序或~ABAQUS~软件计算得到的系统应力云图。为了便于对照，这里二者的位移放大倍数均取成了~107.7~，并且尽可能地选取了一致的应力标尺。
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=5.0 in]{STAPpp+sym.eps}\\
+      \caption{~STAP++~算得的系统变形后图像}\label{fig:STAPpp+sym}
+    \end{figure}
+
+    对比图~\ref{fig:STAPpp+vonMises}~与图~\ref{fig:ABAQUS-Job1-C3D8R}~ 可以发现至少三方面的差异：
+    \begin{enumerate}
+      \item 梁的位移差异很大，STAP++~的结果中甚至出现了明显的梁外翻的现象。这是由于在~STAP++~程序中，将桥面附近相连的平板壳单元与梁单元的旋转自由度处理为固接约束，因此梁会随着桥面的平板壳单元发生较大的旋转。相比之下，由于固接的方式更接近工程实际，因此我们建议在下排两侧梁之间增加一些梁单元进行加固，以提高子系统的刚度。
+      \item 梁的图示应力有一定差异，STAP++~的应力云图比~ABAQUS~的结果大了很多。实际上，这一差异是由于~STAP++~输出的是梁表面的应力，而~ABAQUS~输出的是中性面上的应力，因此这一差异的出现是不足为奇的，并且~STAP++~的输出更有利于材料力学中强度准则的应用。
+      \item 桥中心的桥柱变形有一定差异，STAP++~的结果中变形稍小。注意到图~\ref{fig:ABAQUS-Job1-C3D8R}~中桥柱顶端出现了明显的网格畸变，可以初步判断出现了零能模态。通过查阅~ABAQUS~文档我们了解到，建模时对三维实体单元使用的~\textit{C3D8R}~实际上利用了减缩积分，而我们的~STAP++~使用的是精确积分。因此，后者会出现一定程度的剪切闭锁，而前者尽管避免了剪切闭锁，却很有可能出现零能模态。我们还利用~ABAQUS~选取精确积分的实体单元进行建模，由此得到的图~\ref{fig:ABAQUS-Job1-C3D8}~中网格畸变现象消失，并且位移结果相比之下明显变小，这也在一定程度上验证了我们的上述判断。
+    \end{enumerate}
+
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=5.0 in]{STAPpp+vonMises.eps}\\
+      \caption{~STAP++~算得的~von Mise's~应力云图}\label{fig:STAPpp+vonMises}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=5.0 in]{ABAQUS-Job1-C3D8R.eps}\\
+      \caption{ABAQUS~算得的~von Mise's~应力云图~(实体单元利用了减缩积分)}\label{fig:ABAQUS-Job1-C3D8R}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=5.0 in]{ABAQUS-Job1-C3D8.eps}\\
+      \caption{ABAQUS~算得的~von Mise's~应力云图~(实体单元未利用减缩积分)}\label{fig:ABAQUS-Job1-C3D8}
+    \end{figure}

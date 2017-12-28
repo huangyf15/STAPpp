@@ -28,7 +28,7 @@
 \newtheorem{Prf}{Proof}[section]        % ---------end----------
 \numberwithin{equation}{section}        % 将公式按节编号
 
-\title{\textbf{有限元大作业报告} \protect\\ \textbf{暨~STAPpp~程序说明文档}}
+\title{\textbf{有限元大作业报告} \protect\\ \textbf{暨~STAP++~程序说明文档}}
 \author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;管唯宇\;杨正宇\;卢晟昊}}
 
 \begin{document}
@@ -37,33 +37,52 @@
 
 \tableofcontents
 
-\chapter{问题描述}
+\chapter{问题描述与成果展示}
+\section{问题简述与评测结果}
     \begin{figure}[!htbp]
       \centering
-      \includegraphics[width=4.5 in]{Problem.eps}\\
+      \includegraphics[width=5.0 in]{Problem.eps}\\
       \caption{Problem}\label{fig:Problem}
     \end{figure}
 
-    算例的具体描述与测试结果如下~$^[$\footnote{环境：CPU:\;intel xeon cpu e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;Ox~优化．}$^]$：
+    算例具体描述如下：
     \begin{center}
-    \begin{tabular}{c|c|c|c|c|c|c|c|c}
+    \begin{tabular}{c|c|c|c|c|c|c}
       \hline
-      算例 & \textit{NumNode} & \textit{NumEle} & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} & $t_{min}/s$  & $RAM_{min}/M$ \\
+      \textit{Job} & \textit{NumNode} & \textit{NumEle} & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} \\
       \hline
-      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 & 0.27 & $\backslash$ \\
-      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 & 2.35 & $\backslash$ \\
-      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 & $25.0_{~6244M}$ & $1385_{~132.63s}$ \\
-      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 & $3131_{~12C}$ & $\backslash$ \\
+      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 \\
+      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 \\
+      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 \\
+      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 \\
       \hline
     \end{tabular}
     \end{center}
+
+    经过大规模评测，测试结果如下：
+    \begin{center}
+      \begin{tabular}{c|c|c}
+         \hline
+         \textit{Job} & $t_A/s$ & $t_B/s$ \\
+         \hline
+         1 & 0.27 & 0.1016\\
+         2 & 2.35 & 1.18585\\
+         3 & $25.0_{~6244M}$ & 13.6638 \\
+         4 & $\backslash$ & 3090.13\\
+         \hline
+       \end{tabular}
+    \end{center}
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接．}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，是所有直接求解刚度方程的小组中在相同测试环境下结果最优的，同时达到了比较高的求解精度。
+
+\section{变形图像与应力云图}
+    \input{description/graphic.tex}
 
 \chapter{STAPpp~程序框架}
 \section{前处理模块}
     \input{process/preprocessing.tex}
 \section{单元刚度阵组装}
     \input{process/formation.tex}
-\section{求解器设计}
+\section{求解器模块}
     \input{process/solver.tex}
 \section{后处理模块}
     \input{process/postprocessing.tex}
@@ -74,22 +93,31 @@
     略。
 \section{8H~实体单元}
     \input{elements/8H.tex}
-\section{Euler-Bernoullil~梁单元}
+\section{Euler-Bernoulli~梁单元}
     \input{elements/beam.tex}
 \section{平板壳单元}
     \input{elements/shell.tex}
 
-\chapter{新增单元}
-\section{3T~平面单元}
+\chapter{其他单元}
+\section{平面单元}
+\subsection{3T~单元}
     \input{elements/3T.tex}
-\section{4Q,~9Q~平面单元}
+\subsection{4Q~平面单元}
     \input{elements/4Q.tex}
-\section{Timoshenko~梁单元}
+\subsection{9Q~平面单元}
+    \input{elements/9Q.tex}
+\section{构造单元}
+\subsection{Timoshenko~梁单元}
     \input{elements/Timobeam.tex}
-\section{薄板单元}
+\subsection{薄板单元}
     \input{elements/plate.tex}
-\section{截锥壳单元}
+\subsection{截锥壳单元}
     \input{elements/frustum.tex}
+\section{扩展单元}
+\subsection{无限单元}
+    \input{elements/infinite.tex}
+\subsection{过渡单元}
+    \input{elements/transition.tex}
 
 \chapter{扩展功能}
 \section{稀疏求解器}
@@ -98,19 +126,18 @@
     \input{features/modal.tex}
 \section{分片应力恢复~(SPR)}
     \input{features/SPR.tex}
-\section{无限单元}
-    \input{features/infinite.tex}
-\section{过渡单元}
-    \input{features/transition.tex}
 
 \chapter{致谢}
-    感谢张老师和宋言学长在整个项目完成工作中对本组全组同学的耐心指导，也感谢在部分任务中其余组的部分同学与本组同学的积极讨论与互相扶持！最要感谢的，是我们组里的每一位同学，感谢大家一直以来的不懈努力以及团队所有成员的通力合作！
+    感谢张老师和宋言学长在整个项目完成工作中对本组全组同学的耐心指导！
+
+    感谢在部分任务中，其余组的部分同学与本组同学的积极讨论与互相扶持！
+
+    最要感谢的，是我们组里的每一位同学，感谢大家一直以来的不懈努力以及团队所有成员的通力合作！
 
 \appendix
-\chapter{输入输出文件格式}
-\section{输入文件格式}
+\chapter{输入文件格式}
     \input{appendix/inputfile.tex}
-\section{输出文件格式~(后处理用)}
+\chapter{输出文件格式~(后处理用)}
     \input{appendix/postfile.tex}
 \chapter{优化思路简述}
     \input{appendix/opt.tex}
