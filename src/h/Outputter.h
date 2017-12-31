@@ -89,6 +89,9 @@ public:
 //!	Output Infinite element data
 	void PrintInfiniteElementData(unsigned int EleGrp);
 
+//!	Output 5Q element data
+	void Print5QElementData(unsigned int EleGrp);
+
 //!	Output load data 
 	void OutputLoadInfo(); 
 
