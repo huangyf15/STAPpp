@@ -3,8 +3,8 @@
     8H~单元是线性单元，可以看出是~4Q~单元的一个自然扩展。我们首先考虑位移函数。由于~8H~单元有~24~个自由度，但是三维二阶完备多项式，每个方向有~10~项，所以每个位移方向的两项应当被去掉。考虑到方向性，我们去掉三项二阶式而增加一项三阶式，得到如下的位移函数：
     \begin{align*}
       u &= \alpha_1+\alpha_2 \psi +\alpha_3 \eta +\alpha_4 \zeta +\alpha_5\psi \eta +\alpha_6  \eta \zeta + \alpha_7 \psi \zeta +\alpha_8 \psi \eta \zeta, \\
-      v &= \alpha_9+\alpha_10 \psi +\alpha_11 \eta +\alpha_12 \zeta +\alpha_13\psi \eta +\alpha_14  \eta \zeta + \alpha_15 \psi \zeta +\alpha_16 \psi \eta \zeta, \\
-      w &= \alpha_17+\alpha_18 \psi +\alpha_19 \eta +\alpha_20 \zeta +\alpha_21\psi \eta +\alpha_22  \eta \zeta + \alpha_23 \psi \zeta +\alpha_24 \psi \eta \zeta.
+      v &= \alpha_9+\alpha_{10} \psi +\alpha_{11} \eta +\alpha_{12} \zeta +\alpha_{13} \psi \eta +\alpha_{14}  \eta \zeta + \alpha_{15} \psi \zeta +\alpha_{16} \psi \eta \zeta, \\
+      w &= \alpha_{17}+\alpha_{18} \psi +\alpha_{19} \eta +\alpha_{20} \zeta +\alpha_{21}\psi \eta +\alpha_{22}  \eta \zeta + \alpha_{23} \psi \zeta +\alpha_{24} \psi \eta \zeta.
     \end{align*}
 
 	随后，由以下形式的形函数进行插值：
@@ -59,7 +59,7 @@
 	与图~\ref{fig:8H-2}~所示的计算值对比，可以看到符合得很好，这说明所构造的~8H~单元具有至少二阶精度。实际上，由理论分析易知，8H~单元确实只具有二阶精度。
     \begin{figure}[!htbp]
         \centering
-        \includegraphics[width=3.0 in]{8H-2.eps}
+        \includegraphics[width=4.0 in]{8H-2.eps}
         \caption{单轴拉伸位移场计算结果}\label{fig:8H-2}
     \end{figure}
 
