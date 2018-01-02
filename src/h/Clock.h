@@ -17,6 +17,7 @@
 
 #include <time.h>
 #include <iostream>
+#include <chrono>
 
 using namespace std;  
 
@@ -26,7 +27,7 @@ class Clock
 
 private:
 
-	clock_t t0_, t1_;
+	std::chrono::time_point<std::chrono::high_resolution_clock> t0_, t1_;
 	double ct_;
 	bool st0_;   //!< Flag for Start method
 	bool st1_;   //!< Flag for Stop method

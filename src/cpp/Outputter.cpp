@@ -197,6 +197,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::Infinite:
 				PrintInfiniteElementData(EleGrp);
 				break;
+			case ElementTypes::T5Q:
+				Print5QElementData(EleGrp);
+				break;
 			default:
 				std::cerr << "OutputElementInfo: unknown ElementType " << ElementType << std::endl;
 				exit(2);
@@ -247,6 +250,43 @@ void COutputter::PrintBarElementData(unsigned int EleGrp)
 
 //	Output quadrilateral element data
 void COutputter::PrintInfiniteElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		  << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND CROSS-SECTIONAL CONSTANTS . . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		  << endl
+		  << endl;
+
+	*this << "  SET       YOUNG'S        POISSON'S" << endl
+		  << " NUMBER     MODULUS          RATIO" << endl
+		  << "               E              nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl
+		  << endl
+		  << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     NODE     NODE      MATERIAL" << endl
+		  << " NUMBER-N      I        J        K        L      SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
+}
+
+void COutputter::Print5QElementData(unsigned int EleGrp)
 {
 	CDomain* FEMData = CDomain::Instance();
 
@@ -1009,6 +1049,8 @@ void COutputter::OutputElementStress()
 				}
 				*this << endl;
 				break;
+			case ElementTypes::T5Q:
+				break;
 
 			default: // Invalid element type
 				cerr << "*** Error *** Elment type " << ElementType
@@ -1147,6 +1189,58 @@ void COutputter::PrintStiffnessMatrix()
 	*this << endl;
 }
 
+#ifdef _VIB_
+void COutputter::PrintMassMatrix()
+{
+	*this << "*** _Debug_ *** Banded mass matrix" << endl;
+
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int NEQ = FEMData->GetNEQ();
+	CSkylineMatrix<double>& MassMatrix = FEMData->GetMassMatrix();
+	unsigned int* DiagonalAddress = MassMatrix.GetDiagonalAddress();
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	for (unsigned int i = 0; i < DiagonalAddress[NEQ] - DiagonalAddress[0]; i++)
+	{
+		*this << setw(14) << MassMatrix(i);
+
+		if ((i + 1) % 6 == 0)
+		{
+			*this << endl;
+		}
+	}
+
+	*this << endl
+		  << endl;
+
+	*this << "*** _Debug_ *** Full mass matrix" << endl;
+
+	for (unsigned I = 1; I <= NEQ; I++)
+	{
+		for (unsigned J = 1; J <= NEQ; J++)
+		{
+            int i, j;
+            i = std::min(I, J);
+            j = std::max(I, J);
+			int H = DiagonalAddress[j] - DiagonalAddress[j - 1];
+			if (j - i - H >= 0)
+			{
+				*this << setw(14) << 0.0;
+			}
+			else
+			{
+				*this << setw(14) << MassMatrix(i, j);
+			}
+		}
+
+		*this << endl;
+	}
+	*this << endl;
+}
+#endif
+
 //	Print displacement vector for debuging
 void COutputter::PrintDisplacement(unsigned int loadcase)
 {
@@ -1173,6 +1267,42 @@ void COutputter::PrintDisplacement(unsigned int loadcase)
 
 	*this << endl
 		  << endl;
+}
+
+#endif
+
+#ifdef _VIB_
+void COutputter::PrintVibModNum()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	*this << "The input vibration mod number is" << setw(5) << vibn << endl;
+	*this << std::endl;
+}
+
+void COutputter::OutputVibDisps()
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	unsigned int vibn = FEMData->GetNumEig();
+	unsigned int NEQ = FEMData->GetNEQ();
+	double* lam = FEMData->GetEigenValues();
+	double* vibdisp = FEMData->GetVibDisp();
+	CNode* Nodelist = FEMData->GetNodeList();
+	unsigned int NodeNum = FEMData->GetNUMNP();
+	for (unsigned int i=0; i<vibn; ++i){
+		*this << endl;
+		*this << "VIBRATION MODE " << i+1 << endl;
+		*this << "EIGEN VALUE :" << setw(20) << lam[i] <<endl;
+		*this << " NUMBER           X           Y           Z               DX              DY              DZ"<<endl;
+		for (unsigned int j=0; j<NodeNum; ++j){
+			*this << j+1 << setw(13) << Nodelist[j].XYZ[0] << setw(13) << Nodelist[j].XYZ[1] << setw(13) << Nodelist[j].XYZ[2] ;
+			Nodelist[j].WriteNodalDisplacement(*this, j, vibdisp+i*NEQ);
+
+		}
+		*this << endl;
+	}
 }
 
 #endif
