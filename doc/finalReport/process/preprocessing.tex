@@ -20,7 +20,7 @@
     前处理结构分成三个大部分：解析部分、输出部分和计算部分。
     另外，还有 \texttt{ABAQUS} 模块（定义了 \texttt{ABAQUS} 中的数据结构）、\texttt{STAPpp} 模块（定义了 \texttt{STAP++} 中的数据结构）和一个简单的进度条库，在标准等宽字体下有很好的效果。
     
-    其中，解析部分代码位于 \texttt{ABAQUSparser.py} 文件中，负责解析 \texttt{inp} 文件，返回一个\texttt{dict}对象，将结果传给输出部分。
+    其中，解析部分代码位于 \texttt{ABAQUSparser.py} 文件中，负责解析 \texttt{inp} 文件，返回一个 \texttt{dict} 对象，将结果传给输出部分。
     这一部分通过一个 \texttt{ABAQUSparser.Parser} 类实现，通过调用
     \texttt{Parser.parse} 函数实现解析输入文件后返回约定的数据。
 
