@@ -163,6 +163,59 @@ void CBar::ElementStress(double* stress, double* Displacement)
 	}
 }
 
+
+#ifdef _VIB_
+void CBar::ElementMass(double* mass){
+	clear(mass, SizeOfStiffnessMatrix());
+
+//	Calculate bar length
+	double DX[3];		//	dx = x2-x1, dy = y2-y1, dz = z2-z1
+	for (unsigned int i = 0; i < 3; i++)
+		DX[i] = nodes[1]->XYZ[i] - nodes[0]->XYZ[i];
+
+	double DX2[6];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
+	DX2[0] = DX[0] * DX[0];
+	DX2[1] = DX[1] * DX[1];
+	DX2[2] = DX[2] * DX[2];
+	DX2[3] = DX[0] * DX[1];
+	DX2[4] = DX[1] * DX[2];
+	DX2[5] = DX[0] * DX[2];
+
+    double L2 = DX2[0] + DX2[1] + DX2[2];
+	double L = sqrt(L2);
+
+//	Calculate element stiffness matrix
+
+	CBarMaterial* material = dynamic_cast<CBarMaterial*>(ElementMaterial);	// Pointer to material of the element
+
+    double mass_c = material->rho * L;
+
+    double km = mass_c / L2 * 0.166666666666667;
+    mass[0] = 2*km*DX2[0];
+	mass[1] = 2*km*DX2[1];
+	mass[2] = 2*km*DX2[3];
+	mass[3] = 2*km*DX2[2];
+	mass[4] = 2*km*DX2[4];
+	mass[5] = 2*km*DX2[5];
+	mass[6] = 2*km*DX2[0];
+	mass[7] =  km*DX2[5];
+	mass[8] =  km*DX2[3];
+	mass[9] =  km*DX2[0];
+	mass[10] = 2*km*DX2[1];
+	mass[11] = 2*km*DX2[3];
+	mass[12] =  km*DX2[4];
+	mass[13] =  km*DX2[1];
+	mass[14] =  km*DX2[3];
+	mass[15] = 2*km*DX2[2];
+	mass[16] = 2*km*DX2[4];
+	mass[17] = 2*km*DX2[5];
+	mass[18] =  km*DX2[2];
+	mass[19] =  km*DX2[4];
+	mass[20] =  km*DX2[5];
+
+}
+#endif
+
 // Calculate the values required in POSTPROCESS
 // stress = [XX[0]  YY[0]  ZZ[0]  YZ[0]  ZX[0]  XY[0] ... ]
 // PrePositions = [X[0]  Y[0]  Z[0]  X[1]  Y[1] ... Z[7]]
@@ -274,3 +327,4 @@ void CBar::ElementPostInfo(double* stress, double* Displacement, double* PrePosi
 		stress[6 * i] = ElementStress;
 	}
 }
+

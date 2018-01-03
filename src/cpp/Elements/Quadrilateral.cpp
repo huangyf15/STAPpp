@@ -477,6 +477,10 @@ void CQuadrilateral::ElementStress(double stress[12], double* Displacement, doub
 #endif
 }
 
+#ifdef _VIB_
+void CQuadrilateral::ElementMass(double* mass) {
+}
+#endif
 void CQuadrilateral::ElementPostInfo(double* stress, double* Displacement, double* PrePositions,
                                      double* PostPositions)
 {

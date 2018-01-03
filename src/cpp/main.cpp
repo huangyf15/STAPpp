@@ -69,12 +69,25 @@ int main(int argc, char *argv[])
     Solver->LDLT();
 #endif
 
+
     COutputter* Output = COutputter::Instance();
 
 	PostOutputter* PostOutput = PostOutputter::Instance(PostFile);
 
 #ifdef _DEBUG_
     Output->PrintStiffnessMatrix();
+#endif
+#ifdef _VIB_
+	FEMData->AssembleMassMatrix();
+
+#ifdef _DEBUG_
+	Output->PrintMassMatrix();
+#endif
+
+	if (!FEMData->VibSolver(FEMData->GetNumEig())){
+	    exit(9);
+		cout<< "ERROR: MKL SOLVER FAILED FOR SINGULARITY OR SOMETHING ELSE"<<endl;
+	}
 #endif
 
 //  Loop over for all load cases
@@ -93,6 +106,9 @@ int main(int argc, char *argv[])
         Output->OutputNodalDisplacement(lcase);
     }
 
+#ifdef _VIB_
+	Output->OutputVibDisps();
+#endif
     double time_solution = timer.ElapsedTime();
 
 #ifndef _RUN_

@@ -303,6 +303,10 @@ void CTriangle::ElementStress(double stress[3], double* Displacement, double Gau
 #endif
 }
 
+#ifdef _VIB_
+void CTriangle::ElementMass(double* mass) {
+}
+#endif
 void CTriangle::ElementPostInfo(double* stress, double* Displacement, double* PrePositions,
                                 double* PostPositions)
 {
