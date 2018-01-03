@@ -1,0 +1,43 @@
+\subsection{求解器部分概述}
+
+    求解器部分，在原有的LDLT求解器的基础上，我们增加了Intel MKL Pardiso稀疏直接求解器。
+
+    Pardiso稀疏直接求解器输入格式要求是稀疏矩阵储存方式，支持的比较好的是行压缩储存格式（CSR），
+    我们也选用了CSR矩阵作为我们储存刚度阵的方法。
+
+\subsection{稀疏矩阵的实现}
+
+    LDLT求解器使用的是skyline矩阵（一维变带宽储存方式），因为我们实现了一个CSR矩阵\texttt{CSRMatrix}
+    来适配Pardiso求解器。
+
+    类似 skyline 矩阵的 \texttt{CalculateColumnHeights}方法一样，CSR矩阵也需要提前矩阵每行的长度来分配内存。
+    因此，我们用\texttt{CSRMatrix::beginPositionMark}和\texttt{CSRMatrix::markPostion} 方法
+    来标记每一行的位置和列号。在标记的过程中，需要变长度地储存每一行地列号序列。实现这一功能有多种方法：
+    基于链表结构、基于重新分配的数组结构、基于平衡树的有序结构。
+    
+    为了开发过程的快速和效率，我们使用了对应的
+    STL标准容器：\texttt{std::list}、\texttt{std::vector}、\texttt{std::set}。
+    STL容器使用方便、在高优化下效率极高、接口设计科学、有独立的内存管理（Allocator），有很大的优势。
+
+    几种结构中，\texttt{std::list}是基于链表的结构，插入$O(1)$，需要排序，排序$O(n \log n)$，总体$O(n log n)$。
+    \texttt{std::vector}是基于数组的结构，插入平均$O(1)$，最坏$O(n)$，需要排序，排序$O(n log n)$，总体$O(n log n)$。
+    \texttt{std::set}是基于平衡树的结构，插入$O(log n)$，不需要排序，总体$O(n log n)$。
+    这几种结构中，我们首先排除的是\texttt{std::list}，因为实际使用中，链表的插入和排序都远远慢于
+    数组。在剩下的$std::vector$和$std::set$在实际测试中表现接近，在不同的数据下互有胜负。
+    因此，我们在最后的程序中同时保留了两者，通过一个宏实现类型切换。
+
+\subsection{求解器的优化}
+
+    对于pardiso求解器，因为pardiso会自动进行重排操作，因此我们没有做半带宽优化（重复）。
+
+    pardiso求解器在程序中打开了多线程，链接了并行的静态库，会自动识别可用核心，开启多线程。
+    多线程的线程数还可以使用环境变量 \texttt{MKL\_NUM\_THREADS} 控制：
+    \begin{lstlisting}
+    export MKL_NUM_THREADS=4
+    \end{lstlisting}
+
+    pardiso求解器会自动根据内存占用切换内核求解（In-Core, IC）和
+    外核求解模式（Out-Of-Core, OOC）。
+    通过修改运行目录下的\texttt{pardiso\_ooc.cfg}，
+    我们可以设置pardiso所占用的最小内存和外核缓存路径。
+    
