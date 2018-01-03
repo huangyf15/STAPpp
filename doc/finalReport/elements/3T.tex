@@ -1,0 +1,86 @@
+\subsection{组装刚度阵}
+
+    类似 4Q 单元，进行一次 3d-2d-3d 的转换。
+
+    $n$, $i$, $j$ 同4Q一样生成，但对于 3T 单元，设置 $i = \bar p_{21}$ 可以简化计算量。
+
+    计算刚度阵有
+    $$ K^e = A^e B^{eT} D B^e $$
+
+    计算应力有
+    $$ \sigma = D \varepsilon = D B^e d^e$$
+
+    由于 $D$, $B^e$, $d^e$都是常矩阵，故 3T 单元中为常应力场。
+
+\subsection{分片试验}
+
+    分片实验输入文件见 \texttt{data/3T/patch.dat} ，计算结果如图\ref{fig:ele:3T:1}所示。
+
+    图中，节点为精确解，实体为计算解。
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.9\textwidth]{./elements/fig/patch-test-3T.png}
+        \caption{分片试验}
+        \label{fig:ele:3T:1}
+    \end{figure}
+
+    3T 单元在 $10^{-4}$ 误差下通过分片实验。
+
+
+\subsection{收敛率计算}
+
+    宏 \texttt{\_\_TEST\_\_} 被定义时，会在计算应力时额外输出高斯点的位移和积分的系数。(采用三点高斯积分)。
+
+    这个宏可以在 cmake 中通过 \texttt{STAP++\_TEST} 选项开启。
+
+    根据
+    $$ e^2 = \int_\Omega (u-u^e)^2\text{d}\Omega = \sum W_i (u-u^e)^2 |J| $$
+    就可以计算误差的积分。上式中，$W_i|Je|$合并为 weight，即
+    $$ e^2 = \sum_{i=1}^{NOE} w_i \sum_{j=1}^3 \left(u_{ij} - u^e_{ij}\right)^2 $$
+
+    通过一个简单的 python 文件，根据高斯点的坐标算出准确位移，我们就可以计算出总的误差$e$。
+
+    考虑如图\ref{fig:1}这样一个简单的情况。体力随X线性变化，Y方向限制自由度。
+    体力$\boldsymbol{f}=b\boldsymbol{x}$（均匀梯度重力场）
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./elements/fig/3Tfig1.eps}
+        \caption{施加载荷}
+        \label{fig:ele:3T:1}
+    \end{figure}
+
+    容易计算得到应变满足
+    \[
+        \begin{cases}
+            \varepsilon _x=\frac{1-\nu ^2}{E}b\left( 2-\frac{x^2}{2} \right)\\
+            \varepsilon _y=0\\
+            \gamma _{xy}=0\\
+        \end{cases}
+    \]
+
+    位移满足
+    \[
+        \begin{cases}
+            u_x=\frac{\left( 1-\nu ^2 \right) b}{6E}x\left( 12-x^2 \right)\\
+            u_y=0\\
+        \end{cases}
+    \]
+
+    生成任务文件的脚本见 \texttt{data/3T/genDat.py}。
+
+    处理输出文件的脚本见 \texttt{data/3T/calcErr.py}。
+
+    测试文件见 \texttt{data/3T/run-rate.py}。
+
+    网格划分为每单位长度$1 \sim 32, 64, 128$个单元，计算结果如图\ref{fig:ele:3T:2}所示。
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.9\textwidth]{./elements/fig/3Tconvergencerate.png}
+        \caption{3T收敛率分析}
+        \label{fig:ele:3T:2}
+    \end{figure}
+
+    即，3T单元位移二阶收敛。
+
