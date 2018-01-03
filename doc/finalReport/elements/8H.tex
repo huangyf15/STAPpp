@@ -1,0 +1,74 @@
+
+\subsection{单元构造}
+    8H~单元是线性单元，可以看出是~4Q~单元的一个自然扩展。我们首先考虑位移函数。由于~8H~单元有~24~个自由度，但是三维二阶完备多项式，每个方向有~10~项，所以每个位移方向的两项应当被去掉。考虑到方向性，我们去掉三项二阶式而增加一项三阶式，得到如下的位移函数：
+    \begin{align*}
+      u &= \alpha_1+\alpha_2 \psi +\alpha_3 \eta +\alpha_4 \zeta +\alpha_5\psi \eta +\alpha_6  \eta \zeta + \alpha_7 \psi \zeta +\alpha_8 \psi \eta \zeta, \\
+      v &= \alpha_9+\alpha_{10} \psi +\alpha_{11} \eta +\alpha_{12} \zeta +\alpha_{13} \psi \eta +\alpha_{14}  \eta \zeta + \alpha_{15} \psi \zeta +\alpha_{16} \psi \eta \zeta, \\
+      w &= \alpha_{17}+\alpha_{18} \psi +\alpha_{19} \eta +\alpha_{20} \zeta +\alpha_{21}\psi \eta +\alpha_{22}  \eta \zeta + \alpha_{23} \psi \zeta +\alpha_{24} \psi \eta \zeta.
+    \end{align*}
+
+	随后，由以下形式的形函数进行插值：
+    \begin{equation*}
+      N_i=\frac{1}{8}(1+\psi_i \psi)(1+\eta_i \eta)(1+\zeta_i \zeta), ~\ i=1,2,...,8.
+    \end{equation*}
+	则有应变矩阵:
+    \begin{equation*}
+        B_i=\left( \begin{array}{cccc}
+        \frac{\partial N_i}{\partial x} & 0 & 0 \\
+        0 & \frac{\partial N_i}{\partial y} & 0\\
+        0 & 0& \frac{\partial N_i}{\partial z} \\
+        \frac{\partial N_i}{\partial y} &\frac{\partial N_i}{\partial x} & 0\\
+        0 & \frac{\partial N_i}{\partial z} & \frac{\partial N_i}{\partial y}\\
+        \frac{\partial N_i}{\partial z} & 0& \frac{\partial N_i}{\partial x}\end{array} \right).
+    \end{equation*}
+    其中，$B=[B_1 \; B_2 \; B_3 \; B_4 \; B_5 \; B_6 \; B_7 \; B_8]$。
+
+	为了将形函数映射到物理坐标系中，我们使用和~4Q~方法类似的~Jacobi~矩阵。由此构造出单元刚度阵：
+    \begin{equation*}
+        K^e=\int^1_{-1} \int^1_{-1} \int^1_{-1} B^T D B|J|d\psi d\eta d\zeta.
+    \end{equation*}
+	由此可以构造出总体刚度阵，从而求解系统刚度方程。
+
+\subsection{单元验证}
+    为了验证所构造的~8H~单元，我们采用一个线性场的分片试验进行~test C。由于线性位移场实质上只包括常正应变与常剪应变两种情形，因此我们下面分别构造了单轴拉伸与纯剪载荷的算例进行验证。分片试验由~7~个单元组成，单元划分方式如图~\ref{fig:8H-sketch}~所示。
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=3.0 in]{8H+sketch.eps}
+        \caption{分片试验单元划分示意图}\label{fig:8H-sketch}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+        \centering
+        \subfigure[单轴拉伸]{
+        \label{fig:8H-1}
+        \includegraphics[width=2.2 in]{8H-1.eps}}
+        \subfigure[纯剪载荷]{
+        \label{fig:8H-3}
+        \includegraphics[width=2.0 in]{8H-3.eps}}
+        \caption{分片试验载荷与约束示意图}
+        \label{fig:8H-1,3}
+    \end{figure}
+
+\subsubsection{单轴拉伸}
+	首先是单轴拉伸的分片试验，施加如图~\ref{fig:8H-1}~所示的载荷。相应的位移场精确解应为：
+    \begin{align*}
+      u_x &= -\nu \frac{4P}{E l_z l_x}x, \\
+      u_y &= -\nu \frac{4P}{E l_z l_y}y, \\
+      u_z &= \frac{4P}{E l_z^2}z.
+    \end{align*}
+	与图~\ref{fig:8H-2}~所示的计算值对比，可以看到符合得很好，这说明所构造的~8H~单元具有至少二阶精度。实际上，由理论分析易知，8H~单元确实只具有二阶精度。
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=4.0 in]{8H-2.eps}
+        \caption{单轴拉伸位移场计算结果}\label{fig:8H-2}
+    \end{figure}
+
+\subsubsection{纯剪载荷}
+    考虑到分片试验是单轴拉伸，再构造一个纯剪的算例，加载方式如图~\ref{fig:8H-3}~所示。进而得到了如图~\ref{fig:8H-4}~所示的计算结果，这一结果与理论解符合得很好。这里的~8H~单元使用的是应力平滑~(即~Gauss~点的应力外推)~后的应力。关于应力的进一步处理，将在~SPR~章节~(第~\ref{sec:5-3}~节)~中继续讨论。
+
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=4.0 in]{8H-4.eps}
+        \caption{纯剪载荷位移场计算结果}\label{fig:8H-4}
+    \end{figure}
+
