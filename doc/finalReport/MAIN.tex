@@ -15,8 +15,9 @@
 \usepackage{multicol}                   % 用于实现在同一页中实现不同的分栏
 \usepackage{geometry}                   % 用于设置页边距
 \usepackage{lipsum}                     % 产生随机文本
-\usepackage{listings}                    % 插入公式
-\lstset{basicstyle=\ttfamily}
+\usepackage{listings}                   % 插入公式
+\usepackage{inconsolata}                % 等宽字体使用 consolas
+\lstset{basicstyle=\ttfamily}           % 代码使用等宽字体
 
 \geometry{a4paper,left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}
 
@@ -87,7 +88,7 @@
          \hline
        \end{tabular}
     \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接．}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接，OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
 
 \section{变形图像与应力云图}
 \label{sec:1-2}
