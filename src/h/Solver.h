@@ -38,6 +38,9 @@ public:
 
     //!	Reduce right-hand-side load vector and back substitute
     void BackSubstitution(double* Force);
+#ifdef _VIB_
+	void Multiple(double* acc,double* Force,unsigned int numeq,unsigned int vib_m);
+#endif
 };
 
 class CSRSolver : public CSolver

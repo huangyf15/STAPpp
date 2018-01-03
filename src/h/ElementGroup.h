@@ -24,6 +24,7 @@
 #include "Elements/TimoshenkoSRINT.h"
 #include "Elements/Triangle.h"
 #include "Elements/Infinite_4Q.h"
+#include "Elements/5Q.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -42,7 +43,8 @@ enum ElementTypes
     TimoshenkoSRINT = 8,
     TimoshenkoEBMOD = 9,
     T9Q = 10,
-    Infinite = 11
+    Infinite = 11,
+    T5Q = 12
 };
 
 //! Element group class

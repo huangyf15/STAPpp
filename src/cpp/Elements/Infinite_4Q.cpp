@@ -202,3 +202,7 @@ void CInfEle::ElementStiffness(double* Matrix)
 //	Calculate element stress
 void CInfEle::ElementStress(double* Q4stress, double* Displacement) {}
 void CInfEle::ElementGauss(double* Coordinate) {}
+#ifdef _VIB_
+void CInfEle::ElementMass(double* mass) {
+}
+#endif

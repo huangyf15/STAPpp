@@ -1,11 +1,12 @@
 %\documentclass{ctexart}
-\documentclass[hyperref]{report}       % 设定文档类型（含超链接）
+\documentclass{report}                  % 设定文档类型
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
 \usepackage{ctex}                       % 使用CTeX中文包
 \usepackage{amsmath,amssymb,amsfonts,amstext,amsbsy,amsopn,amsthm}
                                         % 使用AMSLaTeX宏包，用来排出更加漂亮的公式
+\usepackage[colorlinks]{hyperref}
 \usepackage{bm}                         % 用于加粗
 \usepackage{ulem}                       % 用于增加下划线
 \usepackage{graphicx}                   % 用于插入图形
@@ -14,6 +15,8 @@
 \usepackage{multicol}                   % 用于实现在同一页中实现不同的分栏
 \usepackage{geometry}                   % 用于设置页边距
 \usepackage{lipsum}                     % 产生随机文本
+\usepackage{listings}                    % 插入公式
+\lstset{basicstyle=\ttfamily}
 
 \geometry{a4paper,left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}
 
@@ -91,7 +94,8 @@
     \input{description/graphic.tex}
 
 \chapter{STAP++~程序框架}
-    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)。其中，组装刚度阵模块包括单元刚度阵的生成以及总体刚度阵的组装两部分，前者将在第~\ref{chap:3}~ 章以及第~\ref{chap:4}~章详细说明，后者的过程是平凡的，这里不再赘述。
+    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)和测试模块（见~\ref{sec:2-5}~节）。
+    其中，组装刚度阵模块包括单元刚度阵的生成以及总体刚度阵的组装两部分，前者将在第~\ref{chap:3}~ 章以及第~\ref{chap:4}~章详细说明，后者的过程是平凡的，这里不再赘述。
 \section{前处理模块}
 \label{sec:2-1}
     \input{process/preprocessing.tex}
@@ -103,6 +107,9 @@
 \section{后处理模块}
 \label{sec:2-4}
     \input{process/postprocessing.tex}
+\section{测试模块}
+\label{sec:2-5}
+    \input{process/testing.tex}
 
 \chapter{基本单元}
 \label{chap:3}
