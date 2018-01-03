@@ -6,12 +6,12 @@
 
     \lstset{basicstyle=\ttfamily}
     \begin{lstlisting}
-        Usage: main.py [options] inputFile
+    Usage: main.py [options] inputFile
 
-        Options:
-        -h, --help              show this help message and exit
-        -o DEST, --output=DEST
-                                output dat file to dest
+    Options:
+    -h, --help              show this help message and exit
+    -o DEST, --output=DEST
+                            output dat file to dest
     \end{lstlisting}
 
     对输入的参数，前处理有一定的鲁棒性。
@@ -19,31 +19,21 @@
 \subsection{前处理结构}
 
     前处理结构分成三个大部分：解析部分、输出部分和计算部分。
-    此外，还有\texttt{ABAQUS}模块，定义了\texttt{ABAQUS}中的数据结构，和\texttt{STAPpp}模块，
-    定义了\texttt{STAP++}中的数据结构。
+    此外，还有 \texttt{ABAQUS} 模块，定义了 \texttt{ABAQUS} 中的数据结构，和 \texttt{STAPpp} 模块，定义了 \texttt{STAP++} 中的数据结构。
     此外，还包含了一个简单的进度条，在标准等宽字体下有很好的效果。
     
-    其中，解析部分代码位于\texttt{ABAQUSparser.py}文件中，负责解析\texttt{inp} 文件，
-    返回一个\texttt{dict}对象，将结果传给输出部分。
+    其中，解析部分代码位于 \texttt{ABAQUSparser.py} 文件中，负责解析 \texttt{inp} 文件，返回一个\texttt{dict}对象，将结果传给输出部分。
     这一部分通过一个 \texttt{ABAQUSparser.Parser} 类实现，通过调用
-    \texttt{Parser.parse} 函数
-    实现解析输入文件后返回约定的数据。
+    \texttt{Parser.parse} 函数实现解析输入文件后返回约定的数据。
 
-    因为本次大作业中，输入文件的格式比较死，因此我们没有花费时间去实现一个递归下降语法分析器，而是
-    基于本次的输入格式简单实现了一个顺序解析器。这个解析器会以此查找关键词来实现解析。
-    通过\texttt{Parser.parseHeading}、\texttt{Parser.parseParts}、\texttt{Parser.parseAssembly}
-    等函数来依次解析，然后调用\texttt{Parser.analyse}函数，将\texttt{ABAQUS}中的类转换为
-    \texttt{STAPpp}中的类，并返回约定格式的\texttt{dict}对象。
+    因为本次大作业中，输入文件的格式比较死，因此我们没有花费时间去实现一个递归下降语法分析器，而是基于本次的输入格式简单实现了一个顺序解析器。这个解析器会以依次查找关键词的方式来实现解析。
+    通过 \texttt{Parser.parseHeading}、\texttt{Parser.parseParts}、\texttt{Parser.parseAssembly} 等函数来依次解析，然后调用 \texttt{Parser.analyse} 函数，将 \texttt{ABAQUS} 中的类转换为 \texttt{STAPpp} 中的类，进行单元的编号、节点的去重、编号，材料截面的转换，并返回约定格式的 \texttt{dict} 对象。
     
-    输出部分代码位于\texttt{outputter.py}文件中，负责将解析部分返回的数据按照
-    \texttt{STAP++}的约定格式输出到对应的输出文件中。
+    输出部分代码位于 \texttt{outputter.py} 文件中，负责将解析部分返回的数据按照 \texttt{STAP++} 的约定格式输出到对应的输出文件中。
     
-    计算部分独立为一个模块，是因为考虑到在解析部分解析完输入文件后，其实已经可以释放对应
-    \texttt{ABAQUS}部分的储存空间，因此在解析部分不计算体力，而是将节点数据、单元数据输出
-    到缓存文件中，再用计算部分读取计算，这样可以大幅减少内存占用（峰值减少了一半）。
+    计算部分独立为一个模块，是因为考虑到在解析部分解析完输入文件后，其实已经可以释放对应 \texttt{ABAQUS} 部分的储存空间，因此在解析部分不计算体力，而是将节点数据、单元数据输出到缓存文件中，再用计算部分读取计算，最后进行文件拼接。这样在不明显降低速度的前提下，我们可以大幅减少内存占用（峰值减少了接近一半）。
 
     计算部分读取缓存文件中点和单元数据以及解析部分缓存的材料信息，用高斯积分计算体力，
     根据四种单元类型（四边形、杆、口字梁、六面体）计算等效节点力。
 
-    前处理严格遵守了\texttt{STAP++}的约定输入格式，完全兼容已有标准。
-
+    前处理严格遵守了 \texttt{STAP++} 的约定输入格式，完全兼容已有标准。
