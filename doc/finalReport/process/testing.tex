@@ -40,4 +40,4 @@
 
     为了提高编译效率，我们设置了每次编译后 travis 自动缓存 MKL 的 include 文件夹和链接库文件夹。在没有找到缓存的情况下，为在 travis CI 上自动安装 MKL，我们还实现了一个 \texttt{test/installMKL.py} 脚本，它可以在 Linux 平台下自动安装 MKL。
 
-    另外，为了在 Linux 下正常测试，我们对 \texttt{src/CMakeLists.txt} 进行了调整，在其中设置了 include 路径和链接路径，能够分别在 Windows 和 Linux 平台上自动链接 MKL 静态链接库，无需再手动任何设置。因此，我们的程序有极好的跨平台能力。
+    另外，为了在 Linux 下正常测试，我们对 \texttt{src/CMakeLists.txt} 进行了调整，在其中设置了 include 路径和链接路径，能够分别在 Windows 和 Linux 平台上自动链接 MKL 静态链接库，无需再手动进行任何设置。因此，我们的程序有极好的跨平台能力。
