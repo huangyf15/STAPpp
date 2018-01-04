@@ -1,0 +1,163 @@
+\subsection{单元构造}
+
+    对于 4Q 单元，首先要将空间降维，在 4Q 单元所在平面上建立局部坐标系。
+    计算法向量 $\hat n$ ：
+        $$\hat n = \hat p_{21} \times \hat p_{31}$$
+    
+    设 $\hat i$ 向量平行于 $p_{21}$：
+        $$\hat i =  \hat{p_{21}}$$
+    
+    根据 $\hat i$ 和 $\hat n$ 在右手系中生成 $j$：
+    $\hat j = \hat n \times \hat i$.
+
+    于是根据公式
+    $$
+        \begin{aligned}
+        {K^e}'  &= \int{B^T D B} d\Omega \\
+                &= \sum{ W_i W_j \left( B^T D B \right) \left|J\right|} \\
+        \end{aligned}
+    $$
+    
+    $$
+        \begin{aligned}
+            J^e &= GN^{4Q} \left[x^e \; y^e\right]\\
+            \left[B^e\right] &= \left(J^e\right)^{-1} GN^{4Q} \\
+        \end{aligned}
+    $$
+    
+    可以先生成 $GN^{4Q}$ 再生成 $J^e$ 和 $[B^e]$.
+    从 $[B^e]$ 生成 $B$： 
+    $$ B = 
+        \left(
+            \begin{matrix}
+                [B]_{11} & 0 & [B]_{12} & 0 & [B]_{13} & 0 & [B]_{14} & 0 \\
+                0 & [B]_{21} & 0 & [B]_{22} & 0 & [B]_{23} & 0 & [B]_{24} \\
+                \left[B\right]_{21} & [B]_{11} & [B]_{22} & [B]_{12} & [B]_{23} & [B]_{32} & [B]_{24} & [B]_{14}
+            \end{matrix}
+        \right) 
+    $$
+
+    计算 ${K^e_{ij}}'$:
+    $$
+        \begin{aligned}
+            {K^e_{ij}}' &= B^T_{ik} D_{kl} B_{lj} \\
+                        &= B_{ki} B_{lj} D_{kl} \\
+        \end{aligned}
+    $$
+
+    为减少计算量，展开 $D_{kl}$ 并只考虑 $(k,l) = (1,1), (1,2), (2,1), (2,2), (3,3)$.
+    进一步合并同类项可以进一步减少计算量。
+
+    计算出局部坐标系下的 $K^e$ 后，将其转回全局坐标系。
+    $$ K^e = R^T {K^e}' R $$
+
+    其中 
+    \setcounter{MaxMatrixCols}{15}
+    \[
+        R=\left( \begin{matrix}
+        {i_0} &  {i_1} &  {i_2} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  0 \\
+        {j_0} &  {j_1} &  {j_2} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  0 \\
+        {0} &  {0} &  {0} &  {i_0} &  {i_1} &  {i_2} &  {0} &  {0} &  {0} &  {0} &  {0} &  0 \\
+        {0} &  {0} &  {0} &  {j_0} &  {j_1} &  {j_2} &  {0} &  {0} &  {0} &  {0} &  {0} &  0 \\
+        {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {i_0} &  {i_1} &  {i_2} &  {0} &  {0} &  0 \\
+        {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {j_0} &  {j_1} &  {j_2} &  {0} &  {0} &  0 \\
+        {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {i_0} &  {i_1} &  {i_2} \\
+        {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {0} &  {j_0} &  {j_1} &  {j_2} \\
+        \end{matrix} \right) 
+    \]
+
+    即
+    $$
+    \begin{aligned}
+        K^e_{ij} &= R^T_{ik} {K^e_{kl}}' R_{lj} \\
+                &= R_{ki} R_{lj} {K^e_{kl}}'
+    \end{aligned}
+    $$
+
+\subsection{后处理部分}
+
+    计算应力公式：
+    $$\begin{aligned}
+        \sigma^e &= D^e \varepsilon^e \\
+                &= D^e B^e d^e \\
+        \sigma_i^e &= (DB)^e_{ij} d^e_j \;\;\;(j=1:6) \\
+                &= D^e_{ik} B^e_{kj} d_j^e \\
+    \end{aligned}$$
+
+    其中
+    $$
+        d^e = \left(
+            \begin{matrix}
+                u^e_{1x} &
+                u^e_{1y} & 
+                u^e_{2x} &
+                u^e_{2y} & 
+                u^e_{3x} &
+                u^e_{3y} & 
+                u^e_{4x} &
+                u^e_{4y}
+            \end{matrix}
+        \right)^T
+        = R d
+    $$
+
+\subsection{收敛率分析}
+
+    宏 \texttt{\_\_TEST\_\_} 被定义时，会在计算应力时额外输出高斯点的位移和积分的系数。
+    这个宏可以在 cmake 中通过 \texttt{STAP++\_TEST} 选项开启。
+
+    根据
+    $$ e^2 = \int_\Omega (u-u^e)^2\text{d}\Omega = \sum W_i W_j(u-u^e)^2 |J| $$
+    就可以计算误差的积分。上式中，$W_iW_j|Je|$ 合并为 weight，即
+    $$ e^2 = \sum_{i=1}^{NOE} w_i \sum_{j=1}^3 \left(u_{ij} - u^e_{ij}\right)^2 $$
+
+    通过一个简单的 python 文件，根据高斯点的坐标算出准确位移，我们就可以计算出总的误差 $e$。
+
+    考虑如图 \ref{fig:ele:4Q:1} 这样一个简单的情况。体力随 X 线性变化，Y 方向限制自由度。
+    体力 $\boldsymbol{f}=b\boldsymbol{x}$（均匀梯度重力场）
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./elements/fig/4Qfig1.eps}
+        \caption{4Q 施加载荷}
+        \label{fig:ele:4Q:1}
+    \end{figure}
+
+    容易计算得到应变满足
+    \[
+        \begin{cases}
+            \varepsilon _x=\frac{1-\nu ^2}{E}b\left( 2-\frac{x^2}{2} \right)\\
+            \varepsilon _y=0\\
+            \gamma _{xy}=0\\
+        \end{cases}
+    \]
+
+    位移满足
+    \[
+        \begin{cases}
+            u_x=\frac{\left( 1-\nu ^2 \right) b}{6E}x\left( 12-x^2 \right)\\
+            u_y=0\\
+        \end{cases}
+    \]
+
+    生成输入文件的脚本见 \texttt{data/4Q/genDat.py}。
+
+    处理输出文件的脚本见 \texttt{data/4Q/calcErr.py}。
+
+    网格划分为每单位长度 $1 \sim 32, 64, 128, 256$ 个单元，计算结果如图\ref{fig:ele:4Q:2}所示。
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.9\textwidth]{./elements/fig/4Qfig2.eps}
+        \caption{4Q 收敛率分析}
+        \label{fig:ele:4Q:2}
+    \end{figure}
+
+    从图中可以看到，$n=256$ 的点处偏离了曲线。原因可能是受限于输出文件的精度限制（输出文件仅有 6 位有效数字），有浪费现象。
+
+    去除明显偏差的点（$n = 256$），图像拟合得到表达式
+    $$
+    \log e = -12.5277 + 1.98972 \log l
+    $$
+
+    即，4Q 单元位移二阶收敛。符合理论预期。

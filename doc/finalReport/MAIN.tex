@@ -15,8 +15,9 @@
 \usepackage{multicol}                   % 用于实现在同一页中实现不同的分栏
 \usepackage{geometry}                   % 用于设置页边距
 \usepackage{lipsum}                     % 产生随机文本
-\usepackage{listings}                    % 插入公式
-\lstset{basicstyle=\ttfamily}
+\usepackage{listings}                   % 插入公式
+\usepackage{inconsolata}                % 等宽字体使用 consolas
+\lstset{basicstyle=\ttfamily}           % 代码使用等宽字体
 
 \geometry{a4paper,left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}
 
@@ -87,7 +88,7 @@
          \hline
        \end{tabular}
     \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接．}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接，OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
 
 \section{变形图像与应力云图}
 \label{sec:1-2}
@@ -124,13 +125,14 @@
 
 \chapter{其他单元}
 \label{chap:4}
-    这一章将在上一章的基础上介绍新增的其他单元，包括可用于~3~维背景空间的平面单元（包括~3T,~4Q,~9Q，详见~\ref{sec:4-1},~\ref{sec:4-2},~\ref{sec:4-3}~ 节）、为适应结构的尺度效应而发展出的构造单元（包括~Timoshenko~梁单元、薄板单元、截锥壳单元，详见~\ref{sec:4-4},~\ref{sec:4-5},~\ref{sec:4-6}~ 节）以及可用于解决更广泛的弹性力学问题的扩展单元（包括无限单元和过渡单元，详见~\ref{sec:4-7},~\ref{sec:4-8}~ 节）。
-\section{3T~平面单元}
-\label{sec:4-1}
-    \input{elements/3T.tex}
+    这一章将在上一章的基础上介绍新增的其他单元，包括可用于~3~维背景空间的平面单元（包括4Q, 3T, 9Q，详见~\ref{sec:4-1},~\ref{sec:4-2},~\ref{sec:4-3}~ 节）、为适应结构的尺度效应而发展出的构造单元（包括~Timoshenko~梁单元、薄板单元、截锥壳单元，详见~\ref{sec:4-4},~\ref{sec:4-5},~\ref{sec:4-6}~ 节）以及可用于解决更广泛的弹性力学问题的扩展单元（包括无限单元和过渡单元，详见~\ref{sec:4-7},~\ref{sec:4-8}~ 节）。
+
 \section{4Q~平面单元}
-\label{sec:4-2}
+\label{sec:4-1}
     \input{elements/4Q.tex}
+\section{3T~平面单元}
+\label{sec:4-2}
+    \input{elements/3T.tex}
 \section{9Q~平面单元}
 \label{sec:4-3}
     \input{elements/9Q.tex}
