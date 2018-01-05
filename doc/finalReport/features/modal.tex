@@ -11,7 +11,7 @@
 
 对广义特征值问题,首先给出初始向量 $\boldsymbol{X}_1$ 以及 $\boldsymbol{Y}_1=\boldsymbol{M}\boldsymbol{X}_1$, 之后进入循环.在求得的特征值尚未收敛时,利用逆迭代法求下一步的 $\boldsymbol{X}_{n+1}=\boldsymbol{K}^{-1}\boldsymbol{Y}_n$, $\boldsymbol{Y}_{n+1}=\boldsymbol{M}\boldsymbol{X}_{n+1}$, 并求缩并后的矩阵 $\bar{\boldsymbol{K}}=\boldsymbol{X}_{n+1}^T\boldsymbol{K}\boldsymbol{X}_{n+1}=\boldsymbol{X}_{n+1}^T\boldsymbol{Y}_n$,  $\bar{\boldsymbol{M}}=\boldsymbol{X}_{n+1}^T\boldsymbol{M}\boldsymbol{X}_{n+1}=\boldsymbol{X}_{n+1}^T\boldsymbol{Y}_{n+1}$. 这一部分直接在 C++ 中编写代码运行,主要原因是考虑到将原矩阵扩充为对角阵或者带宽阵均会导致占用不必要的空间,我们小组有 LDLT 以及 Pardiso 两种求解器,目前振动模块只兼容 LDLT, 但将这一部分单独写出也方便之后改用稀疏求解器.
 
-缩并后的矩阵由于维数一般不高,可以取上三角阵存储,方便后续输入 LAPACK 的对应求解驱动进行求解,这里我们使用的是 LAPACKE\_dspgvd 函数,这个函数的作用是对解三角存储的对称矩阵的广义特征值问题的所有特征值和特征向量.解得对应的特征值和特征向量之后,再利用选取的基向量把缩减自由度后的特征向量恢复至原坐标系中.如果特征值已经趋于收敛,那么跳出循环,得到的就是子空间迭代法的前 n 阶特征值与特征向量.
+缩并后的矩阵由于维数一般不高,可以取上三角阵存储,方便后续输入 LAPACK 的对应求解驱动进行求解,这里我们使用的是 \texttt{LAPACKE\_dspgvd} 函数,这个函数的作用是对解三角存储的对称矩阵的广义特征值问题的所有特征值和特征向量.解得对应的特征值和特征向量之后,再利用选取的基向量把缩减自由度后的特征向量恢复至原坐标系中.如果特征值已经趋于收敛,那么跳出循环,得到的就是子空间迭代法的前 $n$ 阶特征值与特征向量.
 
 \subsection{算例验证}
 对于该模态分析的验证我们选取了一个一维的质弹系统,如图\ref{modalex1}.
