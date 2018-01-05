@@ -2,7 +2,7 @@
 \subsection{模态分析简介}
 模态分析的主要问题是解广义特征值问题 $|\mathbf{K}-\lambda\mathbf{M}|=0$ 的前几阶特征值及其对应的特征向量,因此我们把模态分析分为两个部分来进行:组装对应的刚度矩阵和质量矩阵,以及求解广义特征值问题.当我们把自由度选在节点上时,刚度阵就是静态分析中的刚度矩阵,因此我们只需要对于每个单元以类似的方法组装质量矩阵.对于求解广义特征值问题,我们使用的是子空间迭代法.
 \subsection{程序实现}
-在组装质量矩阵时,程序仅给出了杆单元的质量矩阵为例.对单元增加私有变量密度 rho, 并改变其读写函数,并增加纯虚函数组装质量矩阵 ElementMass. 我们使用的是一致质量矩阵,有 $\mathbf{M}=\int\rho\mathbf{N}^T\mathbf{N}\mathrm{d}\Omega$, 因此对于杆单元应当有
+在组装质量矩阵时,程序仅给出了杆单元的质量矩阵为例.对单元增加私有变量密度 \texttt{rho}, 并改变其读写函数,并增加纯虚函数组装质量矩阵 \texttt{ElementMass}. 我们使用的是一致质量矩阵,有 $\mathbf{M}=\int\rho\mathbf{N}^T\mathbf{N}\mathrm{d}\Omega$, 因此对于杆单元应当有
 
 \[
 \mathbf{M}=\frac{W}{3}\left(\begin{array}{cc} 2&1\\1&2 \end{array} \right)
