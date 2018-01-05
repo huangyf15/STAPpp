@@ -23,7 +23,7 @@ w=w_0(x,y)
 \subsection{板单元刚度阵的构造}
 
 这里我们采用了彭细荣书中给出的形函数,
-\[ \mathbf{N}^T=\left\{
+\[ \boldsymbol{N}^T=\left\{
 \begin{array}{c}
 -\frac{1}{8}(s-1)(t-1)(s^2+s+t^2+t-2)\\ -\frac{1}{8}b(s-1)(t-1)^2(t+1)\\ \frac{1}{8}a(s-1)^2(s+1)(t-1) \\
 \frac{1}{8}(s+1)(t-1)(s^2-s+t^2+t-2) \\ \frac{1}{8}b(s+1)(t-1)^2(t+1) \\ \frac{1}{8}a(s+1)^2(s-1)(t-1) \\
@@ -31,7 +31,7 @@ w=w_0(x,y)
 \frac{1}{8}(s-1)(t+1)(s^2+s+t^2-t-2) \\ -\frac{1}{8}b(s-1)(t+1)^2(t-1) \\ -\frac{1}{8}a(s-1)^2(s+1)(t+1) \\
 \end{array} \right\} \]
 
-根据 $\mathbf{B}=[-\frac{\partial^2}{\partial x^2},-\frac{\partial^2}{\partial y^2},-2\frac{\partial^2}{\partial x \partial y}]^T\mathbf{N}$ 以及 $\mathbf{K}=4ab\mathbf{B}^T\mathbf{D}\mathbf{B}$ 得到总刚度阵.需要说明的是,这里的形函数事实上是一个沿板厚变化的值,但经过积分可以化为弯曲刚度中的一部分.对于得到的刚度阵利用 Zienkiewicz 的原始论文进行初步的验证,二者得到的结果是一致的.
+根据 $\boldsymbol{B}=[-\frac{\partial^2}{\partial x^2},-\frac{\partial^2}{\partial y^2},-2\frac{\partial^2}{\partial x \partial y}]^T\boldsymbol{N}$ 以及 $\boldsymbol{K}=4ab\boldsymbol{B}^T\boldsymbol{D}\boldsymbol{B}$ 得到总刚度阵.需要说明的是,这里的形函数事实上是一个沿板厚变化的值,但经过积分可以化为弯曲刚度中的一部分.对于得到的刚度阵利用 Zienkiewicz 的原始论文进行初步的验证,二者得到的结果是一致的.
 
 在输出刚度阵时,我们利用 MATLAB 进行完全的积分,并用 char 函数将符号运算输出为字符串,通过少量替换就可以直接在 C++ 中使用.
 
