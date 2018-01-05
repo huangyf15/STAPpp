@@ -1,0 +1,23 @@
+    这里我们采用的文件格式为~dat，具体数据格式如下
+\begin{verbatim}
+TITLE = " STAPpp FEM "
+
+VARIABLES = "X_POST", "Y_POST", "Z_POST", "STRESS_I", "STRESS_II",
+        "STRESS_III", "STRESS_VONMISES", "STRESS_XX", "STRESS_YY",
+        "STRESS_ZZ", "STRESS_XY", "STRESS_YZ", "STRESS_ZX"
+
+/* --------- ------ 控制行 ---- ----------- */
+// NodeNum：结点数，若有重复输出的结点，则重复计数；
+// EleNum：单元数
+// FEPOINT：有限元格式
+// EleType：单元类型，包括 BRICK,QUADRILATERAL 等
+ZONE T = "Bridge", N = NodeNum, E = EleNum, F = FEPOINT, ET = EleType, C = RED
+
+/* --------------- 结点信息 -------------- */
+// 依次输入 "X_POST", "Y_POST", "Z_POST", "STRESS_I", "STRESS_II",
+        "STRESS_III", "STRESS_VONMISES", "STRESS_XX", "STRESS_YY",
+        "STRESS_ZZ", "STRESS_XY", "STRESS_YZ", "STRESS_ZX"
+
+/* ---------- 单元-节点连接信息 ---------- */
+// 依次输入每个单元对应的所有结点号，结点号排序方式按上一段输出的顺序
+\end{verbatim}

@@ -1,0 +1,351 @@
+    Timoshenko~梁与~Euler-Bernoulli~梁是两种经典的梁模型，二者的共同之处在于均采用了平截面假设，即变形前位于中性轴法线上的点在变形后仍然共线。二者的关键性区别在于，后者的模型中采用了直法线假设，这直接导致了剪应变为零，因此只适用于剪切变形可以忽略的细长梁；而前者对此作了修正，采用了剪应变沿截面均匀分布的假设，从而可以解决包括短粗梁在内的更广泛的工程问题。需要指出的是，事实上梁的剪应变沿截面并非均匀分布的，因此在实际应用中还需进行系数修正。
+    
+    下面，我们先从变分原理出发导出~Timoshenko~梁的控制方程，进而以此为基础构造分片试验所需要的精确解；接着，给出两种~Timoshenko~梁单元的构造思路及过程；最后，通过分片试验与收敛率分析两种途径对各种~Timoshenko~梁单元进行收敛性分析。
+\subsection{变分原理与精确解构造}
+\subsubsection{变分原理与强形式}
+    为简便起见，仅以挠度在~$y$~方向的情形进行推导。写出系统的势能泛函表达式
+    \[{\Pi _p} = \int_0^l {\frac{1}{2}E{I_z}\kappa _z^2dx}  + \int_0^l {\frac{1}{2}\frac{{GA}}{k}\gamma _{xy}^2dx}  - \int_0^l {\overline{q}vdx}  - {{\overline{N}_{yj}}{v_j}}  - {{\overline{M}_{zk}}{\theta _{zk}}}. \]
+    其中，
+    \begin{align*}
+      {\kappa _z} &\equiv \frac{{d{\theta _z}}}{{dx}}, \\
+      {\gamma _{xy}} &\equiv \frac{{dv}}{{dx}} - {\theta _z}.
+    \end{align*}
+    利用最小势能原理~$\delta \Pi_p=0$~可得到如下控制方程
+    \begin{align}
+      &E{I_z}\frac{{d{\kappa _z}}}{{dx}} + \frac{{GA}}{k}{\gamma _{xy}} + {{\bar M}_{zk}}\delta (x - {x_k}) = 0, \\
+      &\frac{{GA}}{k}\frac{{d{\gamma _{xy}}}}{{dx}} + \bar q + {{\bar N}_{yj}}\delta (x - {x_j}) = 0.
+    \end{align}
+    这里已经假定梁的截面性质沿梁均匀分布。这样就得到了~Timoshenko~梁控制方程的强形式。
+
+    与上面等价的另一种推导强形式的方法是，利用截面局部坐标系中内力分量之间的关系
+    \begin{align}
+      &\frac{{d{M_z}}}{{dx}} + {F_y} = 0,\\
+      &\frac{{d{F_y}}}{{dx}} + \overline{q} = 0.
+    \end{align}
+    这里没有考虑集中力载荷与集中力矩载荷的作用。其中，
+    \begin{align*}
+      {M_z}&\equiv E{I_z}{\kappa _z} =  E{I_z}\frac{{d{\theta _z}}}{{dx}}, \\
+      {F_y}&\equiv \frac{{GA}}{k}{\gamma _{xy}} = \frac{{GA}}{k}\left( {\frac{{dv}}{{dx}} - {\theta _z}} \right).
+    \end{align*}
+\subsubsection{悬臂梁：用于分片试验的精确解}
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=4.0in]{./fig/Timo+example.eps}\\
+      \caption{Example}\label{fig:01}
+    \end{figure}
+    我们考虑一端固定、另一端受集中载荷的矩形截面悬臂梁的情形，如图~\ref{fig:01}~所示。材料/几何尺寸以及相应的材料/截面性质依次为
+    \begin{itemize}
+      \item Young's Modulus $E = 1000$, Poisson's ratio $\nu = 0.25$, $k = \frac{6}{5};$
+      \item $a := Height_y = 0.3,\;b := Height_z = 0.6 \to Area = 0.18,\;I_{yy} = 0.0054,\;I_{zz} = 0.00135;$
+      \item $Theta_{y1} = 0,\;Theta_{y2} = 0,\;Theta_{y3} = -1,\;l = 1.$
+    \end{itemize}
+
+    由于~Timoshenko~梁模型的控制方程为线性方程，因此只需分别求出两种工况下的位移精确解，再进行线性叠加即可。下面给出了两种工况下的精确解表达式，其中的坐标均在单元局部坐标系中。
+    \begin{enumerate}
+      \item 集中弯矩载荷~$M_z=1$：
+        \begin{align*}
+          v &= \frac{{M{x^2}}}{{2E{I_z}}} =  \frac{{10}}{{27}}{x^2} = 0.\dot{3}7\dot{0}x^2; \\
+          \theta_z &=  \frac{{Mx}}{{E{I_z}}} = \frac{{20}}{{27}}x = 0.\dot{7}4\dot{0}x.
+        \end{align*}
+      \item 集中力载荷~$F_y=1$：
+        \begin{align*}
+          v &=  - \frac{F}{{6E{I_z}}}{x^3} + \frac{{Fl}}{{2E{I_z}}}{x^2} + \frac{k}{{GA}}x \\
+            &=  - \frac{{10}}{{{\rm{81}}}}{x^3} + \frac{{10}}{{27}}{x^2} + \frac{1}{{60}}x \\
+            &=  -0.\dot{1}2345679\dot{0}x^3 + 0.\dot{3}7\dot{0}x^2 + 0.01\dot{6}x; \\
+          {\theta _z} &= - \frac{F}{{2E{I_z}}}{x^2} + \frac{{Fl}}{{E{I_z}}}x  \\
+                      &= - \frac{{10}}{{{\rm{27}}}}{x^2} + \frac{{20}}{{27}}x  \\
+                      &= -0.\dot{3}7\dot{0}x^2 + 0.\dot{7}4\dot{0}x.
+        \end{align*}
+    \end{enumerate}
+
+\subsection{有限元离散：两种不同的格式构造方案}
+\subsubsection{坐标变换}
+    我们首先约定，带“$\sim$”为单元局部坐标系中的量，否则为单元背景坐标系中的量。上述坐标系的定义如下
+    \begin{description}
+      \item[单元局部坐标系] 以节点~1~为原点~$\tilde O$，以~$1\to 2$~ 为单元局部坐标系的~$\tilde x$~轴，$\tilde y,\tilde z$~轴由惯性主矩的方向确定，且要求~$\tilde O\tilde x\tilde y\tilde z$~ 成右手系。
+      \item[单元背景坐标系] 以节点~1~为原点~$\tilde O$，以背景空间的~$x,y,z$~轴方向建立单元背景坐标系~$\tilde Oxyz$。
+    \end{description}
+
+    对于无限小转动，角位移可以近似利用向量进行描述，因此可直接利用坐标转换矩阵
+    \begin{equation}\label{equ:3}
+      \bm{L} = diag\{\bm{Q},\bm{Q},\bm{Q},\bm{Q}\}.
+    \end{equation}
+    其中，$Q$~即为坐标变换矩阵，其元素定义为~$Q_{ij}=\bm{e}_i\cdot \bm{\tilde e}_j$。由此可得向量与二阶张量的变换公式分别为
+    \begin{align}\label{equ:4}
+      \bm{a} &= \bm{Q\cdot \tilde a}; \\
+      \bm{K} &= \bm{Q\cdot \tilde K \cdot Q}^T.
+    \end{align}
+
+    本节以下所有讨论均在单元局部坐标系中进行。
+
+\subsubsection{位移转角一致插值~(Euler-Bernoulli~梁的直接修正)}
+
+    将总位移分解为弯曲位移项与纯剪位移项
+    \begin{align*}
+        \bm{a} &= {\bm{a}_b} + {\bm{a}_s}. \\
+        \bm{a}_i &= (u_i,\;v_i,\;w_i,\;\varphi_i,\;\theta_{yi},\;\theta_{zi})^T;\\
+        \bm{a}_b &= (\bm{a}_{b1},\;\bm{a}_{b2})^T;\\
+        \bm{a}_s &= (\bm{a}_{s1},\;\bm{a}_{s2})^T;\\
+        \bm{a}_{bi} &= (u_i,\;v_{bi},\;w_{bi},\;\varphi_i,\;\theta_{yi},\;\theta_{zi})^T;\\
+        \bm{a}_{si} &= (0,\;v_{si},\;w_{si},\;0,\;0,\;0)^T.
+    \end{align*}
+    其中，
+    \begin{align*}
+        \frac{dv_{bi}}{dx} &= \theta_{zi};\\
+        \frac{dw_{bi}}{dx} &= -\theta_{yi}.
+    \end{align*}
+
+    下面以~$y$~方向的刚度阵为例进行推导。对弯曲位移项进行两点~Hermite~ 插值，对剪切位移项进行两点线性插值
+    \begin{equation*}
+      \begin{aligned}
+        v_b &= N_1v_{b1} + N_2\theta_1 + N_3v_{b2} + N_4\theta_4, \\
+        v_s &= N_5v_{s1} + N_6v_{s2}.
+      \end{aligned}
+    \end{equation*}
+    其中，（$0 \le \xi \le 1$）
+    \begin{align*}
+      N_1 &= 1-3\xi^2+2\xi^3 &
+      N_2 &= (\xi - 2\xi^2 + \xi^3)\\
+      N_3 &= 3\xi^2 - 2\xi^3 &
+      N_4 &= (\xi^3-\xi^2)l \\
+      N_5 &= 1-\xi &
+      N_6 &= \xi.
+    \end{align*}
+
+    将上述用形函数表达的位移项代入能量泛函中进行变分，可以得到
+    \begin{equation}\label{equ:1}
+        {{\bm{K}}_b}{\bm{a}_b} = {\bm{P}_b},{{\bm{K}}_s}{\bm{a}_s} = {\bm{P}_s}.
+    \end{equation}
+    由于单元内部成立平衡方程~$Q=\frac{dM}{dx}$，因此弯曲位移项与剪切位移项均可以表达为总位移与转角的线性组合
+    \begin{equation}\label{equ:2}
+    \left( \begin{array}{l}
+        v_{b2} - v_{b1}\\
+        v_{s2} - v_{s1}
+        \end{array} \right) = \left( {\begin{aligned}
+        {\frac{1}{{1 + b_z}}}&\quad \ \ {\frac{{lb_z}}{{2(1 + b_z)}}}\\
+        {\frac{b_z}{{1 + b_z}}}&\quad { - \frac{{lb_z}}{{2(1 + b_z)}}}
+        \end{aligned}} \right)\left( \begin{array}{l}
+        {v_2} - {v_1}\\
+        {\theta _{z1}} + {\theta _{z2}}
+    \end{array} \right).
+    \end{equation}
+    其中，$b_z:=\frac{12EI_zk}{GAl^2}$~为剪切附加项，对于矩形截面梁有~$k=\frac{6}{5}$。注意到公式~(\ref{equ:2})~的特点，将方程~(\ref{equ:1})~ 的式~1~ 与式~5~ 求和，式~3~ 与式~6~ 求和，将公式~(\ref{equ:2})~代入方程~(\ref{equ:1})~ 中，可以得到最终的刚度方程
+    \[\bm{Ka} = \bm{P}.\]
+    其中，
+    \begin{align}
+      \bm{K} & = \frac{{EI_z}}{{(1 + b_z)l^3}}\left( {\begin{array}{*{20}{c}}
+                    {12}&{- 12}&{6l }&{6l}\\
+                    {}&{ 12}&{- 6l}&{ - 6l}\\
+                    {}&{}&{(4 + b_z){l^2}}&{(2 - b_z){l^2}}\\
+                    {[symmetry]}&{}&{}&{(4 + b_z){l^2}}
+                    \end{array}} \right) \\
+      \bm{a} & = (v_1,\;v_2,\;\theta_{z1},\;\theta_{z2})^T.
+    \end{align}
+
+    一般地，考虑所有的位移分量
+    \begin{align*}
+        \bm{a} &= {\bm{a}_b} + {\bm{a}_s}. \\
+        \bm{a}_i &= (u_i,\;v_i,\;w_i,\;\varphi_i,\;\theta_{yi},\;\theta_{zi})^T.\\
+        \bm{P} &= (N_{xi},\;N_{yi},\;N_{zi},\;M_{xi},\;M_{yi},\;M_{zi})^T.
+    \end{align*}
+    则在单元局部坐标系内的刚度阵可写为
+
+    \begin{equation}\label{equ:5}
+    {\zihao{-6}{
+        \bm{K} = \left( {\begin{array}{*{20}{c}}
+        {{\rm{Tens}}}&0&0&0&0&0&{ - {\rm{Tens}}}&0&0&0&0&0\\
+        {}&{{\rm{Bendz1}}}&0&0&0&{{\rm{Bendz2}}}&0&{ - {\rm{Bendz1}}}&0&0&0&{{\rm{Bendz2}}}\\
+        {}&{}&{{\rm{Bendy1}}}&0&{ - {\rm{Bendy2}}}&0&0&0&{ - {\rm{Bendy1}}}&0&{ - {\rm{Bendy2}}}&0\\
+        {}&{}&{}&{{\rm{Tors}}}&0&0&0&0&0&{ - {\rm{Tors}}}&0&0\\
+        {}&{}&{}&{}&{{\rm{Bendy3}}}&0&0&0&{{\rm{Bendy2}}}&0&{{\rm{Bendy4}}}&0\\
+        {}&{}&{}&{}&{}&{{\rm{Bendz3}}}&0&{ - {\rm{Bendz2}}}&0&0&0&{{\rm{Bendz4}}}\\
+        {}&{}&{}&{}&{}&{}&{{\rm{Tens}}}&0&0&0&0&0\\
+        {}&{}&{}&{}&{}&{}&{}&{{\rm{Bendz1}}}&0&0&0&{ - {\rm{Bendz2}}}\\
+        {}&{}&{}&{}&{}&{}&{}&{}&{{\rm{Bendy1}}}&0&{{\rm{Bendy2}}}&0\\
+        {}&{}&{[symmetry]}&{}&{}&{}&{}&{}&{}&{{\rm{Tors}}}&0&0\\
+        {}&{}&{}&{}&{}&{}&{}&{}&{}&{}&{{\rm{Bendy3}}}&0\\
+        {}&{}&{}&{}&{}&{}&{}&{}&{}&{}&{}&{{\rm{Bendz3}}}
+        \end{array}} \right) .
+    }}
+    \end{equation}
+
+    其中，
+    \begin{itemize}
+      \item Tens = $\frac{EA}{l}$,\;Tors = $\frac{GJ}{l}$;
+      \item Bendy1 = $\frac{12EI_y}{(1+b_y)l^3}$,
+            \;Bendy2 = $\frac{6EI_y}{(1+b_y)l^2}$,
+            \;Bendy3 = $\frac{(4+b_y)EI_y}{(1+b_y)l}$,
+            \;Bendy4 = $\frac{(2-b_y)EI_y}{(1+b_y)l}$;
+      \item Bendz1 = $\frac{12EI_z}{(1+b_z)l^3}$,
+            \;Bendz2 = $\frac{6EI_z}{(1+b_z)l^2}$,
+            \;Bendz3 = $\frac{(4+b_z)EI_z}{(1+b_z)l}$,
+            \;Bendz4 = $\frac{(2-b_z)EI_z}{(1+b_z)l}$.
+    \end{itemize}
+    
+    输出的单元内力分量包括节点的轴力、剪力和扭矩值。具体计算公式如下
+    \begin{align*}
+      {F_{x2}} &= -{F_{x1}} = EA\varepsilon_{xx} = \frac{{EA({u_2} - {u_1})}}{l},\\
+      {F_{y2}} &= - {F_{y1}} = \frac{{GA}}{k}{\gamma _{xy}} = \frac{{GA}}{{kl}}\frac{{{b_z}}}{{1 + {b_z}}}\left( {({v_2} - {v_1}) - \frac{{\rm{1}}}{2}({\theta _{z1}} + {\theta _{z2}})l} \right),\\
+      {F_{z2}} &= - {F_{z1}} = \frac{{GA}}{k}{\gamma _{xz}} = \frac{{GA}}{{kl}}\frac{{{b_y}}}{{1 + {b_y}}}\left( {({w_2} - {w_1}) + \frac{{\rm{1}}}{2}({\theta _{y1}} + {\theta _{y2}})l} \right),\\
+      {M_{x2}} &= -{M_{x1}} = GJ\alpha = \frac{{GJ({\varphi _2} - {\varphi _1})}}{l},\\
+      {M_{y1}} &= E{I_y}\frac{{d{\theta _y}}}{{dx}} =  - \frac{{E{I_y}}}{{{l^2}}}\left( {6\frac{{{w_2} - {w_1}}}{{{b_y} + 1}} - 3\frac{{{b_y}}}{{{b_y} + 1}}({\theta _{y1}} + {\theta _{y2}})l + (4{\theta _{y1}} + 2{\theta _{y2}})l} \right),\\
+      {M_{y2}} &= E{I_y}\frac{{d{\theta _y}}}{{dx}} =  - \frac{{E{I_y}}}{{{l^2}}}\left( { - 6\frac{{{w_2} - {w_1}}}{{{b_y} + 1}} + 3\frac{{{b_y}}}{{{b_y} + 1}}({\theta _{y1}} + {\theta _{y2}})l - (2{\theta _{y1}} + 4{\theta _{y2}})l} \right),\\
+      {M_{z1}} &= E{I_z}\frac{{d{\theta _z}}}{{dx}} = \frac{{E{I_z}}}{{{l^2}}}\left( {6\frac{{{v_2} - {v_1}}}{{{b_z} + 1}} + 3\frac{{{b_z}}}{{{b_z} + 1}}({\theta _{z1}} + {\theta _{z2}})l - (4{\theta _{z1}} + 2{\theta _{z2}})l} \right),\\
+      {M_{z2}} &= E{I_z}\frac{{d{\theta _z}}}{{dx}} = \frac{{E{I_z}}}{{{l^2}}}\left( { - 6\frac{{{v_2} - {v_1}}}{{{b_z} + 1}} - 3\frac{{{b_z}}}{{{b_z} + 1}}({\theta _{z1}} + {\theta _{z2}})l + (2{\theta _{z1}} + 4{\theta _{z2}})l} \right).
+    \end{align*}
+
+    输出单元中性面上的~Gauss~点应力，用于恢复并输出节点应力。具体包括单元的轴向正应力~$\sigma_{xx}$、弯曲剪应力~$\sigma_{xy}$~ 与~$\sigma_{xz}$，其计算公式为
+    \begin{align*}
+      {\sigma _{xx}} &= E\varepsilon_{xx} = \frac{{E({u_2} - {u_1})}}{l}, \\
+      {\sigma _{xy}} &= \frac{G}{k}\gamma_{xy}\\
+                     &= \frac{G}{{kl}}\frac{{{b_z}}}{{1 + {b_z}}}\left( {({v_2} - {v_1}) - \frac{{\rm{1}}}{2}({\theta _{z1}} + {\theta _{z2}})l} \right), \\
+      {\sigma _{xz}} &= \frac{G}{k}\gamma_{xz}\\
+                     &= \frac{G}{{kl}}\frac{{{b_y}}}{{1 + {b_y}}}\left( {({w_2} - {w_1}) + \frac{1}{2}({\theta _{y1}} + {\theta _{y2}})l} \right).
+    \end{align*}
+
+\subsubsection{位移转角独立同阶插值}
+
+    位移转角独立进行两点线性插值，以~$v$~方向的刚度阵为例，其单元刚度阵为
+    \begin{align}
+    \bm{K} = \frac{{E{I_z}}}{{{l}}}\left( {\begin{array}{*{20}{c}}
+    {0}&{0}&{0}&{0}\\
+    {0}&{0}&{0}&{0}\\
+    {0}&{0}&{1}&{-1}\\
+    {0}&{0}&{-1}&{1}
+    \end{array}} \right) + \frac{{GA}}{{4kl}}\left( {\begin{array}{*{20}{c}}
+    4&{ - 4}&{2l}&{2l}\\
+    {}&4&{ - 2l}&{ - 2l}\\
+    {}&{}&{{l^2}}&{{l^2}}\\
+    {[sym]}&{}&{}&{{l^2}}
+    \end{array}} \right).
+    \end{align}
+
+    类似地，考虑所有的位移分量时，单元局部坐标系内的刚度阵可写为与式~(\ref{equ:5})~相同的形式，只是其中的变量有所不同。其中，
+    {\zihao{-5}
+    \begin{itemize}
+      \item Tens = $\frac{EA}{l}$,\;Tors = $\frac{GJ}{l}$;
+      \item Bendy1 = $\frac{GA}{kl}$,
+            \;Bendy2 = $\frac{GA}{2k}$,
+            \;Bendy3 = $\frac{GAl}{4k} \left(or\;\frac{GAl}{3k}\right)+\frac{EI_y}{l}$,
+            \;Bendy4 = $\frac{GAl}{4k} \left(or\;\frac{GAl}{6k}\right)-\frac{EI_y}{l}$;
+      \item Bendz1 = $\frac{GA}{kl}$,
+            \;Bendz2 = $\frac{GA}{2k}$,
+            \;Bendz3 = $\frac{GAl}{4k} \left(or\;\frac{GAl}{3k}\right)+\frac{EI_z}{l}$,
+            \;Bendz4 = $\frac{GAl}{4k} \left(or\;\frac{GAl}{6k}\right)-\frac{EI_z}{l}$.
+    \end{itemize}
+    }
+    上述式子中，括号外的项是对转角进行选择性减缩积分（~Selective Reduced Integration，简称~SRINT）的结果，括号内为精确积分（~Accurate Integration，简称~ACINT）的结果。
+
+    输出的单元内力分量包括节点的轴力、剪力和扭矩值。具体计算公式如下
+    \begin{align*}
+      {F_{x2}} &= - {F_{x1}} = EA\varepsilon_{xx} = \frac{{EA({u_2} - {u_1})}}{l},\\
+      {F_{y2}} &= - {F_{y1}} = \frac{GA}{k}\gamma_{xy} = \frac{{GA}}{{kl}}\left( {({v_2} - {v_1}) - \frac{(\theta _{z1} + \theta _{z2})l}{2}} \right),\\
+      {F_{z2}} &= - {F_{z1}} = \frac{GA}{k}\gamma_{xz} = \frac{{GA}}{{kl}}\left( {({w_2} - {w_1}) - \frac{(\theta _{y1} + \theta _{y2})l}{2}} \right),\\
+      {M_{x2}} &= - {M_{x1}} = GJ\alpha = \frac{{GJ({\varphi _2} - {\varphi _1})}}{l},\\
+      {M_{y2}} &= E{I_y}\frac{{d{{\tilde \theta }_y}}}{{dx}} = \frac{{E{I_y}}}{l}({\theta _{y2}} - {\theta _{y1}}) + \frac{1}{2}{F_{z2}}l,\\
+      {M_{y1}} &= E{I_y}\frac{{d{{\tilde \theta }_y}}}{{dx}} = \frac{{E{I_y}}}{l}({\theta _{y2}} - {\theta _{y1}}) - \frac{1}{2}{F_{z2}}l,\\
+      {M_{z2}} &= E{I_z}\frac{{d{{\tilde \theta }_z}}}{{dx}} = \frac{{E{I_z}}}{l}({\theta _{z2}} - {\theta _{z1}}) - \frac{1}{2}{F_{y2}}l,\\
+      {M_{z1}} &= E{I_z}\frac{{d{{\tilde \theta }_z}}}{{dx}} = \frac{{E{I_z}}}{l}({\theta _{z2}} - {\theta _{z1}}) + \frac{1}{2}{F_{y2}}l.
+    \end{align*}
+    需要说明的是，由于转角插值函数的阶数限制，有可能出现单元主矢或单元主矩不为零的情况，因此我们用单元中点上的剪力代替节点处的剪力，并依此来修正节点处的弯矩。细心的读者可能会注意到，这种处理方式与选择性减缩积分的思想是相通的。
+
+    输出单元中性面上的~Gauss~点应力，用于恢复并输出节点应力。具体包括单元的轴向正应力~$\sigma_{xx}$、弯曲剪应力~$\sigma_{xy}$~ 与~$\sigma_{xz}$，其计算公式为
+    \begin{align*}
+      {\sigma_{xx}} &= E\varepsilon_{xx} = \frac{{E({u_2} - {u_1})}}{l}, \\
+      {\sigma_{xy}} &= \frac{G}{k}\gamma_{xy}\\
+                    &= \frac{G}{{kl}}\left( {({v_2} - {v_1}) - \frac{1}{2}({\theta _{z1}} + {\theta _{z2}})l} \right),\\
+      {\sigma_{xz}} &= \frac{G}{k}\gamma_{xz}\\
+                    &= \frac{G}{{kl}}\left( {({w_2} - {w_1}) + \frac{1}{2}({\theta _{y1}} + {\theta _{y2}})l} \right).
+    \end{align*}
+
+\subsubsection{剪应变直接插值}
+    对于~Timoshenko~梁单元的情况，直接用剪应变插值的方法与挠度转角独立插值并减缩积分的方法是等价的，这里不再赘述。
+
+\subsection{程序实现与收敛性分析}
+\subsubsection{程序实现}
+    我们在~\texttt{STAPpp}~程序中新增了两种单元，即~\texttt{TimoshenkoSRINT}~和~\texttt{TimoshenkoEBMOD}，分别对应于两种不同的~Timoshenko~梁单元格式构造思路，即位移转角独立插值方法以及欧拉伯努利梁剪切修正方法。对于前者，我们还设置了预处理器标签
+    ~\texttt{\uline{ }TIMOSHENKO\uline{ }ACCURATE\uline{ }INTEGRATION\underline{ }}~ 用于单元刚度阵数值积分方法的转换，开启时采用精确积分、关闭时采用减缩积分。另外，由于两种单元涉及的材料/截面性质是类似的，我们在基类~\texttt{Material}~ 的基础上定义了派生类~\texttt{CTimoshenkoMaterial}~ 用于储存上述两种单元的材料/截面性质。
+
+    单元刚度阵组装以及单元应力计算的算法上一大节已经给予了充分的说明，下面主要叙述材料/截面性质相关的实现细节。在阅读了~ABAQUS~文档后，笔者最终决定在~Timoshenko~梁单元部分采用杨氏模量、泊松比、截面面积、局部坐标轴惯性矩以及局部~$y$~轴方向的输入参数设置方式。在输入格式的具体设置上，材料/截面性质控制行与纯弯梁单元完全相同，依次为杨氏模量~\texttt{E}、 泊松比~\texttt{nu}、 截面面积~\texttt{Area}、 单元局部~$y$~轴惯性矩~\texttt{Iyy}、单元局部~$z$~ 轴惯性矩~\texttt{Izz}、 单元局部~$y$~ 轴方向~\texttt{Thetay1, Thetay2, Thetay3}。
+\subsubsection{分片试验结果}
+    我们首先探讨~Timoshenko~梁单元的分片试验的含义。一般认为，分片试验应该包括单元的刚体模态与常应变模态。前者的概念是清楚的，而后者的含义则随单元类型的不同而有所差异，但总的来说是指使得单元应变能表达式中的被积函数项为常数的位移模态。对于~Euler-Bernoulli~梁单元来说，所谓常应变模态实际上是常曲率模态，这与该单元应变能表达式中只含有弯曲应变能项是一致的。对于~Timoshenko~梁来说，所谓常应变模态实际上应该指常曲率且常剪应变模态，具体到位移与转角的分布上，可写为
+    \begin{align*}
+      v &= \frac{1}{2}ax^2 + cx + d\;; \\
+      \theta_z &= ax + b.
+    \end{align*}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=4.0in]{./fig/Timo+patchtest.eps}\\
+      \caption{Patch test}\label{fig:02}
+    \end{figure}
+
+    容易看到，这实际上正对应于一端受集中剪力载荷、集中弯矩载荷共同作用的悬臂梁情形，其精确解我们在第一大节已经给出。作为分片试验，我们采用非等距单元（如图~\ref{fig:02}~所示），并分别在端部施加集中剪力载荷以及集中弯矩载荷。
+    
+    图~\ref{fig:1},\;\ref{fig:2}~分别给出了采用选择性减缩积分的~TimoshenkoSRINT~格式在集中弯矩和集中剪力作用下计算得到的有限元解与精确解的对比图；图~\ref{fig:3},\;\ref{fig:4}~分别给出了精确积分时对应的有限元解与精确解的对比图。
+
+    对比图~\ref{fig:1},\;\ref{fig:2}~和图~\ref{fig:3},\;\ref{fig:4}~可以看到，选择性缩减积分提高了节点位移和转角的计算精度；并且，除了端部剪力载荷工况下的位移曲线外，经过选择性缩减积分的~TimoshenkoSRINT~格式均通过了分片试验。为了确保收敛性，下一小节我们将对~TimoshenkoSRINT~格式进行收敛率分析。
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_M_0.eps}\\
+      \caption{Concentrated $M_z$ {\bf{WITH}} SRINT}\label{fig:1}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_F_0.eps}\\
+      \caption{Concentrated $F_y$ {\bf{WITH}} SRINT}\label{fig:2}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_M_1.eps}\\
+      \caption{Concentrated $M_z$ {\bf{WITHOUT}} SRINT}\label{fig:3}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_F_1.eps}\\
+      \caption{Concentrated $F_y$ {\bf{WITHOUT}} SRINT}\label{fig:4}
+    \end{figure}
+
+    图~\ref{fig:5},\;\ref{fig:6}~分别给出了~TimoshenkoEBMOD~格式在集中弯矩和集中剪力作用下计算得到的有限元解与精确解的对比图。由此可见，该单元可以通过分片试验，且由形函数的特点可知该单元具有四阶收敛性。
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+EBMOD_PATCH_M.eps}\\
+      \caption{Concentrated $M_z$ with EBMOD}\label{fig:5}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+EBMOD_PATCH_F.eps}\\
+      \caption{Concentrated $F_y$ with EBMOD}\label{fig:6}
+    \end{figure}
+
+\subsubsection{收敛率分析}
+     \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_CONV_M.eps}\\
+      \caption{Convergence Curve (Concentrated $M_z$)}\label{fig:11}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0in]{./fig/Timo+SRINT_CONV_F.eps}\\
+      \caption{Convergence Curve (Concentrated $F_y$)}\label{fig:12}
+    \end{figure}
+
+    为了得到~TimoshenkoSRINT~梁单元的收敛率，我们仍沿用分片试验时的模型来考察误差应变能随等距单元数加倍时的性态。图~\ref{fig:11}~ 给出了~TimoshenkoSRINT~ 格式两种积分方法在端部集中弯矩载荷工况下的收敛率曲线，图~\ref{fig:12}~则给出了集中剪力作用下的收敛率曲线。这里，误差采用能量范数的平方度量，其中误差应变能定义为~$U(u-u^h)$。
+
+    从上述收敛率分析的结果可以看出，在误差能量范数的意义下，选择性缩减积分的~TimoshenkoSRINT~具有一阶收敛率，而精确积分情形的收敛率则很可能小于一阶。因此，尽管后者在单元数较少时可能会有较好的表现，但当单元数增多时，前者的精度会提高得更快并最终占据绝对优势。

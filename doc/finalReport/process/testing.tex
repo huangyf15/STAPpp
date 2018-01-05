@@ -1,0 +1,43 @@
+因为我们组使用 GitHub 的私有库，其相对于 GitLab 服务器最大的好处之一就在于对公网开放，因此可以引入第三方服务。在注册 GitHub 教育优惠后，我们可以免费使用 \url{travis-ci.com} 提供的持续集成（Continuous integration, CI）服务，这使得我们在每次 push 和提交 Pull Request 的时候都可以进行一次编译检查和分片实验测试，防止错误和冲突影响到代码。在实际使用过程中，CI 多次起到了作用，代码编译错误或是分片试验没通过就不能通过检查，也不能合并到主分支，大幅度减少了 code review 的时间。我们每一个 master 上的提交都能完成编译且通过分片测试，保证了 master 的稳定性。
+
+\subsection{测试模块的实现}
+
+    首先，我们实现了一个跨平台的判断分片实验通过与否的脚本，见 \texttt{data/verify.py}。该脚本可以找到输出文件中所有点的位移和转角，并通过读取 \texttt{data/accurate.json} 获得解析的精确解表达式，自动计算精确解，与输出文件中的计算值比较，在设定的阈值（$10^{-4}$）精度下通过分片实验。
+
+    该脚本非常易于添加新单元，只需要在 \texttt{data/accurate.json} 添加新的精确解析解，并在测试脚本 \texttt{data/run-patch.py} 中添加测试即可。
+    
+    添加精确解的过程也很简单，在 \texttt{data/accurate.json} 中如下书写线性表达式即可。
+
+    \begin{lstlisting}[language=Java]
+    "3T": {
+        "args": {
+            "b": 10,
+            "E": 1.0e6,
+            "v": 0.3
+        },
+        "dx": "b/E*node.x",
+        "dy": "-v*b/E*node.y"
+    }
+    \end{lstlisting}
+
+    通过运行 \texttt{data/run-patch.py}，将编译好的二进制 \texttt{stap++} 地址作为命令行参数传入，即可一次性进行全部单元的分片试验。
+    命令行如下：
+
+    \begin{center}
+        \texttt{\$ py ./data/run-patch.py ./build/stap++}    
+    \end{center}
+
+    另外，在 \texttt{test/test.py} 中，我们还实现了一个自动编译、自动测试的跨平台测试脚本。这个脚本通过调用 cmake，分别在使用 LDLT 和 Pardiso 求解器两个选项的情况下进行编译和测试。它跨平台，在 Windows 下通过调用 \texttt{MSBuild.exe} 进行编译，在 Linux 下通过调用 Makefile 进行编译。
+    调用命令行如下：
+
+    \begin{center}
+        \texttt{\$ py ./test/test.py}
+    \end{center}
+
+\subsection{持续集成的实现}
+
+    在绑定 travis CI 后，在项目根目录下添加 \texttt{.travis.yml} 文件，在其中实现了自动安装依赖 MKL 和 eigen-3 的功能。安装好依赖之后，自动运行 \texttt{test/test.py}，进行编译和分片实验的测试。只有全部分片实验通过，测试才算通过。测试过程会重复两遍，分别使用 \texttt{gcc} 和 \texttt{clang} 作为编译器。
+
+    为了提高编译效率，我们设置了每次编译后 travis 自动缓存 MKL 的 include 文件夹和链接库文件夹。在没有找到缓存的情况下，为在 travis CI 上自动安装 MKL，我们还实现了一个 \texttt{test/installMKL.py} 脚本，它可以在 Linux 平台下自动安装 MKL。
+
+    另外，为了在 Linux 下正常测试，我们对 \texttt{src/CMakeLists.txt} 进行了调整，在其中设置了 include 路径和链接路径，能够分别在 Windows 和 Linux 平台上自动链接 MKL 静态链接库，无需再手动进行任何设置。因此，我们的程序有极好的跨平台能力。
