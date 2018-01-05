@@ -191,6 +191,9 @@ void COutputter::OutputElementInfo()
 			case ElementTypes::T9Q:
 				Print9QElementData(EleGrp);
 				break;
+			case ElementTypes::Frustum:
+				PrintFrustumElementData(EleGrp);
+				break;
 			case ElementTypes::Infinite:
 				PrintInfiniteElementData(EleGrp);
 				break;
@@ -677,6 +680,40 @@ void COutputter::PrintShellElementData(unsigned int EleGrp)
         ElementGroup.GetElement(Ele).Write(*this, Ele);
 
     *this << endl;
+}
+
+void COutputter::PrintFrustumElementData(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::Instance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl << endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND POISSON'S RATIO  CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		<< endl
+		<< endl;
+
+	*this << "  SET       YOUNG'S        THICKNESS        POISSON'S" << endl
+		<< " NUMBER     MODULUS         (HEIGHT)          RATIO" << endl
+		<< "               E               h                nu" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+		ElementGroup.GetMaterial(mset).Write(*this, mset);
+
+	*this << endl << endl << " E L E M E N T   I N F O R M A T I O N" << endl;
+	*this << " ELEMENT     NODE     NODE     MATERIAL" << endl
+		<< " NUMBER-N      I        J        SET NUMBER" << endl;
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < ElementGroup.GetNUME(); Ele++)
+		ElementGroup.GetElement(Ele).Write(*this, Ele);
+
+	*this << endl;
 }
 
 
