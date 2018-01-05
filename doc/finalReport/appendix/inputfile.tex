@@ -7,14 +7,14 @@
     # input.dat:
     # Heading line
     Heading line info
-    
+
     # Control line
     NUMNP NUMEG NLCASE MODEX
 
     # Nodal point data lines
     N *ID X Y Z
     #  here, len(ID) == 3 or len(ID) == 6.
-    #  when len(ID) == 6, ID[3:6] represents 
+    #  when len(ID) == 6, ID[3:5] represents
     # whether dof of rotation is fixed.
 
     # Load data lines
@@ -26,7 +26,7 @@
     NPAR(1) NPAR(2) NPAR(3)
     N *ARGS
     M *NODEINDEXS MTYP
-    #  here, len(ARGS) and len(NODEINDEXS) varies, depending on 
+    #  here, len(ARGS) and len(NODEINDEXS) varies, depending on
     # element type.
 
 \end{lstlisting}
