@@ -28,7 +28,7 @@
 \lambda_1=1.219\times10^8,\lambda_2=1.2\times10^9,\lambda_3=3.9494\times10^9 \]
 
 \[
-\boldsymbol(d)_1=\left( \begin{array}{c} 0.3536 \\ 0.6124 \\ 0.7071 \end{array} \right),
+\boldsymbol{d}_1=\left( \begin{array}{c} 0.3536 \\ 0.6124 \\ 0.7071 \end{array} \right),
 \boldsymbol{d}_2=\left( \begin{array}{c} -0.7071 \\ 0.0000 \\ 0.7071 \end{array} \right),
 \boldsymbol{d}_3=\left( \begin{array}{c} -0.3536 \\ 0.6124 \\ -0.7071 \end{array} \right) \]
 
@@ -37,7 +37,7 @@
 \lambda_1=1.2196\times10^8,\lambda_2=1.24072\times10^9 \]
 
 \[
-\boldsymbol(d)_1=\left( \begin{array}{c} -0.4174 \\ -0.7248 \\ -0.8332 \end{array} \right),
+\boldsymbol{d}_1=\left( \begin{array}{c} -0.4174 \\ -0.7248 \\ -0.8332 \end{array} \right),
 \boldsymbol{d}_2=\left( \begin{array}{c} 1.0732 \\ -0.1402 \\ -0.8312 \end{array} \right) \]
 
 考虑到特征向量没有进行正则化,可以发现一阶特征值以及特征向量误差极小,特征值的误差不超过千分之一,特征向量的误差在千分之四以下.而二阶特征值的误差则相对较大,特征向量的问题则更加显著.这些问题都是因为里兹基向量导致的,在原程序中我们没有使用特别的处理,仅通过逆迭代法逐渐放大对应阶数,因此容易出现这样的问题.在实际情况下,一般要求取前 $n$ 阶特征值时,我们选取 $\min (2n,n+8)$ 作为初始求取的特征值数.
