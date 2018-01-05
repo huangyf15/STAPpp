@@ -31,7 +31,7 @@ CElementGroup::CElementGroup()
     MaterialList_ = nullptr;
 }
 
-//! Deconstructor
+//! Destructor
 CElementGroup::~CElementGroup()
 {
     if (ElementList_)
@@ -98,6 +98,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(C9Q);
             MaterialSize_ = sizeof(C9QMaterial);
             break;
+        case ElementTypes::Frustum:
+            ElementSize_ = sizeof(CFrustum);
+            MaterialSize_ = sizeof(CShellMaterial);
+            break;
         case ElementTypes::Infinite:
             ElementSize_ = sizeof(CInfEle);
             MaterialSize_ = sizeof(CInfEle);
@@ -146,6 +150,9 @@ void CElementGroup::AllocateElement(std::size_t size)
             break;
         case ElementTypes::T9Q:
             ElementList_ = new C9Q[size];
+            break; 
+        case ElementTypes::Frustum:
+            ElementList_ = new CFrustum[size];
             break;
         case ElementTypes::Infinite:
             ElementList_ = new CInfEle[size];
@@ -192,6 +199,9 @@ void CElementGroup::AllocateMaterial(std::size_t size)
             break;
         case ElementTypes::T9Q:
             MaterialList_ = new C9QMaterial[size];
+            break;
+        case ElementTypes::Frustum:
+            MaterialList_ = new CShellMaterial[size];
             break;
         case ElementTypes::Infinite:
             MaterialList_= new CInfiniteMaterial[size];

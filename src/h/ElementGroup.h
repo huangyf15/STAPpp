@@ -17,6 +17,7 @@
 #include "Elements/9Q.h"
 #include "Elements/Bar.h"
 #include "Elements/Beam.h"
+#include "Elements/Frustum.h"
 #include "Elements/Plate.h"
 #include "Elements/Quadrilateral.h"
 #include "Elements/Shell.h"
@@ -44,7 +45,8 @@ enum ElementTypes
     TimoshenkoEBMOD = 9,
     T9Q = 10,
     Infinite = 11,
-    T5Q = 12
+    T5Q = 12,
+    Frustum = 13
 };
 
 //! Element group class
@@ -78,7 +80,7 @@ public:
     //! Constructor
     CElementGroup();
 
-    //! Deconstructor
+    //! Destructor
     ~CElementGroup();
 
     //! Read element group data from stream Input
