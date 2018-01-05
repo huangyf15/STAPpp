@@ -12,7 +12,7 @@
       \item 单元结点的输入顺序。为了提高后处理输出文件的简便性，并提高后处理的可靠度、鲁棒性，测试不同的结点输入顺序对后处理绘图的影响十分重要。	经过大量测试我们发现，按照下图中的编号，六面体使用如下顺序：1-2-3-4-5-6-7-8,\;1-4-6-7-2-3-5-8~均可以顺利读出。在最终的程序编写中，我们对~8H、 杆、梁、板、壳均使用的是六面体单元，3T、4Q、9Q~使用的是四边形单元。
             \begin{figure}[!htbp]
                 \centering
-                \includegraphics[width=2.0 in]{post+order1.eps}
+                \includegraphics[width=2.0 in]{./fig/post+order1.eps}
                 \caption{六面体结点排序}
             \end{figure}
       \item 使用~ZONETYPE~和使用~PEPOINT~的区别。文献~\cite{1}~中未提及的另一个是输出点格式问题，在有限元格式下，仍可选择~\texttt{DATAPACKING = POINT, ZONETYPE = FEBRICK}~或~\texttt{F = FEPOINT}~两种模式。经过测试，这两种模式都可以在~Tecplot~中画出理想图像，但是后者的效果更好。因此最终实现时我们选取了后者。
@@ -20,10 +20,10 @@
     \end{enumerate}
 
 \subsection{后处理程序实现}
-	主要的实现算法分为如下几步，主体程序请参见~PostOutputter.cpp：
+	主要的实现算法分为如下几步，主体程序请参见 \texttt{PostOutputter.cpp}。
 
     \begin{enumerate}
-      \item 读入输入文件的文件名~filename，控制信息。写入新文件“filename\_post.dat”。
+      \item 读入输入文件的文件名 filename，控制信息。写入新文件 \texttt{filename\_post.dat}。
       \item 读入单元组（单元类型）信息，该单元组所包含的单元数目、对应的~Tecplot~画图类型等。
         \begin{enumerate}
           \item 在每个单元组开始前加入信息行，写入~ELEMENTTYPE, N, E, F, C~等信息。不采用从输出文件中读取数据，是为了节约时间，避免重复劳动。
