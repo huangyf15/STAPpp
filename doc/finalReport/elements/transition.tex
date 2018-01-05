@@ -1,0 +1,48 @@
+\subsection{单元构造}
+    采用巧凑边点元的模型构造9Q与4Q之间过渡用的5Q单元，单元标号如图：
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./fig/5Q.eps}
+        \label{5Q}
+        \caption{5Q单元的标号顺序}
+    \end{figure}
+    \
+    
+    构造形函数的等式：
+    $$
+    \begin{cases}
+        N_{5}^{5Q}=\frac{\left( 1-\eta ^2 \right) \left( 1+\xi \right)}{2}\\
+        N_{1}^{5Q}=N_{1}^{4Q}-\frac{N_{5}^{5Q}}{2}=\frac{\left( 1+\xi \right) \left( \eta ^2-\eta \right)}{4}\\
+        N_{2}^{5Q}=N_{2}^{4Q}-\frac{N_{5}^{5Q}}{2}=\frac{\left( 1+\xi \right) \left( \eta ^2+\eta \right)}{4}\\
+        N_{3}^{5Q}=N_{3}^{4Q}=\frac{\left( 1-\xi \right) \left( 1+\eta \right)}{4}\\
+        N_{4}^{5Q}=N_{4}^{4Q}=\frac{\left( 1-\xi \right) \left( 1-\eta \right)}{4}\\
+    \end{cases}
+    $$
+
+    之后的思路和4Q单元相同，由形函数求导得到B矩阵，再由公式得到单元刚度阵（注意此时刚度阵已经是10阶矩阵了）：
+    $$
+    K^e=\int_{\varOmega}{B^TDBd\varOmega}
+    $$
+
+    考虑到桥梁算例中没有应用5Q单元的必要，故没有做从局部坐标系到全局坐标系的变换。
+\subsection{算例验证}
+    使用这样一个算例进行验证：
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./fig/5QExample.eps}
+        \label{5QExample}
+        \caption{算例验证的标号情况}
+    \end{figure}
+    \
+    
+    载荷情况：系统整体受到向右的均布载荷，为单向拉伸状态。13号节点在x，y方向的位移被约束，12号节点在x方向的位移被约束。
+    位移场的精确解为\(u_x=0.0003x,u_y=0.00009x\)，而算例输出的结果如图：
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./fig/5Qpass.png}
+        \label{5QResult}
+        \caption{算例验证的结果}
+    \end{figure}
+    \
+
+    节点位移精确，算例通过。
