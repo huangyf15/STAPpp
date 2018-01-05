@@ -1,0 +1,27 @@
+\subsection{程序设计}
+
+    9Q 单元的实现中利用了一个我们自己编写的简单矩阵库（\texttt{src/h/matrix.h}）。
+
+    计算刚度阵使用
+    $$ K = \int B^T D B |Je| \text{d}\xi\text{d}\eta $$
+
+    因为两点积分会出现零能模态，因此采用三点高斯积分，
+    $$ x_i = \pm \sqrt{\frac{5}{6}}, 0 $$
+    $$ w_i = \frac{5}{9}, \frac{8}{9} $$
+
+    计算荷载使用
+    $$ f_i = \int N_i b \text{d}\eta $$
+    可知，对于边界上三点受力，比例为$1:4:1$。
+
+\subsection{patch test}
+
+    基于教案上的测试算例（图\ref{fig:9Q}）进行了改动，将左下角设为固支。
+
+    实际计算在 $10^{-4}$ 误差下通过分片测试。
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.95\textwidth]{./elements/fig/9Q.png}
+        \caption{9Q patch test}
+        \label{fig:9Q}
+    \end{figure}
