@@ -44,12 +44,13 @@ w=w_0(x,y)
 
 \subsection{单点位移收敛率分析}
 
-取四边简支的正方形薄板,薄板大小同上,取 $E=230.4GPa,\nu=0.2$, 在中央加一集中载荷 $P$, 根据弹性力学可以得到其级数解 $w=\frac{16P}{D\pi^4}\sum\limits_{m=0}^{\infty}\sum\limits_{n=0}^{\infty} \frac{(-1)^(m+n)}{((2m+1)^2+(2n+1)^2)^2}\sin\frac{m\pi x_1}{2}\sin$ $\frac{n\pi x_2}{2}$, 通过数值方法得到其中央的最大挠度为 $\frac{0.04640335P}{D}=0.232017$. 对于 $2\times 2,4\times 4,8\times 8$ 依次进行求解,得到的结果的对数误差如图:
+取四边简支的正方形薄板,薄板大小同上,取 $E=230.4GPa,\nu=0.2$, 在中央加一集中载荷 $P$, 根据弹性力学可以得到其级数解 $w=\frac{16P}{D\pi^4}\sum\limits_{m=0}^{\infty}\sum\limits_{n=0}^{\infty} \frac{(-1)^(m+n)}{((2m+1)^2+(2n+1)^2)^2}\sin\frac{m\pi x_1}{2}\sin$ $\frac{n\pi x_2}{2}$, 通过数值方法得到其中央的最大挠度为 $\frac{0.04640335P}{D}=0.232017$. 对于 $2\times 2,4\times 4,8\times 8$ 依次进行求解,得到的结果的对数误差如图\ref{platecvg}:
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=6cm]{plateconvergence}
   \caption{中点收敛率分析}
+  \label{platecvg}
 \end{figure}
 对于板,其形函数是三次以上的,而且构造的位移场是级数场,因而中点不是其高斯点.发现收敛率为 $1.67$ ,考虑到构造的不是多项式场,认为这样的收敛率是可以满意的,也与书上的结果符合,因此认为该板是收敛的.具体文件见 downpress1, downpress2, downpress3.
 
