@@ -1,12 +1,12 @@
 %\documentclass{ctexart}
-\documentclass{report}                  % 设定文档类型
+\documentclass[hyperref]{report}                  % 设定文档类型
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
 \usepackage{ctex}                       % 使用CTeX中文包
 \usepackage{amsmath,amssymb,amsfonts,amstext,amsbsy,amsopn,amsthm}
                                         % 使用AMSLaTeX宏包，用来排出更加漂亮的公式
-\usepackage[colorlinks]{hyperref}
+%\usepackage[colorlinks]{hyperref}
 \usepackage{bm}                         % 用于加粗
 \usepackage{ulem}                       % 用于增加下划线
 \usepackage{graphicx}                   % 用于插入图形
@@ -38,7 +38,7 @@
 
 \begin{document}
 
-\hypersetup{CJKbookmarks=true}
+%\hypersetup{CJKbookmarks=true}
 
 \maketitle
 \thispagestyle{empty}
