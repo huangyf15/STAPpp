@@ -1,7 +1,6 @@
 
 \subsection{板壳单元基本原理}
 我们所选用的板壳就是最简单的板壳,对于板选用的是 4 节点 12 自由度矩形 Kirchoff 板,壳在板的基础上加上前面的 4Q 单元部分. Kirchoff 板遵循平截面假设和直法线假设,因而有
-
 \[
 \left\{ \begin{gathered}
 u=u_0+z\theta_y \\
@@ -11,7 +10,6 @@ w=w_0(x,y)
 \]
 
 通过假设 $z$ 方向没有剪应变我们可以得到 $\theta_x=\partial x/\partial y, \theta_y=\partial w/\partial x$, 从而
-
 \[
 \left\{ \begin{gathered}
 \varepsilon_x = -z\frac{\partial^2 w}{\partial x^2} \\
@@ -25,7 +23,6 @@ w=w_0(x,y)
 \subsection{板单元刚度阵的构造}
 
 这里我们采用了彭细荣书中给出的形函数,
-
 \[ \mathbf{N}^T=\left\{
 \begin{array}{c}
 -\frac{1}{8}(s-1)(t-1)(s^2+s+t^2+t-2)\\ -\frac{1}{8}b(s-1)(t-1)^2(t+1)\\ \frac{1}{8}a(s-1)^2(s+1)(t-1) \\
