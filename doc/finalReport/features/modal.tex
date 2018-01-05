@@ -49,5 +49,5 @@
 
 对于输入文件也要进行改动.对杆单元连接的质弹系统,在输入杆的材料时,材料参数增加为三个,输入顺序改为密度 $\rho$, 杨氏模量 $E$, 横截面积 $A$. 此外在输入所有单元之后,要继续输入要求解的特征值数.
 
-程序中主要增加了函数 bool CDomain::VibSolver(unsigned int NVibModes), 输入参数为求解的特征值阶数.代码首先生成一个初始基向量组,这个初始基向量组可能不够好但是会随着逆迭代逐渐变好.在这里用到了我们定义的函数 void CLDLTSolver::Multiple(double* acc, double* Force, unsigned int numeq, unsigned int vib\_m), 用途是计算 LDLT 矩阵与列向量相乘的结果.下面定义循环中需要使用的动态数组并进入循环,循环中的内容如上程序实现介绍,最终释放动态数组.此外,程序中的 assembly\_mass 与 AssembleMassMatrix 等函数与对应的刚度矩阵函数的意义是相似的,只不过是改为组装质量矩阵.
+程序中主要增加了函数 \texttt{bool CDomain::VibSolver(unsigned int NVibModes)}, 输入参数为求解的特征值阶数.代码首先生成一个初始基向量组,这个初始基向量组可能不够好但是会随着逆迭代逐渐变好.在这里用到了我们定义的函数 \texttt{void CLDLTSolver::Multiple(double* acc, double* Force, unsigned int numeq, unsigned int vib\_m)}, 用途是计算 LDLT 矩阵与列向量相乘的结果.下面定义循环中需要使用的动态数组并进入循环,循环中的内容如上程序实现介绍,最终释放动态数组.此外,程序中的 assembly\_mass 与 AssembleMassMatrix 等函数与对应的刚度矩阵函数的意义是相似的,只不过是改为组装质量矩阵.
 
