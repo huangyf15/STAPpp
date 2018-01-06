@@ -1,12 +1,12 @@
 \subsection{单元构造}
-    梁单元的单元构造很简单，由四个模态组成：轴向拉伸，沿轴扭转以及两个方向的弯曲。由于数值简单，不需要进行数值积分。具体构成如图：
+    梁单元的单元构造很简单，由四个模态组成：轴向拉伸，沿轴扭转以及两个方向的弯曲。由于数值简单，不需要进行数值积分。具体构成如图\ref{BeamStiffnessMatrix}所示。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamSM.png}
         \label{BeamStiffnessMatrix}
         \caption{梁单元刚度阵，不同模态用不同颜色圈出来}
     \end{figure}
-    
+
     现规定沿轴方向为 x 轴，则对应的位移向量和载荷向量表示为：
     $$
     d^e=\left( \begin{matrix}
@@ -29,7 +29,7 @@
 \subsection{梁单元截面的输入格式}
     除了基本的杨氏模量 E，泊松比$\nu$之外，由于本工程项目中使用的是空心矩形截面梁，因此依次输入的参数是：矩形的长和宽（a，b），四个面上的壁厚（$t_1,t_2,t_3,t_4$），以及一组单位向量（$n_1,n_2,n_3$）来表征局部坐标系的 $y'$ 轴在整体坐标系中的指向。
 \subsection{分片试验}
-    对于梁进行的不规则划分如图：
+    对于梁进行的不规则划分如图\ref{BeamPatchTest}。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamPatchTest.eps}
@@ -41,7 +41,7 @@
     
     载荷条件为：两端简支，两边施加等大反向的弯矩，整个梁为纯弯状态，且各处弯矩相等。位移场的精确解为 $w=0.05x^2-0.05x,\theta=0.1x-0.05$
 
-    分片试验结果如图：
+    分片试验结果如图\ref{BeamPatchTestResult}
 
     \begin{figure}[h]
         \centering
@@ -53,7 +53,7 @@
     节点位移和转角精确，通过分片试验。
 
 \subsection{收敛率分析}
-    对于长度为8的梁，依次将其等分2,4,8个单元：
+    对于长度为8的梁，依次将其等分2,4,8个单元，如图\ref{BeamConvergence}：
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamConvergence.png}
@@ -68,7 +68,7 @@
     \lVert e \rVert =\int_0^8{\left( \frac{du}{dx}-\frac{du^h}{dx} \right) ^2dx}
     $$
 
-    计算得到的结果如图：
+    计算得到的结果如图\ref{BeamConvergenceResult}
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamConvergenceResult.png}

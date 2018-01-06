@@ -11,7 +11,7 @@
     x=-\frac{\xi}{1-\xi}x_C+\frac{1}{1-\xi}x_Q
     $$
 
-    母空间和物理空间中的对应关系如图：
+    母空间和物理空间中的对应关系如图\ref{Infinite}
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/infinite.png}
@@ -49,7 +49,7 @@
     得到形函数表达之后的操作和 4Q 单元完全一致。
  
 \subsection{算例验证}
-    考虑到无限单元对应的算例都很难计算出理论解，故考虑采用和同一模型下ABAQUS的计算结果进行比较，算例如图，为无限大的平板中间挖一个正方形的小孔，四个箭头代表四个大小相等的力：
+    考虑到无限单元对应的算例都很难计算出理论解，故考虑采用和同一模型下ABAQUS的计算结果进行比较，算例如图，为无限大的平板中间挖一个正方形的小孔，四个箭头代表四个大小相等的力，如图\ref{InfiniteExample}
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/InfiniteExample.png}
@@ -58,7 +58,7 @@
     \end{figure}
     
 
-    由于系统的高度对称性，只看一个节点的位移即可：
+    由于系统的高度对称性，只看一个节点的位移即可。结果见图\ref{InfiniteResult}
     \begin{table}
         \centering
         \begin{tabular}[h][|c|c|]\hline
