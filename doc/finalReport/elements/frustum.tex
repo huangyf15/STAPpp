@@ -1,0 +1,27 @@
+    壳单元通常可分为平板壳、扁壳、退化型壳等类型，除此之外还有针对轴对称壳直接构造出的截锥~(frustum)~单元。有关板壳单元的更全面的讨论可参考~\texttt{doc/litReview/On plate and shell elements}~ 文件夹。
+\subsection{单元构造}
+    我们采用两点截锥单元，其单元构造方式与梁单元是完全类似的。二者的不同之处有二，其一是，由于截锥壳是初始曲率非零的壳体，因此其应变及曲率的表达式中增加了面内变形与弯曲变形的耦合项；其二是，截锥壳本质上属于二维背景空间中的单元，因此需要约束掉其“面外变形”的自由度，如~$y,\;\theta_x,\;\theta_z$。 有关单元刚度阵的具体构造方式这里不再赘述，具体可以参考~\texttt{memo/frustum}~文件夹中的~MATLAB~ 程序以及参考文献~\cite{5}。
+
+\subsection{单元验证与讨论}
+    由于一般的壳单元精确解不易求得，考虑到圆柱壳是轴对称壳中最简单的情形之一，我们选取“在一圆截面上有均匀分布载荷的长圆柱形壳的弯曲”作为单元构造的验证算例。这一问题的具体物理图像可以参考文献~\cite{10}~第十五章第~115~节。
+
+    在以集中载荷的作用点为原点的坐标系中，可以写出圆柱壳的横向弯曲变形随轴向坐标的变化关系
+    \[w = \frac{{P{R^2}\beta }}{{2Eh}}{e^{ - \beta |x|}}(\sin \beta |x| + \cos \beta |x|).\]
+    其中，$\beta^4=\frac{3(1-\nu^2)}{a^2 h^2}$。这里需要注意选取合适的参数，即要避免横向挠度变形大于截面半径情况的发生，这等价于要求圆柱壳的壳体足够薄；参数的具体选法可以参考相应的输入文件或者~\texttt{memo/frustum}~ 文件。作为验证，我们将圆柱壳沿轴向等分为~60~份截锥单元，于是可以得到如图~\ref{fig:frustum+whole}~和图~\ref{fig:frustum+detail}~所示的结果。
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=4.0 in]{./elements/fig/frustum+whole.eps}\\
+      \caption{有限元解与精确解横向挠度变形对比（全局）}\label{fig:frustum+whole}
+    \end{figure}
+
+    \begin{figure}[!htbp]
+      \centering
+      % Requires \usepackage{graphicx}
+      \includegraphics[width=6.0 in]{./elements/fig/frustum+detail.eps}\\
+      \caption{有限元解与精确解横向挠度变形对比（细节）}\label{fig:frustum+detail}
+    \end{figure}
+
+    这里有限元解放大至了原来的~10~倍。由图~\ref{fig:frustum+whole}~和图~\ref{fig:frustum+detail}~可见，尽管截锥壳单元的结果相较精确解小了一个数量级，但是截锥壳单元的有限元解与精确解之间的形状是十分相符的。需要注意的是，由于算例中的圆柱壳并非无限长，因此精确解实际上并不完全适合本算例；与此同时，实际上在集中载荷附近应该加密网格，因此上述结果中集中载荷附近的位移值也是不够精确的。
+
