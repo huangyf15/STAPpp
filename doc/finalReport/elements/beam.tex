@@ -7,27 +7,21 @@
         \caption{梁单元刚度阵，不同模态用不同颜色圈出来}
     \end{figure}
 
-    现规定沿轴方向为 x 轴，则对应的位移向量和载荷向量表示为：
-    $$
-    d^e=\left( \begin{matrix}
+    现规定沿轴方向为 x 轴，则对应的位移向量和载荷向量表示为:
+    $$d^e=\left( \begin{matrix}
         u_{x1}&		u_{y1}&		u_{z1}&		u_{x1}&		u_{y1}&		u_{z1}&		u_{x2}&		u_{y2}&		u_{z2}&		\theta _{x2}&		\theta _{y2}&		\theta _{y3}\\
-    \end{matrix} \right) ^T
-    $$
-    $$
-    f^e=\left( \begin{matrix}
+    \end{matrix} \right) ^T$$
+    $$f^e=\left( \begin{matrix}
         F_{x1}&		F_{y1}&		F_{z1}&		M_{x1}&		M_{y1}&		M_{z1}&		F_{x2}&		F_{y2}&		F_{z2}&		M_{x2}&		M_{y2}&		M_{y3}\\
-    \end{matrix} \right) ^T
-    $$
+    \end{matrix} \right) ^T$$
 
-    其中 u 表示位移，$\theta$ 表示转角，F 表示剪力，M 表示弯矩，下标的1、2分别表示左右两端点。
-    于是便得到了基本的单元方程：
-    $$
-    K^ed^e=f^e
-    $$
+    其中 u 表示位移， $\theta$ 表示转角， F 表示剪力， M 表示弯矩，下标的 1、2 分别表示左右两端点。
+    于是便得到了基本的单元方程:
+    $$K^ed^e=f^e$$
 
     可以以这个形式加入总体刚度方程。另外需要注意的是，当局部的坐标系与整体坐标系不一致时，需要对单元刚度阵做一个对应的正交变换。
 \subsection{梁单元截面的输入格式}
-    除了基本的杨氏模量 E，泊松比$\nu$之外，由于本工程项目中使用的是空心矩形截面梁，因此依次输入的参数是：矩形的长和宽（a，b），四个面上的壁厚（$t_1,t_2,t_3,t_4$），以及一组单位向量（$n_1,n_2,n_3$）来表征局部坐标系的 $y'$ 轴在整体坐标系中的指向。
+    除了基本的杨氏模量 E ，泊松比 $\nu$ 之外，由于本工程项目中使用的是空心矩形截面梁，因此依次输入的参数是：矩形的长和宽（a，b），四个面上的壁厚（$t_1,t_2,t_3,t_4$），以及一组单位向量（$n_1,n_2,n_3$）来表征局部坐标系的 $y'$ 轴在整体坐标系中的指向。
 \subsection{分片试验}
     对于梁进行的不规则划分如图\ref{BeamPatchTest}。
     \begin{figure}[h]
@@ -39,9 +33,10 @@
 
     由于梁有四个解耦的模态，为了将其完全约束，在进行分片试验时需要对四个模态分别都加以约束。
     
-    载荷条件为：两端简支，两边施加等大反向的弯矩，整个梁为纯弯状态，且各处弯矩相等。位移场的精确解为 $w=0.05x^2-0.05x,\theta=0.1x-0.05$
+    载荷条件为：两端简支，两边施加等大反向的弯矩，整个梁为纯弯状态，且各处弯矩相等。位移场的精确解为: 
+    $$w=0.05x^2-0.05x,\theta=0.1x-0.05$$
 
-    分片试验结果如图\ref{BeamPatchTestResult}
+    分片试验结果如图\ref{BeamPatchTestResult}。
 
     \begin{figure}[h]
         \centering
@@ -53,7 +48,7 @@
     节点位移和转角精确，通过分片试验。
 
 \subsection{收敛率分析}
-    对于长度为8的梁，依次将其等分2,4,8个单元，如图\ref{BeamConvergence}：
+    对于长度为 8 的梁，依次将其等分为 2,4,8 个单元，如图\ref{BeamConvergence}。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamConvergence.png}
@@ -61,14 +56,13 @@
         \caption{收敛率分析的细分}
     \end{figure}
     
-    梁单元能精确重构三次位移场，为了计算误差，通过一端固支，并合理加载均布载荷、另一端的集中力和弯矩，构造出精确解为 $w=0.0001x^4$
+    梁单元能精确重构三次位移场，为了计算误差，通过一端固支，并合理加载均布载荷、另一端的集中力和弯矩，构造出精确解为: 
+    $$w=0.0001x^4$$
     
-    考虑到单元的刚度为常数，故直接取误差范数的表达式为：
-    $$
-    \lVert e \rVert =\int_0^8{\left( \frac{du}{dx}-\frac{du^h}{dx} \right) ^2dx}
-    $$
+    考虑到单元的刚度为常数，故直接取误差范数的表达式为:
+    $$\lVert e \rVert =\int_0^8{\left( \frac{du}{dx}-\frac{du^h}{dx} \right) ^2dx}$$
 
-    计算得到的结果如图\ref{BeamConvergenceResult}
+    计算得到的结果如图\ref{BeamConvergenceResult}。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./fig/BeamConvergenceResult.png}
