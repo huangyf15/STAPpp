@@ -14,8 +14,9 @@
     # Nodal point data lines
     N *ID X Y Z
     #  here, len(ID) == 3 or len(ID) == 6.
-    #  when len(ID) == 6, ID[3:5] represents
+    #  when len(ID) == 6, ID[3:6] represents
     # whether dof of rotation is fixed.
+    #  here, ID[i:j] := {ID[i],...,ID[j-1]}.
 
     # Load data lines
     LL NLOAD

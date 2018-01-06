@@ -1,8 +1,8 @@
 %\documentclass{ctexart}
-\documentclass[hyperref]{report}        % 设定文档类型
+%\documentclass[hyperref]{report}        % 设定文档类型
 
-%\documentclass{report}                 % 设定文档类型
-%\usepackage[colorlinks]{hyperref}      % 超链接格式设置
+\documentclass{report}                 % 设定文档类型
+\usepackage[colorlinks]{hyperref}      % 超链接格式设置
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
@@ -40,7 +40,7 @@
 
 \begin{document}
 
-%\hypersetup{CJKbookmarks=true}
+\hypersetup{CJKbookmarks=true}
 
 \maketitle
 \thispagestyle{empty}
@@ -93,7 +93,7 @@
          \hline
        \end{tabular}
     \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接，OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接,\;OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
 
 \section{变形图像与应力云图}
 \label{sec:1-2}
