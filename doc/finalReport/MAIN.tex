@@ -1,7 +1,7 @@
-% \documentclass[hyperref]{report}        % 设定文档类型
+\documentclass[hyperref]{report}        % 设定文档类型
 
-\documentclass{report}                 % 设定文档类型
-\usepackage[colorlinks]{hyperref}      % 超链接格式设置
+% \documentclass{report}                 % 设定文档类型
+% \usepackage[colorlinks]{hyperref}      % 超链接格式设置
 
 \usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
     \setlength{\parindent}{2em}
@@ -39,10 +39,12 @@
 
 \begin{document}
 
-% \hypersetup{CJKbookmarks=true}
-
 \maketitle
 \thispagestyle{empty}
+
+%\begin{abstract}
+ % \input{structure/abstract.tex}
+%\end{abstract}
 
 \newpage
 \pagestyle{headings}
@@ -53,8 +55,12 @@
 \newpage
 \setcounter{page}{1}
 \pagenumbering{arabic}
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+  \input{structure/preface.tex}
 
 \chapter{问题描述与成果展示}
+\label{chap:1}
     这一章简述了大作业的题目要求并列举了评测结果~(见~\ref{sec:1-1}~节)，并就~STAP++~的结果与~ABAQUS~的结果进行了对比分析~(见~\ref{sec:1-2}~节)。值得说明的是，在保证较高求解精度的基础上，本组在内存方面的优化取得了相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，
 
 \section{问题简述与评测结果}
@@ -99,7 +105,8 @@
     \input{description/graphic.tex}
 
 \chapter{STAP++~程序框架}
-    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)和测试模块（见~\ref{sec:2-5}~节）。
+\label{chap:2}
+    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)和测试模块（见~\ref{sec:2-5}~ 节）。
     其中，组装刚度阵模块包括单元刚度阵的生成以及总体刚度阵的组装两部分，前者将在第~\ref{chap:3}~ 章以及第~\ref{chap:4}~章详细说明，后者的过程是平凡的，这里不再赘述。另外，本章只涉及求解器模块的概述，有关稀疏求解器的详细内容见扩展功能一章的第~\ref{sec:5-1}~节。
 \section{前处理模块}
 \label{sec:2-1}
