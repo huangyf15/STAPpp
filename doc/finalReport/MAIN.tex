@@ -55,13 +55,14 @@
 \newpage
 \setcounter{page}{1}
 \pagenumbering{arabic}
+
 \chapter*{前言}
 \addcontentsline{toc}{chapter}{前言}
   \input{structure/preface.tex}
 
 \chapter{问题描述与成果展示}
 \label{chap:1}
-    这一章简述了大作业的题目要求并列举了评测结果~(见~\ref{sec:1-1}~节)，并就~STAP++~的结果与~ABAQUS~的结果进行了对比分析~(见~\ref{sec:1-2}~节)。值得说明的是，在保证较高求解精度的基础上，本组在内存方面的优化取得了相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，
+    这一章简述了大作业的题目要求并列举了评测结果~(见~\ref{sec:1-1}~节)，并就~STAP++~的结果与~ABAQUS~的结果进行了对比分析~(见~\ref{sec:1-2}~节)。
 
 \section{问题简述与评测结果}
 \label{sec:1-1}
@@ -98,7 +99,7 @@
          \hline
        \end{tabular}
     \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接,\;OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接,\;OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，为相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，同时保证了较高的求解精度。
 
 \section{变形图像与应力云图}
 \label{sec:1-2}
@@ -137,7 +138,6 @@
 \chapter{其他单元}
 \label{chap:4}
     这一章将在上一章的基础上介绍新增的其他单元，包括可用于~3~维背景空间的平面单元（包括~4Q, 3T, 9Q，详见~\ref{sec:4-1},~\ref{sec:4-2},~\ref{sec:4-3}~ 节）、为适应结构的尺度效应而发展出的构造单元（包括~Timoshenko~梁单元、薄板单元、截锥壳单元，详见~\ref{sec:4-4},~\ref{sec:4-5},~\ref{sec:4-6}~ 节）以及可用于解决更广泛的弹性力学问题的扩展单元（包括无限单元和过渡单元，详见~\ref{sec:4-7},~\ref{sec:4-8}~ 节）。
-
 \section{4Q~平面单元}
 \label{sec:4-1}
     \input{elements/4Q.tex}
@@ -186,12 +186,13 @@
 
 \appendix
 \chapter{输入文件格式}
+\label{app:1}
     \input{appendix/inputfile.tex}
 \chapter{输出文件格式~(后处理用)}
+\label{app:2}
     \input{appendix/postfile.tex}
-\chapter{优化思路简述}
-    \input{appendix/opt.tex}
 \chapter{小组合作清单}
+\label{app:3}
     \input{appendix/assignment.tex}
 
 \begin{thebibliography}{99}
@@ -205,7 +206,6 @@
     \bibitem{8} Wikipedia. Timoshenko beam theory. (2017.08.25)  [2017.12.06]. \\ https://en.wikipedia.org/wiki/Timoshenko\_beam\_theory.
     \bibitem{9} MKL~reference. \\ https://software.intel.com/en-us/mkl-developer-reference-c-spgvd\#22ACC038-0667-4E23-8263-B4C0E67A769C.
     \bibitem{10} S.铁木辛柯，S.沃诺斯基．板壳理论．《板壳理论》翻译组 译．北京：科学出版社，1977．
-
 \end{thebibliography}
 
 \end{document}
