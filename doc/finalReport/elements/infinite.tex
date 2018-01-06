@@ -1,0 +1,72 @@
+\subsection{单元构造}
+    本质上，无限单元是4Q映射单元的一种，只是在一个方向上的映射比较特殊。在这个方向上需要将母空间的点投影到物理空间中的无穷远，而且要求对映射区域引入的试函数序列在半径r增加的情况下仍能够完整描述模型的真实行为。一个理想的映射形函数为：
+    $$
+    \frac{C_1}{r}+\frac{C_2}{r^2}+\frac{C_3}{r^3}+…
+    $$
+
+    其中\(C_i\)为常数，r是到“扰动”中心的距离。
+    \
+
+    但是很明显的上面这个式子没有实用性，现在引入一个符合要求的映射函数：
+    $$
+    x=-\frac{\xi}{1-\xi}x_C+\frac{1}{1-\xi}x_Q
+    $$
+
+    母空间和物理空间中的对应关系如图：
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{./fig/infinite.png}
+        \label{Infinite}
+        \caption{无限单元的映射关系}
+    \end{figure}
+    \
+
+    可以看出：
+    $$
+    \begin{cases}
+        \xi =1,x=\frac{x_Q+x_C}{2}=x_P\\
+        \xi =0,x=x_Q\\
+        \xi =1,x=x_R\rightarrow \infty\\
+    \end{cases}
+    $$
+
+    其中C点在物理空间内是“扰动的原点”，这一点并不约束在无限单元内，而是一个自己定义的点。P点是和其他单元协调的节点，而这个形函数则约束了P为C与Q的中点，从而确定了C点和P点就确定了Q点
+    考虑到P点的位移需要和其他单元协调，故形函数需要包含P点，改写为：
+
+    $$
+    x=\frac{1+\xi}{1-\xi}x_Q+\frac{-2\xi}{1-\xi}x_P
+    $$
+
+    加入另一个方向的形函数，得到整体的形函数表达为：
+    $$
+    x=N_1\left( \eta \right) N_P\left( \xi \right) x_P+N_1\left( \eta \right) N_Q\left( \xi \right) x_Q+N_1\left( \eta \right) N_P\left( \xi \right) x_{P_1}+N_1\left( \eta \right) N_Q\left( \xi \right) x_{Q_1}
+    $$
+    $$
+    N_1=\frac{1+\eta}{2},N_2=\frac{1-\eta}{2}
+    $$
+    $$
+    N_P=\frac{-2\xi}{1-\xi},N_Q=\frac{1+\xi}{1-\xi}
+    $$
+
+    得到形函数表达之后的操作和4Q单元完全一致。
+
+\subsection{算例验证}
+考虑到无限单元对应的算例都很难计算出理论解，故考虑采用和同一模型下abaqus的计算结果进行比较，算例如图，为无限大的平板中间挖一个正方形的小孔，四个箭头代表四个大小相等的力：
+母空间和物理空间中的对应关系如图：
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.6\textwidth]{./fig/InfiniteExample.png}
+    \label{InfiniteExample}
+    \caption{无限单元算例}
+\end{figure}
+\
+
+由于系统的高度对称性，只看一个节点的位移即可：
+\begin{table}
+    \centering
+    \begin{tabular}[h][|c|c|]\hline
+        &节点位移\\
+        abaqus结果&\(5×10^-6\)\\
+        stap结果
+    \end{tabular}
+\end{table}
