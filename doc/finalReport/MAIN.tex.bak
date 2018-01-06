@@ -1,0 +1,209 @@
+%\documentclass{ctexart}
+%\documentclass[hyperref]{report}        % 设定文档类型
+
+\documentclass{report}                 % 设定文档类型
+\usepackage[colorlinks]{hyperref}      % 超链接格式设置
+
+\usepackage{indentfirst}                % 添加缩进，更符合中文书写习惯
+    \setlength{\parindent}{2em}
+\usepackage{ctex}                       % 使用CTeX中文包
+\usepackage{amsmath,amssymb,amsfonts,amstext,amsbsy,amsopn,amsthm}
+                                        % 使用AMSLaTeX宏包，用来排出更加漂亮的公式
+\usepackage{bm}                         % 用于加粗
+\usepackage{ulem}                       % 用于增加下划线
+\usepackage{graphicx}                   % 用于插入图形
+\usepackage{subfigure}                  % 用于插入子图
+\usepackage{caption}                    % 用于设置图形标题格式
+\usepackage{multicol}                   % 用于实现在同一页中实现不同的分栏
+\usepackage{geometry}                   % 用于设置页边距
+\usepackage{lipsum}                     % 产生随机文本
+\usepackage{listings}                   % 插入公式
+\usepackage{inconsolata}                % 等宽字体使用 consolas
+\lstset{basicstyle=\ttfamily}           % 代码使用等宽字体
+
+\geometry{a4paper,left=3.17cm,right=3.17cm,top=2.54cm,bottom=2.54cm}
+
+\newtheorem{Def}{Definition}[section]   % --------begin---------
+\newtheorem{Thm}{Theorem}[section]      % 以下用于定理等引语设置
+\newtheorem{Axm}{Axiom}[section]        %
+\newtheorem{Lem}{Lemma}[section]        %
+\newtheorem{Prs}{Proposition}[section]  %
+\newtheorem{Prt}{Property}[section]     %
+\newtheorem{Cor}{Corollary}[section]    %
+\newtheorem{Rem}{Remark}[section]       %
+\newtheorem{Sol}{Solution}[section]     %
+\newtheorem{Prf}{Proof}[section]        % ---------end----------
+\numberwithin{equation}{section}        % 将公式按节编号
+
+\title{\textbf{有限元大作业报告} \protect\\ \textbf{暨~STAP++~程序说明文档}}
+\author{\fangsong{组长：黄云帆} \\ \fangsong{组员：陈一彤\;邓博元\;管唯宇\;杨正宇\;卢晟昊}}
+
+\begin{document}
+
+<<<<<<< HEAD
+\hypersetup{CJKbookmarks=true}
+=======
+% \hypersetup{CJKbookmarks = true}
+>>>>>>> master
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+\pagestyle{headings}
+\setcounter{page}{1}
+\pagenumbering{Roman}
+\tableofcontents
+
+\newpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\chapter{问题描述与成果展示}
+    这一章简述了大作业的题目要求并列举了评测结果~(见~\ref{sec:1-1}~节)，并就~STAP++~的结果与~ABAQUS~的结果进行了对比分析~(见~\ref{sec:1-2}~节)。值得说明的是，在保证较高求解精度的基础上，本组在内存方面的优化取得了相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，
+
+\section{问题简述与评测结果}
+\label{sec:1-1}
+    \begin{figure}[!htbp]
+      \centering
+      \includegraphics[width=5.0 in]{./fig/Descrip+Problem.eps}\\
+      \caption{Problem}\label{fig:Problem}
+    \end{figure}
+
+    算例具体描述如下：
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c|c|c}
+      \hline
+      \textit{Job} & \textit{NumNode} & \textit{NumEle} & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} \\
+      \hline
+      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 \\
+      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 \\
+      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 \\
+      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 \\
+      \hline
+    \end{tabular}
+    \end{center}
+
+    经过大规模评测，测试结果如下：
+    \begin{center}
+      \begin{tabular}{c|c|c}
+         \hline
+         \textit{Job} & $t_A/s$ & $t_B/s$ \\
+         \hline
+         1 & 0.27 & 0.1016\\
+         2 & 2.35 & 1.18585\\
+         3 & $25.0_{~6244M}$ & 13.6638 \\
+         4 & $\backslash$ & 3090.13\\
+         \hline
+       \end{tabular}
+    \end{center}
+    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接,\;OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，在相同求解思路（即直接求解刚度方程）、相同测试环境下，取得了所有小组中的最好结果，同时保证了较高的求解精度。
+
+\section{变形图像与应力云图}
+\label{sec:1-2}
+    \input{description/graphic.tex}
+
+\chapter{STAP++~程序框架}
+    这一章介绍了~STAP++~有限元程序求解弹性力学问题的整体框架，包括前处理模块~(见~\ref{sec:2-1}~节)、组装刚度阵~(见~\ref{sec:2-2}~节)、求解器模块~(见~\ref{sec:2-3}~节)、后处理模块~(见~\ref{sec:2-4}~节)和测试模块（见~\ref{sec:2-5}~节）。
+    其中，组装刚度阵模块包括单元刚度阵的生成以及总体刚度阵的组装两部分，前者将在第~\ref{chap:3}~ 章以及第~\ref{chap:4}~章详细说明，后者的过程是平凡的，这里不再赘述。另外，本章只涉及求解器模块的概述，有关稀疏求解器的详细内容见扩展功能一章的第~\ref{sec:5-1}~节。
+\section{前处理模块}
+\label{sec:2-1}
+    \input{process/preprocessing.tex}
+\section{组装刚度阵~(略)}
+\label{sec:2-2}
+\section{求解器模块}
+\label{sec:2-3}
+    \input{process/solver.tex}
+\section{后处理模块}
+\label{sec:2-4}
+    \input{process/postprocessing.tex}
+\section{测试模块}
+\label{sec:2-5}
+    \input{process/testing.tex}
+
+\chapter{基本单元}
+\label{chap:3}
+    这一章着重介绍在桥梁算例中使用的各种单元类型。
+\section{Bar~杆单元~(略)}
+\section{8H~实体单元}
+    \input{elements/8H.tex}
+\section{Euler-Bernoulli~梁单元}
+    \input{elements/beam.tex}
+\section{平板壳单元}
+    \input{elements/shell.tex}
+
+\chapter{其他单元}
+\label{chap:4}
+    这一章将在上一章的基础上介绍新增的其他单元，包括可用于~3~维背景空间的平面单元（包括~4Q, 3T, 9Q，详见~\ref{sec:4-1},~\ref{sec:4-2},~\ref{sec:4-3}~ 节）、为适应结构的尺度效应而发展出的构造单元（包括~Timoshenko~梁单元、薄板单元、截锥壳单元，详见~\ref{sec:4-4},~\ref{sec:4-5},~\ref{sec:4-6}~ 节）以及可用于解决更广泛的弹性力学问题的扩展单元（包括无限单元和过渡单元，详见~\ref{sec:4-7},~\ref{sec:4-8}~ 节）。
+
+\section{4Q~平面单元}
+\label{sec:4-1}
+    \input{elements/4Q.tex}
+\section{3T~平面单元}
+\label{sec:4-2}
+    \input{elements/3T.tex}
+\section{9Q~平面单元}
+\label{sec:4-3}
+    \input{elements/9Q.tex}
+\section{Timoshenko~梁单元}
+\label{sec:4-4}
+    \input{elements/Timobeam.tex}
+\section{薄板单元}
+\label{sec:4-5}
+    \input{elements/plate.tex}
+\section{截锥壳单元}
+\label{sec:4-6}
+    \input{elements/frustum.tex}
+\section{无限单元}
+\label{sec:4-7}
+    \input{elements/infinite.tex}
+\section{过渡单元}
+\label{sec:4-8}
+    \input{elements/transition.tex}
+
+\chapter{扩展功能}
+\label{chap:5}
+    这一章介绍了~STAP++~程序的一些扩展功能，包括基于~MKL~的稀疏求解器~(见~\ref{sec:5-1}~节)、基于~Bar~单元的模态分析~(见~\ref{sec:5-2}~节~)以及基于~8H~ 单元的分片应力恢复~(见~\ref{sec:5-3}~节)。
+\section{稀疏求解器}
+\label{sec:5-1}
+    \input{features/sparse.tex}
+\section{模态分析}
+\label{sec:5-2}
+    \input{features/modal.tex}
+\section{分片应力恢复~(SPR)}
+\label{sec:5-3}
+    \input{features/SPR.tex}
+
+\chapter{致谢}
+
+    感谢张老师和宋言学长在整个项目完成工作中对本组全组同学的耐心指导！
+
+    感谢在部分任务中，其余组的部分同学与本组同学的积极讨论与互相扶持！
+
+    最要感谢的，是我们组里的每一位同学，感谢大家一直以来的不懈努力以及团队所有成员的通力合作！
+
+\appendix
+\chapter{输入文件格式}
+    \input{appendix/inputfile.tex}
+\chapter{输出文件格式~(后处理用)}
+    \input{appendix/postfile.tex}
+\chapter{优化思路简述}
+    \input{appendix/opt.tex}
+\chapter{小组合作清单}
+    \input{appendix/assignment.tex}
+
+\begin{thebibliography}{99}
+    \bibitem{1} 张雄 等．计算动力学（第二版）．北京：清华大学出版社，2015．
+    \bibitem{2} 彭细荣 等．有限单元法及其应用．北京：清华大学出版社，北京交通大学出版社，2012．
+    \bibitem{3} 青克维奇, E.C.，泰勒, R.L. 著．有限元方法（第一卷，基本原理）．曾攀 译．北京：清华大学出版社，2008．
+    \bibitem{4} 王勖成．有限单元法．北京：清华大学出版社，2003．
+    \bibitem{5} 薛守义．有限单元法．北京：中国建材工业出版社，2005．
+    \bibitem{6} 陆明万．弹性理论基础（第二版）．北京，德国：清华大学出版社，施普林格出版社，2001．
+    \bibitem{7} Zienkiewicz O C, Cheung Y K. The Finite Element Method for Analysis of Elastic Isotropic and Orthotropic Slabs. Proc. Inst. Civ. Eng. 28:471-488, 1964.
+    \bibitem{8} Wikipedia. Timoshenko beam theory. (2017.08.25)  [2017.12.06]. \\ https://en.wikipedia.org/wiki/Timoshenko\_beam\_theory.
+    \bibitem{9} MKL~reference. \\ https://software.intel.com/en-us/mkl-developer-reference-c-spgvd\#22ACC038-0667-4E23-8263-B4C0E67A769C.
+    \bibitem{10} S.铁木辛柯，S.沃诺斯基．板壳理论．《板壳理论》翻译组 译．北京：科学出版社，1977．
+
+\end{thebibliography}
+
+\end{document}
