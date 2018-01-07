@@ -42,10 +42,6 @@
 \maketitle
 \thispagestyle{empty}
 
-%\begin{abstract}
- % \input{structure/abstract.tex}
-%\end{abstract}
-
 \newpage
 \pagestyle{headings}
 \setcounter{page}{1}
@@ -66,40 +62,7 @@
 
 \section{问题简述与评测结果}
 \label{sec:1-1}
-    \begin{figure}[!htbp]
-      \centering
-      \includegraphics[width=5.0 in]{./fig/Descrip+Problem.eps}\\
-      \caption{Problem}\label{fig:Problem}
-    \end{figure}
-
-    算例具体描述如下：
-    \begin{center}
-    \begin{tabular}{c|c|c|c|c|c|c}
-      \hline
-      \textit{Job} & \textit{NumNode} & \textit{NumEle} & \textit{S4R} & \textit{C3D8R} & \textit{B31} & \textit{T3D2} \\
-      \hline
-      1 & 4.16E3 & 2.88E3 & 4E2 & 1.76E3 & 7.04E2 & 20 \\
-      2 & 3.72E4 & 3.04E4 & 2.5E3 & 2.65E4 & 1.35E3 & 20 \\
-      3 & $\backslash$ & 2.33E5 & 1E4 & 2.2E5 & 2.7E3 & 20 \\
-      4 & 1.91E6 & 1.81E6 & 4E4 & 1.76E6 & 5.42E3 & 20 \\
-      \hline
-    \end{tabular}
-    \end{center}
-
-    经过大规模评测，测试结果如下：
-    \begin{center}
-      \begin{tabular}{c|c|c}
-         \hline
-         \textit{Job} & $t_A/s$ & $t_B/s$ \\
-         \hline
-         1 & 0.27 & 0.1016\\
-         2 & 2.35 & 1.18585\\
-         3 & $25.0_{~6244M}$ & 13.6638 \\
-         4 & $\backslash$ & 3090.13\\
-         \hline
-       \end{tabular}
-    \end{center}
-    其中，环境~A~$^[$\footnote{环境~A：CPU:\;Intel Xeon CPU e5-2620 v4，2.10Hz，16核；内存:\;64G；操作系统:\;win10；MSVC~编译,\;O2~ 优化．}$^]$ 和环境~B~$^[$\footnote{环境~B：CPU:\;Intel Core i9-7920X，4.40Hz，12核；内存:\;32G；操作系统:\;ubuntu16.04；clang 3.8.0~编译,\;O3~优化,\;Intel Parallel Studio XE 2018.1.038~静态链接,\;OOC 使用 HDD.}$^]$的说明见脚注。值得说明的是，本组在环境~A~中对~Job—3~进行内存优化测试的结果为~$1385M_{~132.63s}$，为相同求解思路（即直接求解刚度方程）、相同测试环境下所有小组中的最好结果，同时保证了较高的求解精度。
+    \input{description/results.tex}
 
 \section{变形图像与应力云图}
 \label{sec:1-2}
@@ -198,7 +161,7 @@
 \begin{thebibliography}{99}
     \bibitem{1} 张雄 等．计算动力学（第二版）．北京：清华大学出版社，2015．
     \bibitem{2} 彭细荣 等．有限单元法及其应用．北京：清华大学出版社，北京交通大学出版社，2012．
-    \bibitem{3} 青克维奇, E.C.，泰勒, R.L. 著．有限元方法（第一卷，基本原理）．曾攀 译．北京：清华大学出版社，2008．
+    \bibitem{3} Zienkiewicz E C, Taylor R L．有限元方法（第一卷，基本原理）．曾攀 译．北京：清华大学出版社，2008．
     \bibitem{4} 王勖成．有限单元法．北京：清华大学出版社，2003．
     \bibitem{5} 薛守义．有限单元法．北京：中国建材工业出版社，2005．
     \bibitem{6} 陆明万．弹性理论基础（第二版）．北京，德国：清华大学出版社，施普林格出版社，2001．
