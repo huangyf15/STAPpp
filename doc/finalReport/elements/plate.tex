@@ -37,7 +37,21 @@ w=w_0(x,y)
 
 \subsection{分片验证}
 
-我们在 $[0,1]^2$ 的正方形板构造这样的位移场 $w=x^2-\nu y^2$, 得到一个纯弯场 $M_{11}=-2D(1-\nu^2)$. 利用 $x=0;x=0.3;y=-0.2;y=0$ 四条直线将正方形板分割成九个分片,对应的将法线沿 $x$ 轴方向边界上的 $y$ 向弯矩分配到每个点上.具体输入文件见 plate\_patch\_test, 可见位移基本准确,误差在浮点数范围内.
+我们在 $[-1,1]^2$ 的正方形板构造这样的位移场 $w=x^2-\nu y^2$, 对应地$\theta_x=-2\nu y$, $\theta_y = -2x$, 得到一个纯弯场 $M_{11}=-2D(1-\nu^2)$. 利用 $x=0;x=0.3;y=-0.2;y=0$ 四条直线将正方形板分割成九个分片,如图\ref{platept},对应的将法线沿 $x$ 轴方向边界上的 $y$ 向弯矩分配到每个点上.具体输入文件见 plate\_patch\_test, 在程序中的输出见图\ref{platedsp},最后三行的输出同壳单元;可见位移基本准确,误差在浮点数范围内.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=6cm]{./fig/platepatch.eps}
+  \caption{分片示意}
+  \label{platept}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=6cm]{./fig/platedisp.eps}
+  \caption{输出位移}
+  \label{platedsp}
+\end{figure}
 
 \subsection{单点位移收敛率分析}
 

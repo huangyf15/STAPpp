@@ -2,12 +2,13 @@
     梁单元的单元构造很简单，由四个模态组成：轴向拉伸，沿轴扭转以及两个方向的弯曲。由于数值简单，不需要进行数值积分。具体构成如图\ref{BeamStiffnessMatrix}所示。
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.6\textwidth]{./fig/BeamSM.png}
+        \includegraphics[width=.6\textwidth]{./elements/fig/BeamSM.png}
         \label{BeamStiffnessMatrix}
         \caption{梁单元刚度阵，不同模态用不同颜色圈出来}
     \end{figure}
 
     现规定沿轴方向为 x 轴，则对应的位移向量和载荷向量表示为:
+    \setcounter{MaxMatrixCols}{15}
     $$d^e=\left( \begin{matrix}
         u_{x1}&		u_{y1}&		u_{z1}&		u_{x1}&		u_{y1}&		u_{z1}&		u_{x2}&		u_{y2}&		u_{z2}&		\theta _{x2}&		\theta _{y2}&		\theta _{y3}\\
     \end{matrix} \right) ^T$$
@@ -15,7 +16,7 @@
         F_{x1}&		F_{y1}&		F_{z1}&		M_{x1}&		M_{y1}&		M_{z1}&		F_{x2}&		F_{y2}&		F_{z2}&		M_{x2}&		M_{y2}&		M_{y3}\\
     \end{matrix} \right) ^T$$
 
-    其中 u 表示位移， $\theta$ 表示转角， F 表示剪力， M 表示弯矩，下标的 1、2 分别表示左右两端点。
+    其中 $u$ 表示位移， $\theta$ 表示转角， $F$ 表示剪力， $M$ 表示弯矩，下标的 1、2 分别表示左右两端点。
     于是便得到了基本的单元方程:
     $$K^ed^e=f^e$$
 
@@ -26,7 +27,7 @@
     对于梁进行的不规则划分如图\ref{BeamPatchTest}。
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.6\textwidth]{./fig/BeamPatchTest.eps}
+        \includegraphics[width=.6\textwidth]{./elements/fig/BeamPatchTest.eps}
         \label{BeamPatchTest}
         \caption{分片试验的划分}
     \end{figure}
@@ -37,21 +38,19 @@
     $$w=0.05x^2-0.05x,\theta=0.1x-0.05$$
 
     分片试验结果如图\ref{BeamPatchTestResult}。
-
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.6\textwidth]{./fig/BeamPatchTestResult.png}
+        \includegraphics[width=.6\textwidth]{./elements/fig/BeamPatchTestResult.png}
         \label{BeamPatchTestResult}
         \caption{分片试验的结果}
     \end{figure}
 
     节点位移和转角精确，通过分片试验。
-
 \subsection{收敛率分析}
     对于长度为 8 的梁，依次将其等分为 2,4,8 个单元，如图\ref{BeamConvergence}。
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.6\textwidth]{./fig/BeamConvergence.png}
+        \includegraphics[width=.6\textwidth]{./elements/fig/BeamConvergence.png}
         \label{BeamConvergence}
         \caption{收敛率分析的细分}
     \end{figure}
@@ -65,9 +64,9 @@
     计算得到的结果如图\ref{BeamConvergenceResult}。
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.6\textwidth]{./fig/BeamConvergenceResult.png}
+        \includegraphics[width=.6\textwidth]{./elements/fig/BeamConvergenceResult.png}
         \label{BeamConvergenceResult}
         \caption{收敛率分析的结果}
     \end{figure}
     
-    得到收敛率为1.5阶。
+    得到收敛率为 1.5 阶。

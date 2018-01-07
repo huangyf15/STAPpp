@@ -1,4 +1,4 @@
-输入格式完全兼容 STAP90 的输入格式。更新的输入格式如下。
+输入格式完全兼容~STAP90~的输入格式。更新的输入格式如下。
 
 \texttt{\#} 为注释，忽略。
 \texttt{*args} 代表多个参数。
@@ -7,15 +7,16 @@
     # input.dat:
     # Heading line
     Heading line info
-    
+
     # Control line
     NUMNP NUMEG NLCASE MODEX
 
     # Nodal point data lines
     N *ID X Y Z
     #  here, len(ID) == 3 or len(ID) == 6.
-    #  when len(ID) == 6, ID[3:6] represents 
+    #  when len(ID) == 6, ID[3:6] represents
     # whether dof of rotation is fixed.
+    #  here, ID[i:j] := {ID[i],...,ID[j-1]}.
 
     # Load data lines
     LL NLOAD
@@ -26,7 +27,7 @@
     NPAR(1) NPAR(2) NPAR(3)
     N *ARGS
     M *NODEINDEXS MTYP
-    #  here, len(ARGS) and len(NODEINDEXS) varies, depending on 
+    #  here, len(ARGS) and len(NODEINDEXS) varies, depending on
     # element type.
 
 \end{lstlisting}
