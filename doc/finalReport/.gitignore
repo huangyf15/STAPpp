@@ -1,8 +1,11 @@
 *.pdf
 *.aux
+*.dvi
 *.fls
 *.log
 *.out
+*.out.bak
+*.tex.bak
 *.toc
 *.gz
 *.fdb*
