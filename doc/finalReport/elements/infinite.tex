@@ -11,12 +11,12 @@
     x=-\frac{\xi}{1-\xi}x_C+\frac{1}{1-\xi}x_Q
     $$
 
-    母空间和物理空间中的对应关系如图\ref{Infinite}。
+    母空间和物理空间中的对应关系如图~\ref{Infinite}~。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./elements/fig/infinite.png}
-        \label{Infinite}
         \caption{无限单元的映射关系}
+        \label{Infinite}
     \end{figure}
 
     可以看出：
@@ -49,26 +49,27 @@
     得到形函数表达之后的操作和 4Q 单元完全一致。
  
 \subsection{算例验证}
-    考虑到无限单元对应的算例都很难计算出理论解，故考虑采用和同一模型下 ABAQUS 的计算结果进行比较，算例如图，为无限大的平板中间挖一个正方形的小孔，四个箭头代表四个大小相等的力，如图\ref{InfiniteExample}。
+    考虑到无限单元对应的算例都很难计算出理论解，故考虑采用和同一模型下 ABAQUS 的计算结果进行比较，
+    算例如图，为无限大的平板中间挖一个正方形的小孔，四个箭头代表四个大小相等的力，如图~\ref{InfiniteExample}~。
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{./elements/fig/InfiniteExample.png}
-        \label{InfiniteExample}
         \caption{无限单元算例}
+        \label{InfiniteExample}
     \end{figure}
     
 
-    由于系统的高度对称性，只看一个节点的位移即可。结果见图\ref{InfiniteResult}。
+    由于系统的高度对称性，只看一个节点的位移即可。结果见图~\ref{InfiniteResult}~。
     \begin{table}
         \centering
-        \begin{tabular}[h][|c|c|]\hline
+        \begin{tabular}[h]{|c|c|}\hline
             &节点位移\\
             ABAQUS 结果&$5×10^-6$\\
             STAP 结果&$4.51231×10^-6$\\
             \hline
         \end{tabular}
-        \label{InfiniteResult}
         \caption{结果比较}
+        \label{InfiniteResult}
     \end{table}
 
     实际上，节点位移从理论上来看就不精确。另外，ABAQUS 用的也不是无限大平板——只是使用了一个非常大的平板而已。
