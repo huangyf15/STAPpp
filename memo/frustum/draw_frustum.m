@@ -34,21 +34,15 @@ w_FEM = 10*[0.00000e+00 3.05289e-09 9.85813e-09 2.37457e-08 ...
 
 % plot
 figure(1)
-plot(x_exact,w_exact,'r-');
-hold on
-plot(x_FEM,w_FEM,'k--');
-hold off
+plot(x_exact,w_exact,'r-',x_FEM,w_FEM,'k--');
+legend('exact solution','FEM solution');
 
 figure(2)
-plot(x_exact(1:100),w_exact(1:100),'r-');
-hold on
-plot(x_FEM(1:11),w_FEM(1:11),'k--');
-hold off
-
-figure(3)
-plot(x_exact(101:200),w_exact(101:200),'r-');
-hold on
-plot(x_FEM(12:21),w_FEM(12:21),'k--');
-hold off
+subplot(1,2,1)
+plot(x_exact(1:100),w_exact(1:100),'r-',x_FEM(1:11),w_FEM(1:11),'k--');
+legend('exact solution','FEM solution');
+subplot(1,2,2)
+plot(x_exact(101:200),w_exact(101:200),'r-',x_FEM(12:21),w_FEM(12:21),'k--');
+legend('exact solution','FEM solution');
 
 end
